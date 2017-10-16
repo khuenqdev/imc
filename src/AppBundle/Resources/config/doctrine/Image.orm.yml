@@ -1,0 +1,77 @@
+AppBundle\Entity\Image:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\ImageRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        filename:
+            type: string
+            length: 255
+        source:
+            type: string
+            length: '512'
+        hash:
+            type: string
+            length: 255
+        src:
+            type: string
+            length: '512'
+        path:
+            type: string
+            length: '512'
+        width:
+            type: integer
+        height:
+            type: integer
+        type:
+            type: string
+            length: '5'
+        alt:
+            type: string
+            length: '512'
+            nullable: true
+        author:
+            type: string
+            length: '128'
+            nullable: true
+        copyright:
+            type: string
+            length: 255
+            nullable: true
+        relatedTexts:
+            type: text
+            column: related_texts
+            nullable: true
+        latitude:
+            type: decimal
+            precision: 10
+            scale: '6'
+            nullable: true
+        longitude:
+            type: decimal
+            precision: 10
+            scale: '6'
+            nullable: true
+        locationName:
+            type: string
+            length: 255
+            nullable: true
+            column: location_name
+        isExifLocation:
+            type: boolean
+            nullable: true
+            column: is_exif_location
+        dateTaken:
+            type: datetime
+            nullable: true
+            column: date_taken
+        dateAcquired:
+            type: datetime
+            nullable: true
+            column: date_acquired
+    lifecycleCallbacks: {  }

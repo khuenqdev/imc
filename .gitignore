@@ -39,3 +39,19 @@
 
 # Backup entities generated with doctrine:generate:entities command
 **/Entity/*~
+.idea/
+.vagrant/
+.cache/
+vendor/
+.composer/
+.ssh/
+.ngrok2/
+.bash_aliases
+.bash_history
+.maria
+.my.cnf
+.sudo_as_admin_successful
+after.sh
+aliases
+Homestead.yaml
+Vagrantfile

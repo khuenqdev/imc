@@ -1,0 +1,42 @@
+AppBundle\Entity\Page:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\PageRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        parentId:
+            type: integer
+            column: parent_id
+        seedId:
+            type: integer
+            column: seed_id
+        url:
+            type: string
+            length: '512'
+        urlTitle:
+            type: string
+            length: '512'
+            column: url_title
+        host:
+            type: string
+            length: 255
+        title:
+            type: string
+            length: 255
+            nullable: true
+        text:
+            type: text
+            nullable: true
+        keywords:
+            type: string
+            length: '512'
+            nullable: true
+        relevance:
+            type: float
+            nullable: true
+    lifecycleCallbacks: {  }
