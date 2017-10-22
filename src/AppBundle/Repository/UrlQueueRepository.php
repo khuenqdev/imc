@@ -12,4 +12,27 @@ use Doctrine\ORM\EntityRepository;
  */
 class UrlQueueRepository extends EntityRepository
 {
+    /**
+     * Check whether the queue is empty
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        $qb = $this->createQueryBuilder('q');
+        $result = $qb->select($qb->expr()->count('q.id'))
+            ->getQuery()->getSingleScalarResult();
+
+        return ($result == 0);
+    }
+
+    public function addLink($link)
+    {
+
+    }
+
+    public function addLinks($links)
+    {
+
+    }
 }

@@ -8,12 +8,25 @@
 
 namespace AppBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
+use AppBundle\Services\CrawlerService;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ExecuteCommand extends Command
+class ExecuteCommand extends ContainerAwareCommand
 {
+    /**
+     * @var CrawlerService
+     */
+    private $crawler;
+
+    public function __construct($name = null)
+    {
+        parent::__construct($name);
+
+        $this->crawler = $this->getContainer()->get('srv.crawler');
+    }
+
     protected function configure()
     {
         $this->setName('crawler:execute')
@@ -23,5 +36,6 @@ class ExecuteCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->crawler->crawl();
     }
 }
