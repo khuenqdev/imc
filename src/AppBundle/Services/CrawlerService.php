@@ -23,6 +23,7 @@ class CrawlerService
     {
         $this->em = $em;
         $this->queue = $this->em->getRepository(UrlQueue::class);
+        $this->initializeQueue();
     }
 
     public function crawl()
@@ -36,31 +37,30 @@ class CrawlerService
 
     }
 
+    /**
+     * Initialize the priority queue
+     */
     protected function initializeQueue()
     {
-        if($this->queue->isEmpty()) {
-            // Find an unfinished seed
-            /** @var Seed $seed */
-            $seed = $this->em->getRepository(Seed::class)->findOneBy(array('finished' => false));
-
-            // Retrieve content of the page associated to the seed link
-            $page = new Page();
-            $page->setUrl($seed->getUrl())
-                ->setUrlTitle($seed->getTitle())
-                ->setSeedId($seed->getId())
-                ->setHost($seed->getHost())
-                ->fetch();
-
-            // Extract all links on the page and put them into the priority queue
-            $links = $page->extractLinks();
-            $this->queue->addLinks($links);
+        if (!$this->queue->isEmpty()) {
+            return;
         }
-    }
 
-    protected function getSeed()
-    {
         // Find an unfinished seed
-        return $this->em->getRepository(Seed::class)->findOneBy(array('finished' => false));
+        /** @var Seed $seed */
+        $seed = $this->em->getRepository(Seed::class)->findOneBy(array('finished' => false));
+
+        // Retrieve content of the page associated to the seed link
+        $page = new Page();
+        $page->setUrl($seed->getUrl())
+            ->setUrlTitle($seed->getTitle())
+            ->setSeedId($seed->getId())
+            ->setHost($seed->getHost())
+            ->fetch();
+
+        // Extract all links on the page and put them into the priority queue
+        $links = $page->extractLinks();
+        $this->queue->addLinks($links);
     }
 
 }

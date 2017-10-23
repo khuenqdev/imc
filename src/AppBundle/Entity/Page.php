@@ -3,6 +3,9 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use GuzzleHttp\Client as HttpClient;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Page
@@ -59,11 +62,15 @@ class Page
      */
     private $relevance;
 
+    /**
+     * @var string
+     */
+    private $html;
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -86,7 +93,7 @@ class Page
     /**
      * Get parentId
      *
-     * @return integer 
+     * @return integer
      */
     public function getParentId()
     {
@@ -109,7 +116,7 @@ class Page
     /**
      * Get seedId
      *
-     * @return integer 
+     * @return integer
      */
     public function getSeedId()
     {
@@ -132,7 +139,7 @@ class Page
     /**
      * Get url
      *
-     * @return string 
+     * @return string
      */
     public function getUrl()
     {
@@ -155,7 +162,7 @@ class Page
     /**
      * Get urlTitle
      *
-     * @return string 
+     * @return string
      */
     public function getUrlTitle()
     {
@@ -178,7 +185,7 @@ class Page
     /**
      * Get host
      *
-     * @return string 
+     * @return string
      */
     public function getHost()
     {
@@ -201,7 +208,7 @@ class Page
     /**
      * Get title
      *
-     * @return string 
+     * @return string
      */
     public function getTitle()
     {
@@ -224,7 +231,7 @@ class Page
     /**
      * Get text
      *
-     * @return string 
+     * @return string
      */
     public function getText()
     {
@@ -247,7 +254,7 @@ class Page
     /**
      * Get keywords
      *
-     * @return string 
+     * @return string
      */
     public function getKeywords()
     {
@@ -270,10 +277,22 @@ class Page
     /**
      * Get relevance
      *
-     * @return float 
+     * @return float
      */
     public function getRelevance()
     {
         return $this->relevance;
+    }
+
+    public function fetch()
+    {
+        $client = new HttpClient();
+
+        $resource = $client->request(Request::METHOD_GET, $this->url);
+
+        if ($resource->getStatusCode() == Response::HTTP_OK) {
+            $this->html = $resource->getBody();
+
+        }
     }
 }
