@@ -54,4 +54,4 @@ vendor/
 after.sh
 aliases
 Homestead.yaml
-Vagrantfile
+puphpet/config-custom.yaml
