@@ -19,14 +19,14 @@ vagrantfile:
                         check_guest_tools: 0
                         update_guest_tools: 0
                 machines:
-                    vflm_7b87vyjuiamu:
-                        id: crawler
-                        hostname: crawler.puphpet
+                    vflm_l56bm9ll3om6:
+                        id: imc
+                        hostname: imc.com
                         network:
                             private_network: 192.168.56.101
                             forwarded_port:
-                                vflmnfp_nei5y1tz71mh:
-                                    host: '9753'
+                                vflmnfp_5akcwu9l1jyf:
+                                    host: '6372'
                                     guest: '22'
                         memory: '2048'
                         cpus: '2'
@@ -40,7 +40,7 @@ vagrantfile:
                     - '--verbose'
                     - '--hiera_config /vagrant/puphpet/puppet/hiera.yaml'
         synced_folder:
-            vflsf_nvmg3mlegj6n:
+            vflsf_qft15g3ealgl:
                 owner: www-data
                 group: www-data
                 source: ./
@@ -128,17 +128,15 @@ nginx:
         names_hash_bucket_size: 128
     upstreams: {  }
     vhosts:
-        nxv_u4lj1xu0nji8:
+        nxv_8dhah7q0zd3u:
             server_name: imc.com
-            server_aliases:
-                - www.imc.com
-            www_root: /var/www/imc
+            www_root: /var/www
             listen_port: '80'
             client_max_body_size: 1m
             ssl: '0'
             locations:
-                nxvl_0hwq6vto8eu8:
-                    www_root: /var/www/imc/web
+                nxvl_bgnrtvs2xkpm:
+                    www_root: /var/www/web
                     location: /
                     autoindex: 'off'
                     internal: 'false'
@@ -146,7 +144,6 @@ nginx:
                         - index.html
                         - index.php
                         - app.php
-                        - app_dev.php
                     try_files:
                         - $uri
                         - $uri/
@@ -155,13 +152,10 @@ nginx:
                     fastcgi: ''
                     fastcgi_index: ''
                     fastcgi_split_path: ''
-                    set:
-                        - 'APP_ENV dev'
-                        - 'APP_DEBUG true'
                     proxy: ''
                     proxy_redirect: ''
-                nxvl_depf7iapjphw:
-                    www_root: /var/www/imc/web
+                nxvl_47lw9s1iesii:
+                    www_root: /var/www/web
                     location: '~ ^/(app_dev|config)\.php(/|$)'
                     autoindex: 'off'
                     internal: 'false'
@@ -179,8 +173,8 @@ nginx:
                         - '$path_info $fastcgi_path_info'
                     proxy: ''
                     proxy_redirect: ''
-                nxvl_nfla1catqsmr:
-                    www_root: /var/www/imc/web
+                nxvl_aca3t5facby2:
+                    www_root: /var/www/web
                     location: '~ ^/index\.php(/|$)'
                     autoindex: 'off'
                     internal: 'false'
@@ -197,8 +191,8 @@ nginx:
                         - '$path_info $fastcgi_path_info'
                     proxy: ''
                     proxy_redirect: ''
-                nxvl_mhunw0uxaark:
-                    www_root: /var/www/imc/web
+                nxvl_s9f4xia0c4az:
+                    www_root: /var/www/web
                     location: '~ ^/app\.php(/|$)'
                     autoindex: 'off'
                     internal: 'false'
@@ -231,11 +225,11 @@ apache:
         - proxy_fcgi
         - rewrite
     vhosts:
-        av_6i0o17g0dzvq:
-            servername: imc.com
+        av_g7f2bmsmlvft:
+            servername: awesome.dev
             serveraliases:
-                - www.imc.dev
-            docroot: /var/www/imc/web
+                - www.awesome.dev
+            docroot: /var/www/awesome/web
             port: '80'
             setenvif:
                 - 'Authorization "(.*)" HTTP_AUTHORIZATION=$1'
@@ -248,9 +242,9 @@ apache:
             ssl_protocol: ''
             ssl_cipher: ''
             directories:
-                avd_46qgjq5myspc:
-                    path: /var/www/imc/web
-                    directoryindex: 'index.php app.dev app_dev.php app.php'
+                avd_7x83woixobgz:
+                    path: /var/www/awesome/web
+                    directoryindex: 'index.php app.dev'
                     options:
                         - Indexes
                         - FollowSymlinks
@@ -262,21 +256,21 @@ apache:
                     custom_fragment: ''
                     provider: directory
             files_match:
-                avfm_83kw6s68lz04:
+                avfm_lbxdjkhphxq3:
                     path: (app_dev|config)\.php$
                     sethandler: 'proxy:fcgi://127.0.0.1:9000'
                     setenv:
                         - 'APP_ENV dev'
                     custom_fragment: ''
                     provider: filesmatch
-                avfm_8fcick5j97o5:
+                avfm_b98412qzz450:
                     path: app\.php$
                     sethandler: 'proxy:fcgi://127.0.0.1:9000'
                     setenv:
                         - 'APP_ENV prod'
                     custom_fragment: ''
                     provider: filesmatch
-                avfm_ox6yop5xk51i:
+                avfm_mu7qsid795il:
                     path: \.php$
                     sethandler: 'proxy:fcgi://127.0.0.1:9000'
                     custom_fragment: ''
@@ -296,6 +290,7 @@ php:
             - cli
             - intl
             - xml
+            - mbstring
         pear: {  }
         pecl: {  }
     ini:
@@ -306,7 +301,7 @@ php:
     fpm_ini:
         error_log: /var/log/php-fpm.log
     fpm_pools:
-        phpfp_vpz9ep9wieo8:
+        phpfp_objurciny3ey:
             ini:
                 prefix: www
                 listen: '127.0.0.1:9000'
@@ -349,7 +344,7 @@ drush:
 ruby:
     install: '1'
     versions:
-        rv_njjl17nvezrj:
+        rv_xz9sypdzwfci:
             default: '1'
             bundler: '1'
             version: 2.3.1
@@ -373,15 +368,12 @@ mariadb:
         root_password: root
         override_options: {  }
     users:
-        mariadbnu_zaegtlbbp7sz:
+        mariadbnu_poj4inpwn0oy:
             name: imc
             password: imc
-    databases:
-        mariadbnd_g0cf1jp3kjez:
-            name: imc
-            sql: ''
+    databases: {  }
     grants:
-        mariadbng_okgotsyn1v6u:
+        mariadbng_ti08nthtjr6p:
             user: imc
             table: '*.*'
             privileges:
@@ -393,15 +385,15 @@ mysql:
         root_password: '123'
         override_options: {  }
     users:
-        mysqlnu_93pt2q0v91ur:
+        mysqlnu_4495jvqtyhqj:
             name: dbuser
             password: '123'
     databases:
-        mysqlnd_58v85c5t9ckp:
+        mysqlnd_1oe4ksw00uxl:
             name: dbname
             sql: ''
     grants:
-        mysqlng_3v5ay7j3x7pj:
+        mysqlng_mbshgw5j73f7:
             user: dbuser
             table: '*.*'
             privileges:
@@ -464,7 +456,7 @@ elastic_search:
         version: 2.3.1
         java_install: true
     instances:
-        esi_oxx31yt1f7nl:
+        esi_0y6xkzn5bqqz:
             name: es-01
 solr:
     install: '0'

@@ -23,8 +23,6 @@ class ExecuteCommand extends ContainerAwareCommand
     public function __construct($name = null)
     {
         parent::__construct($name);
-
-        $this->crawler = $this->getContainer()->get('srv.crawler');
     }
 
     protected function configure()
