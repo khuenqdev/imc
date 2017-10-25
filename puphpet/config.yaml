@@ -371,7 +371,10 @@ mariadb:
         mariadbnu_poj4inpwn0oy:
             name: imc
             password: imc
-    databases: {  }
+    databases:
+        mariadbnd_g6i063fkogep:
+            name: imc
+            sql: ''
     grants:
         mariadbng_ti08nthtjr6p:
             user: imc
