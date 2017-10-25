@@ -52,11 +52,11 @@ class CrawlerService
 
         // Retrieve content of the page associated to the seed link
         $page = new Page();
-        $page->setUrl($seed->getUrl())
+        $html = $page->setUrl($seed->getUrl())
             ->setUrlTitle($seed->getTitle())
             ->setSeedId($seed->getId())
             ->setHost($seed->getHost())
-            ->fetch();
+            ->getHtml();
 
         // Extract all links on the page and put them into the priority queue
         $links = $page->extractLinks();

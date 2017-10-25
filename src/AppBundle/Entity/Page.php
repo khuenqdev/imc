@@ -3,9 +3,6 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use GuzzleHttp\Client as HttpClient;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Page
@@ -66,6 +63,16 @@ class Page
      * @var string
      */
     private $html;
+
+    /**
+     * @var \DOMDocument
+     */
+    private $dom;
+
+    /**
+     * @var array
+     */
+    private $links;
 
     /**
      * Get id
@@ -284,15 +291,72 @@ class Page
         return $this->relevance;
     }
 
-    public function fetch()
+    /**
+     * Set raw HTML content
+     *
+     * @param $html
+     * @return $this
+     */
+    public function setHtml($html)
     {
-        $client = new HttpClient();
+        $this->html = $html;
 
-        $resource = $client->request(Request::METHOD_GET, $this->url);
+        return $this;
+    }
 
-        if ($resource->getStatusCode() == Response::HTTP_OK) {
-            $this->html = $resource->getBody();
+    /**
+     * Retrieve raw HTML content of a page
+     *
+     * @return string
+     */
+    public function getHtml()
+    {
+        return $this->html;
+    }
 
-        }
+    /**
+     * Set links
+     *
+     * @param $links
+     * @return $this
+     */
+    public function setLinks($links)
+    {
+        $this->links = $links;
+
+        return $this;
+    }
+
+    /**
+     * Get links
+     *
+     * @return array
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * Set DOM object
+     *
+     * @param $dom
+     * @return $this
+     */
+    public function setDom($dom)
+    {
+        $this->dom = $dom;
+
+        return $this;
+    }
+
+    /**
+     * Get DOM object
+     *
+     * @return \DOMDocument
+     */
+    public function getDom()
+    {
+        return $this->dom;
     }
 }
