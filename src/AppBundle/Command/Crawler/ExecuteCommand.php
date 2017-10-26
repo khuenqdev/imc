@@ -6,7 +6,7 @@
  * Time: 19:45
  */
 
-namespace AppBundle\Command;
+namespace AppBundle\Command\Crawler;
 
 use AppBundle\Services\CrawlerService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
