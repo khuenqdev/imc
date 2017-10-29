@@ -8,6 +8,21 @@ services:
     #    class: AppBundle\Directory\ClassName
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
 
+    # Services
     srv.crawler:
         class: AppBundle\Services\CrawlerService
         arguments: ['@doctrine.orm.entity_manager']
+
+    # Helpers
+    hlp.string:
+        class: AppBundle\Services\Helpers\String
+
+    hlp.url:
+        class: AppBundle\Services\Helpers\Url
+
+    # Components
+    cpn.downloader:
+        class: AppBundle\Components\Downloader
+        arguments: ['@logger','@doctrine.orm.entity_manager', '@hlp.string', '@hlp.url']
+        tags:
+            - { name: monolog.logger, channel: imc }

@@ -21,6 +21,11 @@ monolog:
         console:
             type: console
             channels: ['!event', '!doctrine']
+        imc:
+            type: stream
+            path: '%kernel.logs_dir%/imc.log'
+            level: debug
+            channels: imc
         # uncomment to get logging in your browser
         # you may have to allow bigger header sizes in your Web server configuration
         #firephp:

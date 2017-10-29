@@ -8,6 +8,7 @@
 
 namespace AppBundle\Components;
 
+use AppBundle\Entity\Link;
 use AppBundle\Entity\Page;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as HttpClient;
@@ -15,9 +16,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Services\Helpers\String as StringHelper;
 use AppBundle\Services\Helpers\Url as UrlHelper;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 class Downloader
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     /**
      * @var EntityManager
      */
@@ -33,23 +40,26 @@ class Downloader
      */
     private $urlHelper;
 
-    public function __construct(EntityManager $em, StringHelper $stringHelper, UrlHelper $urlHelper)
+    public function __construct(LoggerInterface $logger, EntityManager $em, StringHelper $stringHelper, UrlHelper $urlHelper)
     {
-
+        $this->em = $em;
+        $this->stringHelper = $stringHelper;
+        $this->urlHelper = $urlHelper;
+        $this->logger = $logger;
     }
 
     /**
      * Retrieve a page's data
      *
      * @param Page $page
-     * @throws \Exception
      */
     public function retrieve(Page $page)
     {
         if (!$page->getHtml()) {
 
             if (!$page->getUrl()) {
-                throw new \Exception("Unable to fetch page: Page URL reference must not be empty!");
+                $this->logger->notice("Unable to fetch page: Page URL reference must not be empty!");
+                return;
             }
 
             $client = new HttpClient();
@@ -57,34 +67,52 @@ class Downloader
             $resource = $client->request(Request::METHOD_GET, $page->getUrl());
 
             if ($resource->getStatusCode() == Response::HTTP_OK) {
-                $page->setHtml($resource->getBody());
-
+                // Create DOM object from page's HTML content
                 $dom = new \DOMDocument();
-                @$dom->loadHTML($page->getHtml());
+                @$dom->loadHTML($resource->getBody());
 
-                $page->setDom($dom)
-                    ->setTitle($dom->getElementsByTagName('title')->item(0)->textContent);
+                if ($dom) {
+                    // Update page data
+                    $page->setDom($dom)
+                        ->setTitle($dom->getElementsByTagName('title')->item(0)->textContent);
 
-                $this->extractLinks($dom);
+                    // Extract page URL
+                    $this->extractUrls($dom, $page->getUrl());
+                }
             }
         }
 
+        $this->em->persist($page);
+        $this->em->flush();
     }
 
-    protected function extractLinks(\DOMDocument $dom)
+    /**
+     * Extract page's URLs, calculate their relevance and add them to the queue
+     *
+     * @param \DOMDocument $dom
+     * @param $baseUrl
+     */
+    protected function extractUrls(\DOMDocument $dom, $baseUrl)
     {
         $linkElements = $dom->getElementsByTagName('a');
 
-        $links = array();
-
         /** @var \DOMElement $linkElement */
         foreach ($linkElements as $linkElement) {
+            // Parse the Hyper Reference to obtain valid URL
+            $url = $this->urlHelper->parse($linkElement->getAttribute('href'), $baseUrl);
 
-            // Get the Hypertext Reference attribute of the link
-            $href = $linkElement->getAttribute('href');
+            if ($url) {
+                // @todo Calculate URL relevance
+                $relevance = 1;
 
-            // Parse the reference to obtain URL reference
-            $url = $this->urlHelper->parse($href);
+                // Create a link entity
+                $link = new Link();
+                $link->setUrl($url)
+                    ->setTitle($linkElement->nodeValue)
+                    ->setRelevance($relevance);
+
+                $this->em->persist($link);
+            }
         }
     }
 }

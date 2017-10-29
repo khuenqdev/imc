@@ -1,7 +1,7 @@
-AppBundle\Entity\UrlQueue:
+AppBundle\Entity\Link:
     type: entity
     table: null
-    repositoryClass: AppBundle\Repository\UrlQueueRepository
+    repositoryClass: AppBundle\Repository\LinkRepository
     id:
         id:
             type: integer
@@ -9,20 +9,11 @@ AppBundle\Entity\UrlQueue:
             generator:
                 strategy: AUTO
     fields:
-        parentId:
-            type: integer
-            column: parent_id
-        seedId:
-            type: integer
-            column: seed_id
         url:
             type: string
             length: '512'
-        urlTitle:
-            type: string
-            length: '512'
-            column: url_title
-        host:
+            unique: true
+        title:
             type: string
             length: 255
         relevance:
