@@ -8,6 +8,12 @@ AppBundle\Entity\Image:
             id: true
             generator:
                 strategy: AUTO
+    manyToOne:
+        page:
+            targetEntity: AppBundle\Entity\Page
+            joinColumn:
+                name: page_id
+                referenceColumnName: id
     fields:
         filename:
             type: string

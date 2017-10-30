@@ -24,8 +24,19 @@ class Queue
         $this->em = $em;
     }
 
+    /**
+     * Get the next link in queue, which is actually the most relevant one
+     *
+     * @return bool|Link
+     */
     public function getNextLink()
     {
-        $nextLink = $this->em->getRepository(Link::class)->getMostRelevantLink();
+        $res = $this->em->getRepository(Link::class)->getMostRelevantLink();
+
+        if (empty($res)) {
+            return false;
+        }
+
+        return array_shift($res);
     }
 }

@@ -8,20 +8,23 @@ AppBundle\Entity\Page:
             id: true
             generator:
                 strategy: AUTO
+    oneToMany:
+        links:
+            targetEntity: AppBundle\Entity\Link
+            mappedBy: AppBundle\Entity\Page
+        images:
+            targetEntity: AppBundle\Entity\Image
+            mappedBy: AppBundle\Entity\Page
+    manyToOne:
+        parent:
+            targetEntity: AppBundle\Entity\Page
+            joinColumn:
+                name: parent_id
+                referenceColumnName: id
     fields:
-        parentId:
-            type: integer
-            column: parent_id
-        seedId:
-            type: integer
-            column: seed_id
         url:
             type: string
             length: '512'
-        urlTitle:
-            type: string
-            length: '512'
-            column: url_title
         host:
             type: string
             length: 255

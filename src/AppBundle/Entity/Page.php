@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -70,7 +71,7 @@ class Page
     private $dom;
 
     /**
-     * @var array
+     * @var Collection
      */
     private $links;
 
@@ -320,7 +321,7 @@ class Page
      * @param $links
      * @return $this
      */
-    public function setLinks($links)
+    public function setLinks(Collection $links)
     {
         $this->links = $links;
 
@@ -330,11 +331,26 @@ class Page
     /**
      * Get links
      *
-     * @return array
+     * @return Collection
      */
     public function getLinks()
     {
         return $this->links;
+    }
+
+    /**
+     * Add a link to page entity
+     *
+     * @param Link $link
+     * @return $this
+     */
+    public function addLink(Link $link)
+    {
+        if(!$this->links->contains($link)) {
+            $this->links->add($link);
+        }
+
+        return $this;
     }
 
     /**

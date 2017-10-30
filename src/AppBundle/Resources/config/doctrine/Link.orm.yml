@@ -8,14 +8,22 @@ AppBundle\Entity\Link:
             id: true
             generator:
                 strategy: AUTO
+    manyToOne:
+        page:
+            targetEntity: AppBundle\Entity\Page
+            joinColumn:
+                name: page_id
+                referenceColumnName: id
     fields:
         url:
             type: string
             length: '512'
-            unique: true
+            unique: false
         title:
             type: string
             length: 255
+        visited:
+            type: boolean
         relevance:
             type: float
     lifecycleCallbacks: {  }

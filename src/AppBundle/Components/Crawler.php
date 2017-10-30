@@ -1,10 +1,9 @@
 <?php
 
-namespace AppBundle\Services;
+namespace AppBundle\Components;
 
 use AppBundle\Entity\Page;
 use AppBundle\Entity\Seed;
-use AppBundle\Entity\UrlQueue;
 use Doctrine\ORM\EntityManager;
 
 /**
@@ -13,24 +12,23 @@ use Doctrine\ORM\EntityManager;
  * Date: 19-Oct-17
  * Time: 19:43
  */
-class CrawlerService
+class Crawler
 {
-
     protected $em;
     protected $queue;
 
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, Queue $queue)
     {
         $this->em = $em;
-        $this->queue = $this->em->getRepository(UrlQueue::class);
+        $this->queue = $queue;
         $this->initializeQueue();
     }
 
     public function crawl()
     {
-        $seed = $this->getSeed();
+        $link = $this->queue->getNextLink();
 
-        if (!$seed) {
+        if (!$link) {
             return;
         }
 

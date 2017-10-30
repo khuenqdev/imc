@@ -13,6 +13,11 @@ class Link
     private $id;
 
     /**
+     * @var Page
+     */
+    private $page;
+
+    /**
      * @var string
      */
     private $url;
@@ -21,6 +26,11 @@ class Link
      * @var string
      */
     private $title;
+
+    /**
+     * @var bool
+     */
+    private $visited;
 
     /**
      * @var float
@@ -108,6 +118,62 @@ class Link
     public function getRelevance()
     {
         return $this->relevance;
+    }
+
+    /**
+     * Set page
+     *
+     * @param Page $page
+     * @return $this
+     */
+    public function setPage(Page $page)
+    {
+        $this->page = $page;
+
+        return $this;
+    }
+
+    /**
+     * Get page
+     *
+     * @return Page
+     */
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
+     * Set visited
+     *
+     * @param bool $visited
+     * @return $this
+     */
+    public function setVisited($visited)
+    {
+        $this->visited = $visited;
+
+        return $this;
+    }
+
+    /**
+     * Get visited
+     *
+     * @return bool
+     */
+    public function getVisited()
+    {
+        return $this->visited;
+    }
+
+    /**
+     * Alias of getVisited()
+     *
+     * @return bool
+     */
+    public function isVisited()
+    {
+        return $this->getVisited();
     }
 }
 

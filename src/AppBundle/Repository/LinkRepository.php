@@ -13,9 +13,9 @@ class LinkRepository extends \Doctrine\ORM\EntityRepository
     public function getMostRelevantLink()
     {
         $qb = $this->createQueryBuilder('l');
-        $qb->select('l, MAX(l.relevance) as HIDDEN max_relevance')
+        /*$qb->select('l, MAX(l.relevance) as HIDDEN max_relevance')
             ->setMaxResults(1)
-            ->orderBy('max_relevance', 'DESC');
+            ->orderBy('max_relevance', 'DESC');*/
 
         return $qb->getQuery()->getResult();
     }

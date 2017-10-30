@@ -40,6 +40,14 @@ class Downloader
      */
     private $urlHelper;
 
+    /**
+     * Downloader constructor.
+     *
+     * @param LoggerInterface $logger
+     * @param EntityManager $em
+     * @param StringHelper $stringHelper
+     * @param UrlHelper $urlHelper
+     */
     public function __construct(LoggerInterface $logger, EntityManager $em, StringHelper $stringHelper, UrlHelper $urlHelper)
     {
         $this->em = $em;
@@ -53,19 +61,23 @@ class Downloader
      *
      * @param Page $page
      */
-    public function retrieve(Page $page)
+    public function download(Page $page)
     {
         if (!$page->getHtml()) {
 
+            // Bypass the current page if its URL is empty
             if (!$page->getUrl()) {
                 $this->logger->notice("Unable to fetch page: Page URL reference must not be empty!");
                 return;
             }
 
+            // Create a new HTTP client
             $client = new HttpClient();
 
+            // Request for resource
             $resource = $client->request(Request::METHOD_GET, $page->getUrl());
 
+            // Check if our request returns valid response
             if ($resource->getStatusCode() == Response::HTTP_OK) {
                 // Create DOM object from page's HTML content
                 $dom = new \DOMDocument();
@@ -76,12 +88,16 @@ class Downloader
                     $page->setDom($dom)
                         ->setTitle($dom->getElementsByTagName('title')->item(0)->textContent);
 
-                    // Extract page URL
-                    $this->extractUrls($dom, $page->getUrl());
+                    // Extract links on page and save them to the database
+                    $this->extractLinks($page, $dom);
+
+                    // Download images on the page
+                    $this->downloadImages($page, $dom);
                 }
             }
         }
 
+        // Save page changes and flush all entities
         $this->em->persist($page);
         $this->em->flush();
     }
@@ -89,17 +105,17 @@ class Downloader
     /**
      * Extract page's URLs, calculate their relevance and add them to the queue
      *
+     * @param Page $page
      * @param \DOMDocument $dom
-     * @param $baseUrl
      */
-    protected function extractUrls(\DOMDocument $dom, $baseUrl)
+    protected function extractLinks(Page &$page, \DOMDocument $dom)
     {
         $linkElements = $dom->getElementsByTagName('a');
 
         /** @var \DOMElement $linkElement */
         foreach ($linkElements as $linkElement) {
             // Parse the Hyper Reference to obtain valid URL
-            $url = $this->urlHelper->parse($linkElement->getAttribute('href'), $baseUrl);
+            $url = $this->urlHelper->parse($linkElement->getAttribute('href'), $page->getUrl());
 
             if ($url) {
                 // @todo Calculate URL relevance
@@ -111,8 +127,19 @@ class Downloader
                     ->setTitle($linkElement->nodeValue)
                     ->setRelevance($relevance);
 
-                $this->em->persist($link);
+                $page->addLink($link);
             }
         }
+    }
+
+    /**
+     * Download images from a page
+     *
+     * @param Page $page
+     * @param \DOMDocument $dom
+     */
+    protected function downloadImages(Page &$page, \DOMDocument $dom)
+    {
+
     }
 }
