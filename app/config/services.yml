@@ -9,9 +9,6 @@ services:
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
 
     # Services
-    srv.crawler:
-        class: AppBundle\Services\CrawlerService
-        arguments: ['@doctrine.orm.entity_manager']
 
     # Helpers
     hlp.string:
@@ -21,6 +18,14 @@ services:
         class: AppBundle\Services\Helpers\Url
 
     # Components
+    cpn.queue:
+        class: AppBundle\Components\Queue
+        arguments: []
+
+    cpn.crawler:
+        class: AppBundle\Components\Crawler
+        arguments: ['@doctrine.orm.entity_manager', '@cpn.queue']
+
     cpn.downloader:
         class: AppBundle\Components\Downloader
         arguments: ['@logger','@doctrine.orm.entity_manager', '@hlp.string', '@hlp.url']

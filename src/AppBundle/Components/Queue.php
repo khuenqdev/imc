@@ -10,33 +10,16 @@ namespace AppBundle\Components;
 
 
 use AppBundle\Entity\Link;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
-class Queue
+class Queue extends ArrayCollection implements Collection
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
-    }
-
-    /**
-     * Get the next link in queue, which is actually the most relevant one
-     *
-     * @return bool|Link
-     */
     public function getNextLink()
     {
-        $res = $this->em->getRepository(Link::class)->getMostRelevantLink();
+        $this->filter(function() {
 
-        if (empty($res)) {
-            return false;
-        }
-
-        return array_shift($res);
+        });
     }
 }
