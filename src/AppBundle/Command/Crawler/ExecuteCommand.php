@@ -8,7 +8,7 @@
 
 namespace AppBundle\Command\Crawler;
 
-use AppBundle\Services\CrawlerService;
+use AppBundle\Components\Crawler;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ExecuteCommand extends ContainerAwareCommand
 {
     /**
-     * @var CrawlerService
+     * @var Crawler
      */
     private $crawler;
 
