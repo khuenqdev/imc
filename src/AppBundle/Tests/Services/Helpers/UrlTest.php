@@ -1,4 +1,7 @@
 <?php
+
+namespace AppBundle\Tests\Helpers;
+
 /**
  * Created by PhpStorm.
  * User: khuen
