@@ -37,7 +37,6 @@ class Link
      */
     private $relevance;
 
-
     /**
      * Get id
      *

@@ -17,36 +17,76 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Queue
      */
-    private $service;
+    private $queue;
 
     public function setUp()
     {
-        $this->service = new Queue();
+        $this->queue = new Queue();
+        $this->createTestLinks();
+
     }
 
+    /**
+     * Test adding links
+     */
     public function testAddLink()
     {
-        $link1 = new Link();
-        $link1->setRelevance(0.7);
+        $link = new Link();
+        $link->setRelevance(0.3);
+        $this->queue->addLink($link);
+        $this->assertSame(0.5, $this->queue->getFirstLink()->getRelevance());
+        $this->assertSame(6, $this->queue->getLength());
 
-        $link2 = new Link();
-        $link2->setRelevance(0.1);
+        $linkMax = new Link();
+        $linkMax->setRelevance(0.9);
+        $this->queue->addLink($linkMax);
+        $this->assertSame(0.9, $this->queue->getFirstLink()->getRelevance());
+        $this->assertSame(7, $this->queue->getLength());
+    }
 
-        $link3 = new Link();
-        $link3->setRelevance(0.9);
+    /**
+     * Test get relevance tree
+     */
+    public function testGetRelevanceTree()
+    {
+        $heap = $this->queue->getRelevanceTree();
 
-        $link4 = new Link();
-        $link4->setRelevance(0.3);
+        $first = reset($heap);
+        $last = end($heap);
 
-        $this->service->addLink($link1)
-            ->addLink($link2)
-            ->addLink($link3)
-            ->addLink($link4);
+        $this->assertSame(0.5, $first['current']);
+        $this->assertSame(0.4, $first['left']);
+        $this->assertSame(0.2, $first['right']);
+        $this->assertSame(0.3, $last['current']);
+        $this->assertSame(0.4, $last['parent']);
+    }
 
-        $this->assertSame(4, $this->service->getLength());
-        $this->assertSame($link3, $this->service->getFirstLink());
-        $this->assertSame($link2, $this->service->getLastLink());
+    /**
+     * Test get next link from the queue
+     */
+    public function testGetNextLink()
+    {
+        $expected = [0.4, 0.3, 0.2, 0.1];
+        $len = $this->queue->getLength();
 
-        var_dump($this->service->getAllLinks());
+        foreach($expected as $ex) {
+            $this->queue->getNextLink();
+            $this->assertSame($ex, $this->queue->getFirstLink()->getRelevance());
+            $this->assertSame(--$len, $this->queue->getLength());
+        }
+    }
+
+    /**
+     * Create test links
+     */
+    private function createTestLinks()
+    {
+        $rel = 0.0;
+        for ($i = 0; $i < 5; $i++) {
+            $l = new Link();
+            $rel += 0.1;
+            $l->setRelevance($rel);
+            $this->queue->addLink($l);
+        }
     }
 }
