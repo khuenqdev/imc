@@ -21,6 +21,12 @@ class Queue
 
     private $length = 0;
 
+    /**
+     * Add a link to the queue
+     *
+     * @param Link $link
+     * @return $this
+     */
     public function addLink(Link $link)
     {
         // 1. Place the link at the end of the heap
@@ -72,6 +78,42 @@ class Queue
     public function getNextLink()
     {
 
+    }
+
+    /**
+     * Get all links in the queue
+     *
+     * @param bool $asHeap
+     * @return array
+     */
+    public function getAllLinks($asHeap = false)
+    {
+        if ($asHeap) {
+            // @todo build a link heap for better presentation
+            $heap = $this->buildLinkHeap();
+
+            return $heap;
+        }
+
+        return $this->links;
+    }
+
+    /**
+     * Get the total number of elements in the queue
+     *
+     * @return int
+     */
+    public function getLength()
+    {
+        return $this->length;
+    }
+
+    /**
+     * Build a link heap
+     */
+    private function buildLinkHeap()
+    {
+        return [];
     }
 
 }

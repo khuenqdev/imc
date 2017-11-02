@@ -12,7 +12,7 @@ use AppBundle\Entity\Link;
  * Time: 15:39
  */
 
-class QueueTest extends PHPUnit_Framework_TestCase
+class QueueTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Queue
@@ -43,8 +43,10 @@ class QueueTest extends PHPUnit_Framework_TestCase
             ->addLink($link3)
             ->addLink($link4);
 
-        $link = $this->service->getFirstLink();
+        $this->assertSame(4, $this->service->getLength());
+        $this->assertSame($link3, $this->service->getFirstLink());
+        $this->assertSame($link2, $this->service->getLastLink());
 
-        $this->assertSame($link3, $link);
+        var_dump($this->service->getAllLinks());
     }
 }
