@@ -61,7 +61,7 @@ class Downloader
      *
      * @param Page $page
      */
-    public function download(Page $page)
+    public function download(Page &$page)
     {
         if (!$page->getHtml()) {
 

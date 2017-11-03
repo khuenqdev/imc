@@ -19,6 +19,20 @@ class Queue
      */
     private $links = [];
 
+    public function __construct()
+    {
+        $this->initialize();
+    }
+
+    /**
+     * Initialize the queue with unvisited links
+     * from the database
+     */
+    private function initialize()
+    {
+
+    }
+
     /**
      * Add a set of links to the queue
      *

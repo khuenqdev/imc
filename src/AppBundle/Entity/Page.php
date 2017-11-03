@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,24 +17,14 @@ class Page
     private $id;
 
     /**
-     * @var int
+     * @var Page
      */
-    private $parentId;
-
-    /**
-     * @var int
-     */
-    private $seedId;
+    private $parent;
 
     /**
      * @var string
      */
     private $url;
-
-    /**
-     * @var string
-     */
-    private $urlTitle;
 
     /**
      * @var string
@@ -46,19 +37,14 @@ class Page
     private $title;
 
     /**
-     * @var string
+     * @var Text
      */
     private $text;
 
     /**
-     * @var string
+     * @var Collection
      */
     private $keywords;
-
-    /**
-     * @var float
-     */
-    private $relevance;
 
     /**
      * @var string
@@ -76,6 +62,28 @@ class Page
     private $links;
 
     /**
+     * @var Collection
+     */
+    private $images;
+
+    /**
+     * Page constructor.
+     *
+     * @param $url
+     * @param $title
+     * @param null $parent
+     */
+    public function __construct($url, $title = '', $parent = null)
+    {
+        $this->url = $url;
+        $this->title = $title;
+        $this->parent = $parent;
+        $this->keywords = new ArrayCollection();
+        $this->links = new ArrayCollection();
+        $this->images = new ArrayCollection();
+    }
+
+    /**
      * Get id
      *
      * @return integer
@@ -86,49 +94,26 @@ class Page
     }
 
     /**
-     * Set parentId
+     * Set parent
      *
-     * @param integer $parentId
+     * @param integer $parent
      * @return Page
      */
-    public function setParentId($parentId)
+    public function setParent($parent)
     {
-        $this->parentId = $parentId;
+        $this->parent = $parent;
 
         return $this;
     }
 
     /**
-     * Get parentId
+     * Get parent
      *
-     * @return integer
-     */
-    public function getParentId()
-    {
-        return $this->parentId;
-    }
-
-    /**
-     * Set seedId
-     *
-     * @param integer $seedId
      * @return Page
      */
-    public function setSeedId($seedId)
+    public function getParent()
     {
-        $this->seedId = $seedId;
-
-        return $this;
-    }
-
-    /**
-     * Get seedId
-     *
-     * @return integer
-     */
-    public function getSeedId()
-    {
-        return $this->seedId;
+        return $this->parent;
     }
 
     /**
@@ -152,29 +137,6 @@ class Page
     public function getUrl()
     {
         return $this->url;
-    }
-
-    /**
-     * Set urlTitle
-     *
-     * @param string $urlTitle
-     * @return Page
-     */
-    public function setUrlTitle($urlTitle)
-    {
-        $this->urlTitle = $urlTitle;
-
-        return $this;
-    }
-
-    /**
-     * Get urlTitle
-     *
-     * @return string
-     */
-    public function getUrlTitle()
-    {
-        return $this->urlTitle;
     }
 
     /**
@@ -226,7 +188,7 @@ class Page
     /**
      * Set text
      *
-     * @param string $text
+     * @param Text $text
      * @return Page
      */
     public function setText($text)
@@ -239,7 +201,7 @@ class Page
     /**
      * Get text
      *
-     * @return string
+     * @return Text
      */
     public function getText()
     {
@@ -249,7 +211,7 @@ class Page
     /**
      * Set keywords
      *
-     * @param string $keywords
+     * @param Collection $keywords
      * @return Page
      */
     public function setKeywords($keywords)
@@ -262,7 +224,7 @@ class Page
     /**
      * Get keywords
      *
-     * @return string
+     * @return Collection
      */
     public function getKeywords()
     {
@@ -270,26 +232,19 @@ class Page
     }
 
     /**
-     * Set relevance
+     * Add a keyword
      *
-     * @param float $relevance
-     * @return Page
+     * @param Keyword $keyword
+     * @return $this
      */
-    public function setRelevance($relevance)
+    public function addKeyword(Keyword $keyword)
     {
-        $this->relevance = $relevance;
+        if (!$this->keywords->contains($keyword)) {
+            $this->keywords->add($keyword);
+            $keyword->setPage($this);
+        }
 
         return $this;
-    }
-
-    /**
-     * Get relevance
-     *
-     * @return float
-     */
-    public function getRelevance()
-    {
-        return $this->relevance;
     }
 
     /**
@@ -346,8 +301,48 @@ class Page
      */
     public function addLink(Link $link)
     {
-        if(!$this->links->contains($link)) {
+        if (!$this->links->contains($link)) {
             $this->links->add($link);
+            $link->setPage($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set images
+     *
+     * @param $images
+     * @return $this
+     */
+    public function setImages($images)
+    {
+        $this->images = $images;
+
+        return $this;
+    }
+
+    /**
+     * Get images
+     *
+     * @return ArrayCollection|Collection
+     */
+    public function getImages()
+    {
+        return $this->images;
+    }
+
+    /**
+     * Add an image
+     *
+     * @param Image $image
+     * @return $this
+     */
+    public function addImage(Image $image)
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setPage($this);
         }
 
         return $this;

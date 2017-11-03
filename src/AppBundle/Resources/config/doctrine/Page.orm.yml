@@ -15,6 +15,15 @@ AppBundle\Entity\Page:
         images:
             targetEntity: AppBundle\Entity\Image
             mappedBy: AppBundle\Entity\Page
+        keywords:
+            targetEntity: AppBundle\Entity\Keyword
+            mappedBy: AppBundle\Entity\Page
+    oneToOne:
+        text:
+            targetEntity: AppBundle\Entity\Text
+            joinColumn:
+                name: text_id
+                referencedColumnName: id
     manyToOne:
         parent:
             targetEntity: AppBundle\Entity\Page
@@ -31,15 +40,5 @@ AppBundle\Entity\Page:
         title:
             type: string
             length: 255
-            nullable: true
-        text:
-            type: text
-            nullable: true
-        keywords:
-            type: string
-            length: '512'
-            nullable: true
-        relevance:
-            type: float
             nullable: true
     lifecycleCallbacks: {  }

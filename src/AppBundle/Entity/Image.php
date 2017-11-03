@@ -104,11 +104,15 @@ class Image
      */
     private $dateAcquired;
 
+    /**
+     * @var Page
+     */
+    private $page;
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -131,7 +135,7 @@ class Image
     /**
      * Get filename
      *
-     * @return string 
+     * @return string
      */
     public function getFilename()
     {
@@ -154,7 +158,7 @@ class Image
     /**
      * Get source
      *
-     * @return string 
+     * @return string
      */
     public function getSource()
     {
@@ -177,7 +181,7 @@ class Image
     /**
      * Get hash
      *
-     * @return string 
+     * @return string
      */
     public function getHash()
     {
@@ -200,7 +204,7 @@ class Image
     /**
      * Get src
      *
-     * @return string 
+     * @return string
      */
     public function getSrc()
     {
@@ -223,7 +227,7 @@ class Image
     /**
      * Get path
      *
-     * @return string 
+     * @return string
      */
     public function getPath()
     {
@@ -246,7 +250,7 @@ class Image
     /**
      * Get width
      *
-     * @return integer 
+     * @return integer
      */
     public function getWidth()
     {
@@ -269,7 +273,7 @@ class Image
     /**
      * Get height
      *
-     * @return integer 
+     * @return integer
      */
     public function getHeight()
     {
@@ -292,7 +296,7 @@ class Image
     /**
      * Get type
      *
-     * @return string 
+     * @return string
      */
     public function getType()
     {
@@ -315,7 +319,7 @@ class Image
     /**
      * Get alt
      *
-     * @return string 
+     * @return string
      */
     public function getAlt()
     {
@@ -338,7 +342,7 @@ class Image
     /**
      * Get author
      *
-     * @return string 
+     * @return string
      */
     public function getAuthor()
     {
@@ -361,7 +365,7 @@ class Image
     /**
      * Get copyright
      *
-     * @return string 
+     * @return string
      */
     public function getCopyright()
     {
@@ -384,7 +388,7 @@ class Image
     /**
      * Get relatedTexts
      *
-     * @return string 
+     * @return string
      */
     public function getRelatedTexts()
     {
@@ -407,7 +411,7 @@ class Image
     /**
      * Get latitude
      *
-     * @return string 
+     * @return string
      */
     public function getLatitude()
     {
@@ -430,7 +434,7 @@ class Image
     /**
      * Get longitude
      *
-     * @return string 
+     * @return string
      */
     public function getLongitude()
     {
@@ -453,7 +457,7 @@ class Image
     /**
      * Get locationName
      *
-     * @return string 
+     * @return string
      */
     public function getLocationName()
     {
@@ -476,7 +480,7 @@ class Image
     /**
      * Get isExifLocation
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getIsExifLocation()
     {
@@ -499,7 +503,7 @@ class Image
     /**
      * Get dateTaken
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDateTaken()
     {
@@ -522,10 +526,33 @@ class Image
     /**
      * Get dateAcquired
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDateAcquired()
     {
         return $this->dateAcquired;
+    }
+
+    /**
+     * Set page
+     *
+     * @param Page $page
+     * @return $this
+     */
+    public function setPage(Page $page)
+    {
+        $this->page = $page;
+
+        return $this;
+    }
+
+    /**
+     * Get page
+     *
+     * @return Page
+     */
+    public function getPage()
+    {
+        return $this->page;
     }
 }

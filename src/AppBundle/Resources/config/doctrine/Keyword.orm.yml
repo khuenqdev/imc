@@ -1,0 +1,28 @@
+AppBundle\Entity\Keyword:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\KeywordRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    manyToOne:
+        page:
+            targetEntity: AppBundle\Entity\Page
+            joinColumn:
+                name: page_id
+                referenceColumnName: id
+    fields:
+        word:
+            type: string
+            length: 255
+            unique: true
+        tf:
+            type: float
+            nullable: true
+        idf:
+            type: float
+            nullable: true
+    lifecycleCallbacks: {  }
