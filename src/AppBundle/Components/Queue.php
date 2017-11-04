@@ -9,6 +9,7 @@
 namespace AppBundle\Components;
 
 use AppBundle\Entity\Link;
+use Doctrine\ORM\EntityManager;
 
 class Queue
 {
@@ -19,8 +20,19 @@ class Queue
      */
     private $links = [];
 
-    public function __construct()
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    /**
+     * Queue constructor.
+     *
+     * @param EntityManager $em
+     */
+    public function __construct(EntityManager $em)
     {
+        $this->em = $em;
         $this->initialize();
     }
 
@@ -30,7 +42,12 @@ class Queue
      */
     private function initialize()
     {
+        // Find all unvisited links
+        $links = $this->em->getRepository(Link::class)->findBy([
+            'visited' => false
+        ]);
 
+        $this->addLinks($links);
     }
 
     /**
@@ -111,6 +128,10 @@ class Queue
     {
         // The next link is the first link in queue
         $next = reset($this->links);
+
+        if (!$next) {
+            return false;
+        }
 
         /** Reorganize the queue */
         $this->links[0] = array_pop($this->links);

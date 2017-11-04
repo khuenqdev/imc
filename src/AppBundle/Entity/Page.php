@@ -76,8 +76,14 @@ class Page
     public function __construct($url, $title = '', $parent = null)
     {
         $this->url = $url;
+
+        // Determine host from URL
+        $host = parse_url($url, PHP_URL_HOST);
+        $this->setHost($host);
+
         $this->title = $title;
         $this->parent = $parent;
+
         $this->keywords = new ArrayCollection();
         $this->links = new ArrayCollection();
         $this->images = new ArrayCollection();

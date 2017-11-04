@@ -4,6 +4,7 @@ namespace AppBundle\Components;
 
 use AppBundle\Entity\Page;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Security\Acl\Exception\Exception;
 
 /**
  * Created by PhpStorm.
@@ -28,12 +29,41 @@ class Crawler
      */
     protected $downloader;
 
+    /**
+     * @var bool
+     */
+    protected $outputToCommandLine = false;
+
+    /**
+     * Crawler constructor.
+     *
+     * @param EntityManager $em
+     * @param Queue $queue
+     * @param Downloader $downloader
+     */
     public function __construct(EntityManager $em, Queue $queue, Downloader $downloader)
     {
         $this->em = $em;
         $this->queue = $queue;
+        $this->downloader = $downloader;
     }
 
+    /**
+     * Whether the crawler output relevant information to commandline interface
+     *
+     * @param $outputToCommandLine
+     * @return $this
+     */
+    public function setOutputToCommandLine($outputToCommandLine)
+    {
+        $this->outputToCommandLine = $outputToCommandLine;
+
+        return $this;
+    }
+
+    /**
+     * Main crawling logic
+     */
     public function crawl()
     {
         // Get next link in queue
@@ -41,17 +71,43 @@ class Crawler
 
         // If the queue contains no link, stop the crawler
         if (!$link) {
-            return;
+            return false;
         }
 
-        // Create a new page object
-        $page = new Page($link->getUrl(), $link->getTitle());
+        // Output link information
+        if ($this->outputToCommandLine) {
+            echo $link->getUrl() . "|" . $link->getRelevance() . "\n";
+        }
 
-        // Download the page content
-        $this->downloader->download($page);
+        // Check if the page was already retrieved
+        if ($this->em->getRepository(Page::class)->findOneBy(['url' => $link->getUrl()])) {
+            return $this->crawl();
+        }
 
-        // Add its link to the queue
-        $this->queue->addLinks($page->getLinks()->toArray());
+        try {
+            // Otherwise, create a new page object
+            $page = new Page($link->getUrl(), $link->getTitle(), $link->getPage());
+
+            // Download the page content
+            $this->downloader->download($page);
+
+            // Add its link to the queue
+            $this->queue->addLinks($page->getLinks()->toArray());
+
+            // Mark the current link as visited
+            $link->setVisited(true);
+            $this->em->persist($link);
+            $this->em->flush($link);
+        } catch (Exception $e) {
+            // Output link information
+            if ($this->outputToCommandLine) {
+                echo $e->getMessage() . "\n";
+            }
+        }
+
+
+        // Continue the crawling process
+        return $this->crawl();
     }
 
 }

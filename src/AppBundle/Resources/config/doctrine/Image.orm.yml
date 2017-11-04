@@ -11,6 +11,7 @@ AppBundle\Entity\Image:
     manyToOne:
         page:
             targetEntity: AppBundle\Entity\Page
+            inversedBy: images
             joinColumn:
                 name: page_id
                 referenceColumnName: id
@@ -26,7 +27,7 @@ AppBundle\Entity\Image:
             length: 255
         src:
             type: string
-            length: '512'
+            length: '1024'
         path:
             type: string
             length: '512'
@@ -47,7 +48,7 @@ AppBundle\Entity\Image:
             nullable: true
         copyright:
             type: string
-            length: 255
+            length: 512
             nullable: true
         relatedTexts:
             type: text
@@ -65,7 +66,7 @@ AppBundle\Entity\Image:
             nullable: true
         locationName:
             type: string
-            length: 255
+            length: 512
             nullable: true
             column: location_name
         isExifLocation:

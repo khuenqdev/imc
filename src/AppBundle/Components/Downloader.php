@@ -75,26 +75,39 @@ class Downloader
             $client = new HttpClient();
 
             // Request for resource
-            $resource = $client->request(Request::METHOD_GET, $page->getUrl());
+            try {
+                $resource = $client->request(Request::METHOD_GET, $page->getUrl());
 
-            // Check if our request returns valid response
-            if ($resource->getStatusCode() == Response::HTTP_OK) {
-                // Create DOM object from page's HTML content
-                $dom = new \DOMDocument();
-                @$dom->loadHTML($resource->getBody());
+                // Check if our request returns valid response
+                if ($resource->getStatusCode() == Response::HTTP_OK) {
 
-                if ($dom) {
-                    // Update page data
-                    $page->setDom($dom)
-                        ->setTitle($dom->getElementsByTagName('title')->item(0)->textContent);
+                    // Create DOM object from page's HTML content
+                    $dom = new \DOMDocument();
+                    @$dom->loadHTML($resource->getBody());
 
-                    // Extract links on page and save them to the database
-                    $this->extractLinks($page, $dom);
+                    if ($dom) {
+                        // Update page data
+                        $page->setHtml($resource->getBody())
+                            ->setDom($dom);
 
-                    // Download images on the page
-                    $this->downloadImages($page, $dom);
+                        if ($titleElement = $dom->getElementsByTagName('title')->item(0)) {
+                            $page->setTitle($titleElement->textContent);
+                        }
+
+                        // Extract text content and keywords
+                        $this->extractTextAndKeywords($page, $dom);
+
+                        // Extract links on page and save them to the database
+                        $this->extractLinks($page, $dom);
+
+                        // Download images on the page
+                        $this->downloadImages($page, $dom);
+                    }
                 }
+            } catch (\Exception $e) {
+
             }
+
         }
 
         // Save page changes and flush all entities
@@ -121,13 +134,8 @@ class Downloader
                 // @todo Calculate URL relevance
                 $relevance = 1;
 
-                // Create a link entity
-                $link = new Link();
-                $link->setUrl($url)
-                    ->setTitle($linkElement->nodeValue)
-                    ->setRelevance($relevance);
-
-                $page->addLink($link);
+                // Create a link entity, persist and associate it to the page
+                $this->createLink($url, $linkElement->nodeValue, $relevance, $page);
             }
         }
     }
@@ -141,5 +149,37 @@ class Downloader
     protected function downloadImages(Page &$page, \DOMDocument $dom)
     {
 
+    }
+
+    /**
+     * Extract text and keywords of the page
+     *
+     * @param Page $page
+     * @param \DOMDocument $dom
+     */
+    protected function extractTextAndKeywords(Page &$page, \DOMDocument $dom)
+    {
+
+    }
+
+    /**
+     * Create a new link
+     *
+     * @param $url
+     * @param $title
+     * @param $relevance
+     * @param Page $page
+     */
+    protected function createLink($url, $title, $relevance, Page &$page)
+    {
+        $linkRepo = $this->em->getRepository(Link::class);
+
+        $url = $this->urlHelper->parse($url, $page->getUrl());
+
+        if (!$linkRepo->findOneBy(['url' => $url])) {
+            $link = new Link($url, $title, $relevance);
+            $this->em->persist($link);
+            $page->addLink($link);
+        }
     }
 }

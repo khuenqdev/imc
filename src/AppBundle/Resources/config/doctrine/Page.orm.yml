@@ -11,13 +11,13 @@ AppBundle\Entity\Page:
     oneToMany:
         links:
             targetEntity: AppBundle\Entity\Link
-            mappedBy: AppBundle\Entity\Page
+            mappedBy: page
         images:
             targetEntity: AppBundle\Entity\Image
-            mappedBy: AppBundle\Entity\Page
+            mappedBy: page
         keywords:
             targetEntity: AppBundle\Entity\Keyword
-            mappedBy: AppBundle\Entity\Page
+            mappedBy: page
     oneToOne:
         text:
             targetEntity: AppBundle\Entity\Text
@@ -34,11 +34,12 @@ AppBundle\Entity\Page:
         url:
             type: string
             length: '512'
+            unique: true
         host:
             type: string
-            length: 255
+            length: 512
         title:
             type: string
-            length: 255
+            length: 512
             nullable: true
     lifecycleCallbacks: {  }

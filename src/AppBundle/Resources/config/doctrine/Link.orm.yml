@@ -11,6 +11,7 @@ AppBundle\Entity\Link:
     manyToOne:
         page:
             targetEntity: AppBundle\Entity\Page
+            inversedBy: links
             joinColumn:
                 name: page_id
                 referenceColumnName: id
@@ -21,7 +22,7 @@ AppBundle\Entity\Link:
             unique: false
         title:
             type: string
-            length: 255
+            length: 512
         visited:
             type: boolean
         relevance:

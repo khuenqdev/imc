@@ -15,16 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ExecuteCommand extends ContainerAwareCommand
 {
-    /**
-     * @var Crawler
-     */
-    private $crawler;
-
-    public function __construct($name = null)
-    {
-        parent::__construct($name);
-    }
-
     protected function configure()
     {
         $this->setName('crawler:execute')
@@ -34,6 +24,8 @@ class ExecuteCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->crawler->crawl();
+        $this->getContainer()->get('cpn.crawler')
+            ->setOutputToCommandLine(true)
+            ->crawl();
     }
 }

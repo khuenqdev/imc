@@ -46,9 +46,17 @@ class Url
             } elseif (substr($href, 0, 3) == '../') { // Handle href with double dots and a slash, e.g. ../test.html
                 return $baseUrl . '/' . $href;
             } elseif (substr($href, 0, 5) != 'https' && substr($href, 0, 4) != 'http' && isset($hrefComponents['path'])) {
-                return $urlComponents['scheme'] . '://' . $href; // Handle href without URL scheme but still have valid path
+                return $baseUrl . '/' . $href; // Handle href without URL scheme but still have valid path
             } elseif (substr($href, 0, 5) != 'https' && substr($href, 0, 4) != 'http') { // Handle href without URL scheme
-                return $baseUrl . '://' . $href;
+                return $urlComponents['scheme'] . '://' . $href;
+            }
+
+            if ((isset($hrefComponents['query']) && !empty($hrefComponents['query']))
+                || (isset($hrefComponents['fragment']) && !empty($hrefComponents['fragment']))
+            ) {
+                // Strip off query string
+                $path = isset($hrefComponents['path']) ? ('/' . $hrefComponents['path']) : '';
+                return $hrefComponents['scheme'] . '://' . $hrefComponents['host'] . $path;
             }
 
             // Return original href if it's a standard url

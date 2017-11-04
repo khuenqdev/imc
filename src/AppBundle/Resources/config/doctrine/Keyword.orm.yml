@@ -11,6 +11,7 @@ AppBundle\Entity\Keyword:
     manyToOne:
         page:
             targetEntity: AppBundle\Entity\Page
+            inversedBy: keywords
             joinColumn:
                 name: page_id
                 referenceColumnName: id

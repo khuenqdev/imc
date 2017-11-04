@@ -20,11 +20,11 @@ services:
     # Components
     cpn.queue:
         class: AppBundle\Components\Queue
-        arguments: []
+        arguments: ['@doctrine.orm.entity_manager']
 
     cpn.crawler:
         class: AppBundle\Components\Crawler
-        arguments: ['@doctrine.orm.entity_manager', '@cpn.queue']
+        arguments: ['@doctrine.orm.entity_manager', '@cpn.queue', '@cpn.downloader']
 
     cpn.downloader:
         class: AppBundle\Components\Downloader
