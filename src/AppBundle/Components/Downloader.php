@@ -8,6 +8,7 @@
 
 namespace AppBundle\Components;
 
+use AppBundle\Entity\Image;
 use AppBundle\Entity\Link;
 use AppBundle\Entity\Page;
 use Doctrine\ORM\EntityManager;
@@ -148,7 +149,17 @@ class Downloader
      */
     protected function downloadImages(Page &$page, \DOMDocument $dom)
     {
+        $imgElements = $dom->getElementsByTagName('img');
 
+        if ($imgElements->length > 0) {
+            /** @var \DOMElement $element */
+            foreach ($imgElements as $element) {
+                $src = $this->urlHelper->parse($element->getAttribute('src'), $page->getUrl());
+                if (!empty($src)) {
+                    $image = new Image($src, $element->getAttribute('alt'), $page);
+                }
+            }
+        }
     }
 
     /**

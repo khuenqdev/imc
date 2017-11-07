@@ -22,11 +22,6 @@ class Image
     /**
      * @var string
      */
-    private $source;
-
-    /**
-     * @var string
-     */
     private $hash;
 
     /**
@@ -70,26 +65,6 @@ class Image
     private $copyright;
 
     /**
-     * @var string
-     */
-    private $relatedTexts;
-
-    /**
-     * @var string
-     */
-    private $latitude;
-
-    /**
-     * @var string
-     */
-    private $longitude;
-
-    /**
-     * @var string
-     */
-    private $locationName;
-
-    /**
      * @var bool
      */
     private $isExifLocation;
@@ -108,6 +83,18 @@ class Image
      * @var Page
      */
     private $page;
+
+    /**
+     * @var Location
+     */
+    private $location;
+
+    public function __construct($src, $alt = '', Page $page)
+    {
+        $this->src = $src;
+        $this->alt = $alt;
+        $this->page = $page;
+    }
 
     /**
      * Get id
@@ -140,29 +127,6 @@ class Image
     public function getFilename()
     {
         return $this->filename;
-    }
-
-    /**
-     * Set source
-     *
-     * @param string $source
-     * @return Image
-     */
-    public function setSource($source)
-    {
-        $this->source = $source;
-
-        return $this;
-    }
-
-    /**
-     * Get source
-     *
-     * @return string
-     */
-    public function getSource()
-    {
-        return $this->source;
     }
 
     /**
@@ -373,98 +337,6 @@ class Image
     }
 
     /**
-     * Set relatedTexts
-     *
-     * @param string $relatedTexts
-     * @return Image
-     */
-    public function setRelatedTexts($relatedTexts)
-    {
-        $this->relatedTexts = $relatedTexts;
-
-        return $this;
-    }
-
-    /**
-     * Get relatedTexts
-     *
-     * @return string
-     */
-    public function getRelatedTexts()
-    {
-        return $this->relatedTexts;
-    }
-
-    /**
-     * Set latitude
-     *
-     * @param string $latitude
-     * @return Image
-     */
-    public function setLatitude($latitude)
-    {
-        $this->latitude = $latitude;
-
-        return $this;
-    }
-
-    /**
-     * Get latitude
-     *
-     * @return string
-     */
-    public function getLatitude()
-    {
-        return $this->latitude;
-    }
-
-    /**
-     * Set longitude
-     *
-     * @param string $longitude
-     * @return Image
-     */
-    public function setLongitude($longitude)
-    {
-        $this->longitude = $longitude;
-
-        return $this;
-    }
-
-    /**
-     * Get longitude
-     *
-     * @return string
-     */
-    public function getLongitude()
-    {
-        return $this->longitude;
-    }
-
-    /**
-     * Set locationName
-     *
-     * @param string $locationName
-     * @return Image
-     */
-    public function setLocationName($locationName)
-    {
-        $this->locationName = $locationName;
-
-        return $this;
-    }
-
-    /**
-     * Get locationName
-     *
-     * @return string
-     */
-    public function getLocationName()
-    {
-        return $this->locationName;
-    }
-
-    /**
      * Set isExifLocation
      *
      * @param boolean $isExifLocation
@@ -554,5 +426,28 @@ class Image
     public function getPage()
     {
         return $this->page;
+    }
+
+    /**
+     * Set location
+     *
+     * @param Location $location
+     * @return $this
+     */
+    public function setLocation(Location $location)
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    /**
+     * Get location
+     *
+     * @return Location
+     */
+    public function getLocation()
+    {
+        return $this->location;
     }
 }

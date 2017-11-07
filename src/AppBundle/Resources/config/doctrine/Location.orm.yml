@@ -1,0 +1,42 @@
+AppBundle\Entity\Location:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\LocationRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    oneToMany:
+        images:
+            targetEntity: AppBundle\Entity\Image
+            mappedBy: location
+    fields:
+        lat:
+            type: decimal
+            precision: 10
+            scale: '6'
+        lng:
+            type: decimal
+            precision: 10
+            scale: '6'
+        name:
+            type: string
+            length: 255
+            nullable: true
+        address:
+            type: string
+            length: '512'
+        code:
+            type: string
+            length: 255
+            nullable: true
+        country:
+            type: string
+            length: 255
+            nullable: true
+        images:
+            type: array
+            nullable: true
+    lifecycleCallbacks: {  }

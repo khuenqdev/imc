@@ -15,19 +15,26 @@ AppBundle\Entity\Image:
             joinColumn:
                 name: page_id
                 referenceColumnName: id
+        location:
+            targetEntity: AppBundle\Entity\Location
+            inversedBy: images
+            joinColumn:
+                name: location_id
+                referenceColumnName: id
     fields:
-        filename:
-            type: string
-            length: 255
-        source:
-            type: string
-            length: '512'
         hash:
             type: string
             length: 255
         src:
             type: string
             length: '1024'
+        alt:
+            type: string
+            length: '512'
+            nullable: true
+        filename:
+            type: string
+            length: 255
         path:
             type: string
             length: '512'
@@ -38,10 +45,6 @@ AppBundle\Entity\Image:
         type:
             type: string
             length: '5'
-        alt:
-            type: string
-            length: '512'
-            nullable: true
         author:
             type: string
             length: '128'
@@ -50,25 +53,6 @@ AppBundle\Entity\Image:
             type: string
             length: 512
             nullable: true
-        relatedTexts:
-            type: text
-            column: related_texts
-            nullable: true
-        latitude:
-            type: decimal
-            precision: 10
-            scale: '6'
-            nullable: true
-        longitude:
-            type: decimal
-            precision: 10
-            scale: '6'
-            nullable: true
-        locationName:
-            type: string
-            length: 512
-            nullable: true
-            column: location_name
         isExifLocation:
             type: boolean
             nullable: true
