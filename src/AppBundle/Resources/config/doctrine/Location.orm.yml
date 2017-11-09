@@ -36,7 +36,4 @@ AppBundle\Entity\Location:
             type: string
             length: 255
             nullable: true
-        images:
-            type: array
-            nullable: true
     lifecycleCallbacks: {  }

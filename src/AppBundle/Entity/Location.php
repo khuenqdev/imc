@@ -1,6 +1,7 @@
 <?php
 
 namespace AppBundle\Entity;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -49,6 +50,10 @@ class Location
      */
     private $images;
 
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -226,6 +231,22 @@ class Location
     public function getImages()
     {
         return $this->images;
+    }
+
+    /**
+     * Add an image to location
+     *
+     * @param Image $image
+     * @return $this
+     */
+    public function addImage(Image $image)
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setLocation($this);
+        }
+
+        return $this;
     }
 }
 
