@@ -33,6 +33,16 @@ class Text
     }
 
     /**
+     * Text constructor.
+     *
+     * @param string $content
+     */
+    public function __construct($content = '')
+    {
+        $this->content = $content;
+    }
+
+    /**
      * Set content
      *
      * @param string $content
@@ -65,6 +75,10 @@ class Text
     public function setPage(Page $page)
     {
         $this->page = $page;
+
+        if (!$page->getText()) {
+            $page->setText($this);
+        }
 
         return $this;
     }

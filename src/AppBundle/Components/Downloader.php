@@ -9,13 +9,19 @@
 namespace AppBundle\Components;
 
 use AppBundle\Entity\Image;
+use AppBundle\Entity\Keyword;
 use AppBundle\Entity\Link;
 use AppBundle\Entity\Page;
+use AppBundle\Entity\Text;
+use AppBundle\Repository\KeywordRepository;
+use AppBundle\Services\Helpers\Keyword as KeywordHelper;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
+use DOMElement;
 use GuzzleHttp\Client as HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use AppBundle\Services\Helpers\String as StringHelper;
 use AppBundle\Services\Helpers\Url as UrlHelper;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
@@ -32,9 +38,9 @@ class Downloader
     private $em;
 
     /**
-     * @var StringHelper
+     * @var KeywordHelper
      */
-    private $stringHelper;
+    private $keywordHelper;
 
     /**
      * @var UrlHelper
@@ -42,19 +48,44 @@ class Downloader
     private $urlHelper;
 
     /**
+     * @var bool
+     */
+    protected $outputToCommandLine = false;
+
+    /**
+     * List of HTML elements contain texts
+     *
+     * @var array
+     */
+    private $elementsContainText = ['title', 'h1', 'h2', 'h3', 'h4', 'h5', 'p'];
+
+    /**
      * Downloader constructor.
      *
      * @param LoggerInterface $logger
      * @param EntityManager $em
-     * @param StringHelper $stringHelper
+     * @param KeywordHelper $keywordHelper
      * @param UrlHelper $urlHelper
      */
-    public function __construct(LoggerInterface $logger, EntityManager $em, StringHelper $stringHelper, UrlHelper $urlHelper)
+    public function __construct(LoggerInterface $logger, EntityManager $em, KeywordHelper $keywordHelper, UrlHelper $urlHelper)
     {
         $this->em = $em;
-        $this->stringHelper = $stringHelper;
+        $this->keywordHelper = $keywordHelper;
         $this->urlHelper = $urlHelper;
         $this->logger = $logger;
+    }
+
+    /**
+     * Whether the downloader output relevant information to commandline interface
+     *
+     * @param $outputToCommandLine
+     * @return $this
+     */
+    public function setOutputToCommandLine($outputToCommandLine)
+    {
+        $this->outputToCommandLine = $outputToCommandLine;
+
+        return $this;
     }
 
     /**
@@ -64,51 +95,49 @@ class Downloader
      */
     public function download(Page &$page)
     {
-        if (!$page->getHtml()) {
+        // Bypass the current page if its URL is empty
+        if (!$page->getUrl()) {
+            $this->logger->notice("Unable to fetch page: Page URL reference must not be empty!");
+            return;
+        }
 
-            // Bypass the current page if its URL is empty
-            if (!$page->getUrl()) {
-                $this->logger->notice("Unable to fetch page: Page URL reference must not be empty!");
-                return;
-            }
+        // Create a new HTTP client
+        $client = new HttpClient();
 
-            // Create a new HTTP client
-            $client = new HttpClient();
+        // Request for resource
+        try {
+            $resource = $client->request(Request::METHOD_GET, $page->getUrl());
 
-            // Request for resource
-            try {
-                $resource = $client->request(Request::METHOD_GET, $page->getUrl());
+            // Check if our request returns valid response
+            if ($resource->getStatusCode() == Response::HTTP_OK) {
 
-                // Check if our request returns valid response
-                if ($resource->getStatusCode() == Response::HTTP_OK) {
+                // Create DOM object from page's HTML content
+                $dom = new \DOMDocument();
+                @$dom->loadHTML($resource->getBody());
 
-                    // Create DOM object from page's HTML content
-                    $dom = new \DOMDocument();
-                    @$dom->loadHTML($resource->getBody());
-
-                    if ($dom) {
-                        // Update page data
-                        $page->setHtml($resource->getBody())
-                            ->setDom($dom);
-
-                        if ($titleElement = $dom->getElementsByTagName('title')->item(0)) {
-                            $page->setTitle($titleElement->textContent);
-                        }
-
-                        // Extract text content and keywords
-                        $this->extractTextAndKeywords($page, $dom);
-
-                        // Extract links on page and save them to the database
-                        $this->extractLinks($page, $dom);
-
-                        // Download images on the page
-                        $this->downloadImages($page, $dom);
+                if ($dom) {
+                    // Update page data
+                    if ($titleElement = $dom->getElementsByTagName('title')->item(0)) {
+                        $page->setTitle($titleElement->textContent);
                     }
+
+                    // Extract text content
+                    $page->setText($this->extractText($dom));
+
+                    // Extract keywords
+                    $page->setKeywords($this->extractKeywords($page));
+
+                    // Extract links on page and save them to the database
+                    $page->setLinks($this->extractLinks($page, $dom));
+
+                    // Download images on the page
+                    $this->downloadImages($page, $dom);
                 }
-            } catch (\Exception $e) {
-
             }
-
+        } catch (\Exception $e) {
+            if ($this->outputToCommandLine) {
+                echo '[Warning] ' . $e->getMessage() . "\n";
+            }
         }
 
         // Save page changes and flush all entities
@@ -117,28 +146,126 @@ class Downloader
     }
 
     /**
-     * Extract page's URLs, calculate their relevance and add them to the queue
+     * Extract text and keywords of the page
+     *
+     * @param \DOMDocument $dom
+     * @return $text
+     */
+    protected function extractText(\DOMDocument $dom)
+    {
+        // Initialize extracted text content
+        $text = "";
+
+        // Get text from meta description
+        $metas = $dom->getElementsByTagName('meta');
+
+        /** @var DOMElement $meta */
+        foreach ($metas as $meta) {
+            if ($meta->getAttribute('name') === 'description') {
+                $text .= preg_replace("/[\W]+/", " ", strip_tags($meta->getAttribute('content'))) . " ";
+                break;
+            }
+        }
+
+        // Append text from body elements
+        foreach ($this->elementsContainText as $tagName) {
+            $elements = $dom->getElementsByTagName($tagName);
+            if ($elements->length > 0) {
+                /** @var DOMElement $element */
+                foreach ($elements as $element) {
+                    $text .= preg_replace("/[\W]+/", " ", strip_tags($element->textContent)) . " ";
+                }
+            }
+        }
+
+        // Save text content
+        $text = new Text($text);
+        $this->em->persist($text);
+
+        return $text;
+    }
+
+    /**
+     * Extract keywords
      *
      * @param Page $page
-     * @param \DOMDocument $dom
+     * @return ArrayCollection
      */
-    protected function extractLinks(Page &$page, \DOMDocument $dom)
+    protected function extractKeywords(Page $page)
     {
+        // Extract keywords from the page
+        $extracted = $this->keywordHelper->extractKeywords($page->getText());
+
+        // Initialize keyword collection
+        $keywords = new ArrayCollection();
+
+        /** @var KeywordRepository $repo */
+        $repo = $this->em->getRepository(Keyword::class);
+
+        // Check if extracted keyword exists in the database
+        foreach ($extracted as $keyword => $tfidf) {
+            /** @var Keyword $keywordObj */
+            $keywordObj = $repo->findOneBy(['word' => $keyword, 'page' => $page]);
+
+            // If the keyword already exists, update its tfidf score
+            if ($keywordObj) {
+                $keywordObj->setTfIdf($tfidf);
+            } else {
+                // Otherwise, create a new keyword in the database
+                $keywordObj = new Keyword($keyword, $tfidf);
+            }
+
+            $this->em->persist($keywordObj);
+            $keywords->add($keywordObj);
+        }
+
+        return $keywords;
+    }
+
+    /**
+     * Extract page's URLs, calculate their relevance and add them to the queue
+     *
+     * @param string $baseUrl URL of the page contains the link
+     * @param \DOMDocument $dom Object model of the page content
+     * @return Collection
+     */
+    protected function extractLinks($baseUrl, \DOMDocument $dom)
+    {
+        // Initialize a collection of links
+        $links = new ArrayCollection();
+
+        // Get link repository
+        $linkRepo = $this->em->getRepository(Link::class);
+
+        // Get link elements from the document object model
         $linkElements = $dom->getElementsByTagName('a');
 
         /** @var \DOMElement $linkElement */
         foreach ($linkElements as $linkElement) {
-            // Parse the Hyper Reference to obtain valid URL
-            $url = $this->urlHelper->parse($linkElement->getAttribute('href'), $page->getUrl());
+            // Extract the Hyper Reference of the link element
+            $href = $linkElement->getAttribute('href');
 
-            if ($url) {
-                // @todo Calculate URL relevance
+            // If the link element has Hyper Reference
+            if ($href) {
+                // Parse the Hyper Reference as URL
+                $url = $this->urlHelper->parse($href, $baseUrl);
+
+                // Calculate link relevance
                 $relevance = 1;
 
-                // Create a link entity, persist and associate it to the page
-                $this->createLink($url, $linkElement->nodeValue, $relevance, $page);
+                // Check if a link with the same URL already exists
+                if (!$linkRepo->findOneBy(['url' => $url])) {
+                    // If not, create new link entity object
+                    $link = new Link($url, $linkElement->nodeValue, $relevance);
+
+                    // Persist and add the link to link collection
+                    $this->em->persist($link);
+                    $links->add($link);
+                }
             }
         }
+
+        return $links;
     }
 
     /**
@@ -162,35 +289,4 @@ class Downloader
         }
     }
 
-    /**
-     * Extract text and keywords of the page
-     *
-     * @param Page $page
-     * @param \DOMDocument $dom
-     */
-    protected function extractTextAndKeywords(Page &$page, \DOMDocument $dom)
-    {
-
-    }
-
-    /**
-     * Create a new link
-     *
-     * @param $url
-     * @param $title
-     * @param $relevance
-     * @param Page $page
-     */
-    protected function createLink($url, $title, $relevance, Page &$page)
-    {
-        $linkRepo = $this->em->getRepository(Link::class);
-
-        $url = $this->urlHelper->parse($url, $page->getUrl());
-
-        if (!$linkRepo->findOneBy(['url' => $url])) {
-            $link = new Link($url, $title, $relevance);
-            $this->em->persist($link);
-            $page->addLink($link);
-        }
-    }
 }

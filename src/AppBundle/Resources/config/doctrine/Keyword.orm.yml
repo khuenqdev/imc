@@ -20,10 +20,7 @@ AppBundle\Entity\Keyword:
             type: string
             length: 255
             unique: true
-        tf:
-            type: float
-            nullable: true
-        idf:
+        tfIdf:
             type: float
             nullable: true
     lifecycleCallbacks: {  }

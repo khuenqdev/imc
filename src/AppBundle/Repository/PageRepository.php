@@ -12,4 +12,16 @@ use Doctrine\ORM\EntityRepository;
  */
 class PageRepository extends EntityRepository
 {
+    /**
+     * Get total number of crawled pages
+     *
+     * @return mixed
+     */
+    public function getNoOfCrawledPages()
+    {
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

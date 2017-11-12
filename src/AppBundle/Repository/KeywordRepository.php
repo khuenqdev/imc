@@ -10,4 +10,31 @@ namespace AppBundle\Repository;
  */
 class KeywordRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * Find keywords in the database
+     *
+     * @param $keywords
+     * @return array
+     */
+    public function findKeywords($keywords)
+    {
+        return $this->findBy(['word' => $keywords]);
+    }
+
+    /**
+     * Count the number of web pages contains the keyword
+     *
+     * @param $keyword
+     * @return mixed
+     */
+    public function getNoOfPageContainsKeyword($keyword)
+    {
+        return $this->createQueryBuilder('k')
+            ->select('COUNT(k.page)')
+            ->where('k.word = :word')
+            ->setParameter('word', $keyword)
+            ->groupBy('k.page')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

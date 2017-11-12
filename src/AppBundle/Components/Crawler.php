@@ -89,7 +89,9 @@ class Crawler
             $page = new Page($link->getUrl(), $link->getTitle(), $link->getPage());
 
             // Download the page content
-            $this->downloader->download($page);
+            $this->downloader
+                ->setOutputToCommandLine($this->outputToCommandLine)
+                ->download($page);
 
             // Add its link to the queue
             $this->queue->addLinks($page->getLinks()->toArray());
@@ -101,10 +103,9 @@ class Crawler
         } catch (Exception $e) {
             // Output link information
             if ($this->outputToCommandLine) {
-                echo $e->getMessage() . "\n";
+                echo '[Warning] ' . $e->getMessage() . "\n";
             }
         }
-
 
         // Continue the crawling process
         return $this->crawl();

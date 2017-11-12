@@ -1,7 +1,5 @@
 <?php
 
-namespace AppBundle\Tests\Helpers;
-
 /**
  * Created by PhpStorm.
  * User: khuen
@@ -9,16 +7,21 @@ namespace AppBundle\Tests\Helpers;
  * Time: 4:05 PM
  */
 
+namespace AppBundle\Tests\Helpers;
+
+use AppBundle\Services\Helpers\Url;
+use PHPUnit_Framework_TestCase;
+
 class UrlTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var \AppBundle\Services\Helpers\Url
+     * @var Url
      */
     private $service;
 
     public function setUp()
     {
-        $this->service = new \AppBundle\Services\Helpers\Url();
+        $this->service = new Url();
     }
 
     /**

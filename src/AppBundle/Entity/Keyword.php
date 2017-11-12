@@ -20,17 +20,24 @@ class Keyword
     /**
      * @var float
      */
-    private $tf;
-
-    /**
-     * @var float
-     */
-    private $idf;
+    private $tfIdf;
 
     /**
      * @var Page
      */
     private $page;
+
+    /**
+     * Keyword constructor.
+     *
+     * @param string $word
+     * @param float $tfIdf
+     */
+    public function __construct($word = '', $tfIdf = 0.0)
+    {
+        $this->word = $word;
+        $this->tfIdf = $tfIdf;
+    }
 
     /**
      * Get id
@@ -67,51 +74,27 @@ class Keyword
     }
 
     /**
-     * Set tf
+     * Set tf-idf
      *
-     * @param float $tf
+     * @param float $tfIdf
      *
      * @return Keyword
      */
-    public function setTf($tf)
+    public function setTfIdf($tfIdf)
     {
-        $this->tf = $tf;
+        $this->tfIdf = $tfIdf;
 
         return $this;
     }
 
     /**
-     * Get tf
+     * Get tf-idf
      *
      * @return float
      */
-    public function getTf()
+    public function getTfIdf()
     {
-        return $this->tf;
-    }
-
-    /**
-     * Set idf
-     *
-     * @param float $idf
-     *
-     * @return Keyword
-     */
-    public function setIdf($idf)
-    {
-        $this->idf = $idf;
-
-        return $this;
-    }
-
-    /**
-     * Get idf
-     *
-     * @return float
-     */
-    public function getIdf()
-    {
-        return $this->idf;
+        return $this->tfIdf;
     }
 
     /**

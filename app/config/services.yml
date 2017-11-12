@@ -17,6 +17,13 @@ services:
     hlp.url:
         class: AppBundle\Services\Helpers\Url
 
+    hlp.image:
+        class: AppBundle\Services\Helpers\Image
+
+    hlp.keyword:
+        class: AppBundle\Services\Helpers\Keyword
+        arguments: ['@doctrine.orm.entity_manager']
+
     # Components
     cpn.queue:
         class: AppBundle\Components\Queue
@@ -28,6 +35,6 @@ services:
 
     cpn.downloader:
         class: AppBundle\Components\Downloader
-        arguments: ['@logger','@doctrine.orm.entity_manager', '@hlp.string', '@hlp.url']
+        arguments: ['@logger','@doctrine.orm.entity_manager', '@hlp.keyword', '@hlp.url']
         tags:
             - { name: monolog.logger, channel: imc }

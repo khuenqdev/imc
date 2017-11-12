@@ -47,16 +47,6 @@ class Page
     private $keywords;
 
     /**
-     * @var string
-     */
-    private $html;
-
-    /**
-     * @var \DOMDocument
-     */
-    private $dom;
-
-    /**
      * @var Collection
      */
     private $links;
@@ -201,6 +191,10 @@ class Page
     {
         $this->text = $text;
 
+        if (!$text->getPage()) {
+            $text->setPage($this);
+        }
+
         return $this;
     }
 
@@ -251,29 +245,6 @@ class Page
         }
 
         return $this;
-    }
-
-    /**
-     * Set raw HTML content
-     *
-     * @param $html
-     * @return $this
-     */
-    public function setHtml($html)
-    {
-        $this->html = $html;
-
-        return $this;
-    }
-
-    /**
-     * Retrieve raw HTML content of a page
-     *
-     * @return string
-     */
-    public function getHtml()
-    {
-        return $this->html;
     }
 
     /**
@@ -352,28 +323,5 @@ class Page
         }
 
         return $this;
-    }
-
-    /**
-     * Set DOM object
-     *
-     * @param $dom
-     * @return $this
-     */
-    public function setDom($dom)
-    {
-        $this->dom = $dom;
-
-        return $this;
-    }
-
-    /**
-     * Get DOM object
-     *
-     * @return \DOMDocument
-     */
-    public function getDom()
-    {
-        return $this->dom;
     }
 }

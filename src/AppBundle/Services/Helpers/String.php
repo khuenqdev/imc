@@ -174,17 +174,4 @@ class String
         $args = func_get_args();
         return $args[($i++ % count($args))];
     }
-
-    /**
-     * Break a text into a set of word tokens
-     *
-     * @param $text
-     * @return array
-     */
-    public function tokenize($text)
-    {
-        $tokens = preg_split('/[\W]+/', $text, -1, PREG_SPLIT_NO_EMPTY);
-        $tokens = array_map('trim', $tokens);
-        return array_filter($tokens);
-    }
 }
