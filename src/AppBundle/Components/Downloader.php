@@ -276,13 +276,18 @@ class Downloader
      */
     protected function downloadImages(Page &$page, \DOMDocument $dom)
     {
+        // Get image elements
         $imgElements = $dom->getElementsByTagName('img');
 
         if ($imgElements->length > 0) {
             /** @var \DOMElement $element */
             foreach ($imgElements as $element) {
+
+                // Parse image src attribute to get actual image URL
                 $src = $this->urlHelper->parse($element->getAttribute('src'), $page->getUrl());
+
                 if (!empty($src)) {
+                    // Create new image object
                     $image = new Image($src, $element->getAttribute('alt'), $page);
                 }
             }
