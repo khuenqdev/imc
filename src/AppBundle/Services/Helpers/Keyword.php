@@ -73,8 +73,8 @@ class Keyword
         '/\n/' => ' ',
         '/\r/' => ' ',
         '/\d+[s]/' => ' ',
-        '/ \w{1,2} /' => ' ',
-        '/(\b.{1,2}\s)/' => ' ' // Removing short words
+        //'/ \w{1,2} /' => ' ',
+        //'/(\b.{1,2}\s)/' => ' ' // Removing short words
     ];
 
     /**
@@ -111,7 +111,7 @@ class Keyword
         arsort($tfIdf);
 
         // 6. Select the top 10 tokens with the highest tf-idf score as keywords
-        return array_keys(array_slice($tfIdf, 0, self::NO_OF_KEYWORDS, true));
+        return array_slice($tfIdf, 0, self::NO_OF_KEYWORDS, true);
     }
 
     /**
@@ -203,10 +203,11 @@ class Keyword
     {
         $tf = $this->calculateTf($tokens);
         $idf = $this->calculateIdf($tokens);
+
         $tfIdf = array_map(function ($x, $y) {
             return $x * $y;
         }, $tf, $idf);
 
-        return $tfIdf;
+        return array_combine(array_keys($tf), $tfIdf);
     }
 }

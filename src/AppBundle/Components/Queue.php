@@ -127,15 +127,17 @@ class Queue
     public function getNextLink()
     {
         // The next link is the first link in queue
-        $next = reset($this->links);
+        $next = array_shift($this->links);
 
         if (!$next) {
             return false;
         }
 
         /** Reorganize the queue */
-        $this->links[0] = array_pop($this->links);
-        $this->heapifyDown($this->links[0]);
+        if (!$this->isEmpty()) {
+            $this->links[0] = array_pop($this->links);
+            $this->heapifyDown($this->links[0]);
+        }
 
         return $next;
     }

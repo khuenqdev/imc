@@ -29,12 +29,16 @@ class KeywordRepository extends \Doctrine\ORM\EntityRepository
      */
     public function getNoOfPageContainsKeyword($keyword)
     {
-        return $this->createQueryBuilder('k')
-            ->select('COUNT(k.page)')
-            ->where('k.word = :word')
-            ->setParameter('word', $keyword)
-            ->groupBy('k.page')
-            ->getQuery()
-            ->getSingleScalarResult();
+        try {
+            return $this->createQueryBuilder('k')
+                ->select('COUNT(k.page)')
+                ->where('k.word = :word')
+                ->setParameter('word', $keyword)
+                ->groupBy('k.page')
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 }

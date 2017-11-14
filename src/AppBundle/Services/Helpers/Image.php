@@ -8,8 +8,7 @@
 
 namespace AppBundle\Services\Helpers;
 
-
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface as Kernel;
 
 class Image
 {

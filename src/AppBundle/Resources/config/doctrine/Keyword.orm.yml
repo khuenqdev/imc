@@ -19,7 +19,6 @@ AppBundle\Entity\Keyword:
         word:
             type: string
             length: 255
-            unique: true
         tfIdf:
             type: float
             nullable: true

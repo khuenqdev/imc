@@ -4,6 +4,7 @@ namespace AppBundle\Components;
 
 use AppBundle\Entity\Page;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NoResultException;
 use Symfony\Component\Security\Acl\Exception\Exception;
 
 /**
@@ -80,9 +81,15 @@ class Crawler
         }
 
         // Check if the page was already retrieved
-        if ($this->em->getRepository(Page::class)->findOneBy(['url' => $link->getUrl()])) {
-            return $this->crawl();
-        }
+//        try {
+//            $dbPage = $this->em->getRepository(Page::class)->findOneBy(['url' => $link->getUrl()]);
+//
+//            if ($dbPage) {
+//                return $this->crawl();
+//            }
+//        } catch(NoResultException $e) {
+//
+//        }
 
         try {
             // Otherwise, create a new page object
@@ -103,7 +110,7 @@ class Crawler
         } catch (Exception $e) {
             // Output link information
             if ($this->outputToCommandLine) {
-                echo '[Warning] ' . $e->getMessage() . "\n";
+                echo '[Crawler Warning] ' . $e->getMessage() . "\n";
             }
         }
 

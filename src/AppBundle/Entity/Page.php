@@ -187,7 +187,7 @@ class Page
      * @param Text $text
      * @return Page
      */
-    public function setText($text)
+    public function setText(Text $text)
     {
         $this->text = $text;
 

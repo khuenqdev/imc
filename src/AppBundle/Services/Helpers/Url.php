@@ -22,7 +22,7 @@ class Url
      */
     public function parse($href, $baseUrl)
     {
-        if (preg_match('/(#|\bjavascript:\b|\bmailto:\b|\bdata:\b)/', $href)) {
+        if (preg_match('/(^\#|\bjavascript\b|\bmailto\b|\bdata\b)/i', $href)) {
             return false;
         }
 
@@ -34,9 +34,9 @@ class Url
             $baseUrl = $urlComponents['scheme'] . '://' . $urlComponents['host'];
 
             if (substr($href, 0, 1) == '/' && strlen($href) == 1) { // When the href has only one slash
-                return ''; // No crawling at all!
+                return false; // No crawling at all!
             } else if ($href === 'http://' || $href === 'https://') { // When the href has only http scheme
-                return ''; // No crawling at all!
+                return false; // No crawling at all!
             } elseif (substr($href, 0, 2) == '//') { // Handle href with double slashes, e.g. //test.html
                 return $urlComponents['scheme'] . ':' . $href;
             } elseif (substr($href, 0, 1) == '/' && substr($href, 0, 2) != '/') {
@@ -46,7 +46,7 @@ class Url
             } elseif (substr($href, 0, 3) == '../') { // Handle href with double dots and a slash, e.g. ../test.html
                 return $baseUrl . '/' . $href;
             } elseif (substr($href, 0, 5) != 'https' && substr($href, 0, 4) != 'http' && isset($hrefComponents['path'])) {
-                return $baseUrl . '/' . $href; // Handle href without URL scheme but still have valid path
+                return $urlComponents['scheme'] . '://' . $href; // Handle href without URL scheme but still have valid path
             } elseif (substr($href, 0, 5) != 'https' && substr($href, 0, 4) != 'http') { // Handle href without URL scheme
                 return $urlComponents['scheme'] . '://' . $href;
             }

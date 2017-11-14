@@ -19,6 +19,7 @@ services:
 
     hlp.image:
         class: AppBundle\Services\Helpers\Image
+        arguments: ['@kernel']
 
     hlp.keyword:
         class: AppBundle\Services\Helpers\Keyword

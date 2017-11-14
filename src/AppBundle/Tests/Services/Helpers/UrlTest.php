@@ -53,6 +53,7 @@ class UrlTest extends PHPUnit_Framework_TestCase
             [$baseUrl, 'data:test_data', false],
             [$baseUrl, '#something', false],
             [$baseUrl, 'example.com', 'https://example.com'],
+            [$baseUrl, 'https://support.google.com/javascript:;', false],
         ];
     }
 }

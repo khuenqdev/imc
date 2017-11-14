@@ -18,6 +18,7 @@ use AppBundle\Services\Helpers\Keyword as KeywordHelper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NoResultException;
 use DOMElement;
 use GuzzleHttp\Client as HttpClient;
 use Symfony\Component\HttpFoundation\Request;
@@ -131,18 +132,19 @@ class Downloader
                     $page->setLinks($this->extractLinks($page, $dom));
 
                     // Download images on the page
-                    $this->downloadImages($page, $dom);
+                    //$this->downloadImages($page, $dom);
                 }
             }
+
+            // Save page changes and flush all entities
+            $this->em->persist($page);
+            $this->em->flush();
         } catch (\Exception $e) {
             if ($this->outputToCommandLine) {
-                echo '[Warning] ' . $e->getMessage() . "\n";
+                echo '[Downloader Warning] ' . $e->getMessage() . "\n";
+                //echo $e->getTraceAsString() . "\n";
             }
         }
-
-        // Save page changes and flush all entities
-        $this->em->persist($page);
-        $this->em->flush();
     }
 
     /**
@@ -194,7 +196,7 @@ class Downloader
     protected function extractKeywords(Page $page)
     {
         // Extract keywords from the page
-        $extracted = $this->keywordHelper->extractKeywords($page->getText());
+        $extracted = $this->keywordHelper->extractKeywords($page->getText()->getContent());
 
         // Initialize keyword collection
         $keywords = new ArrayCollection();
@@ -205,18 +207,22 @@ class Downloader
         // Check if extracted keyword exists in the database
         foreach ($extracted as $keyword => $tfidf) {
             /** @var Keyword $keywordObj */
-            $keywordObj = $repo->findOneBy(['word' => $keyword, 'page' => $page]);
+            try {
+                $keywordObj = $repo->findOneBy(['word' => $keyword, 'page' => $page]);
+                // If the keyword already exists, update its tfidf score
+                if ($keywordObj) {
+                    $keywordObj->setTfIdf($tfidf);
+                } else {
+                    // Otherwise, create a new keyword in the database
+                    $keywordObj = new Keyword($keyword, $tfidf);
+                    $keywordObj->setPage($page);
+                }
 
-            // If the keyword already exists, update its tfidf score
-            if ($keywordObj) {
-                $keywordObj->setTfIdf($tfidf);
-            } else {
-                // Otherwise, create a new keyword in the database
-                $keywordObj = new Keyword($keyword, $tfidf);
+                $this->em->persist($keywordObj);
+                $keywords->add($keywordObj);
+            } catch (NoResultException $e) {
+                echo '[Keyword Warning]' . $e->getMessage() . "\n";
             }
-
-            $this->em->persist($keywordObj);
-            $keywords->add($keywordObj);
         }
 
         return $keywords;
@@ -225,12 +231,14 @@ class Downloader
     /**
      * Extract page's URLs, calculate their relevance and add them to the queue
      *
-     * @param string $baseUrl URL of the page contains the link
+     * @param Page $page The page contains the link
      * @param \DOMDocument $dom Object model of the page content
      * @return Collection
      */
-    protected function extractLinks($baseUrl, \DOMDocument $dom)
+    protected function extractLinks(Page $page, \DOMDocument $dom)
     {
+        $baseUrl = $page->getUrl();
+
         // Initialize a collection of links
         $links = new ArrayCollection();
 
@@ -251,16 +259,22 @@ class Downloader
                 $url = $this->urlHelper->parse($href, $baseUrl);
 
                 // Calculate link relevance
-                $relevance = 1;
+                $relevance = $this->computeRelevance($page, $url, $linkElement->textContent);
 
                 // Check if a link with the same URL already exists
-                if (!$linkRepo->findOneBy(['url' => $url])) {
-                    // If not, create new link entity object
-                    $link = new Link($url, $linkElement->nodeValue, $relevance);
+                try {
+                    $dbLink = $linkRepo->findOneBy(['url' => $url]);
+                    if (!$dbLink && $relevance > 0.0) {
+                        // If not, create new link entity object
+                        $link = new Link($url, $linkElement->textContent, $relevance);
+                        $link->setPage($page);
 
-                    // Persist and add the link to link collection
-                    $this->em->persist($link);
-                    $links->add($link);
+                        // Persist and add the link to link collection
+                        $this->em->persist($link);
+                        $links->add($link);
+                    }
+                } catch (NoResultException $e) {
+                    echo "[Link Warning] " . $e->getMessage() . "\n";
                 }
             }
         }
@@ -292,6 +306,19 @@ class Downloader
                 }
             }
         }
+    }
+
+    /**
+     * Compute relevance of a link
+     *
+     * @param Page $page
+     * @param $url
+     * @param $title
+     * @return float
+     */
+    protected function computeRelevance(Page $page, $url, $title)
+    {
+        return 1.0;
     }
 
 }
