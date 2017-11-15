@@ -1,0 +1,16 @@
+AppBundle\Entity\Stopword:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\StopwordRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        word:
+            type: string
+            length: '512'
+            unique: true
+    lifecycleCallbacks: {  }
