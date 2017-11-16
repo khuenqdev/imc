@@ -90,7 +90,7 @@ class Keyword
      * @param int $noOfKeywords
      * @return array
      */
-    public function extractKeywords($text, $noOfKeywords = 10)
+    public function extractKeywordsFromText($text, $noOfKeywords = 10)
     {
         // 1. Purify the text
         $text = $this->purify($text);
@@ -99,7 +99,7 @@ class Keyword
         $tokens = $this->tokenize($text);
 
         // 3. Normalize all tokens (convert to lowercase)
-        $normalizedTokens = $this->normalize($tokens);
+        $normalizedTokens = $this->normalizeTokens($tokens);
 
         // 4. Filter out stop words
         $filteredTokens = $this->filterStopwords($normalizedTokens);
@@ -116,6 +116,21 @@ class Keyword
         }
 
         return array_keys($tfIdf);
+    }
+
+    /**
+     * Extract keywords from a string
+     *
+     * @param $string
+     * @return mixed
+     */
+    public function extractKeywordsFromString($string)
+    {
+        $string = $this->normalizeString($string);
+        $string = $this->purify($string);
+        $tokens = $this->tokenize($string);
+
+        return $this->filterStopwords($tokens);
     }
 
     /**
@@ -165,9 +180,20 @@ class Keyword
      * @param $tokens
      * @return array
      */
-    public function normalize($tokens)
+    public function normalizeTokens($tokens)
     {
         return array_map('mb_strtolower', $tokens);
+    }
+
+    /**
+     * Normalize a string
+     *
+     * @param $string
+     * @return mixed|string
+     */
+    public function normalizeString($string)
+    {
+        return mb_strtolower($string);
     }
 
     /**

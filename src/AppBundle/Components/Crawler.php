@@ -80,19 +80,7 @@ class Crawler
             echo $link->getUrl() . "|" . $link->getRelevance() . "\n";
         }
 
-        // Check if the page was already retrieved
-//        try {
-//            $dbPage = $this->em->getRepository(Page::class)->findOneBy(['url' => $link->getUrl()]);
-//
-//            if ($dbPage) {
-//                return $this->crawl();
-//            }
-//        } catch(NoResultException $e) {
-//
-//        }
-
         try {
-            // Otherwise, create a new page object
             $page = new Page($link->getUrl(), $link->getTitle(), $link->getPage());
 
             // Download the page content

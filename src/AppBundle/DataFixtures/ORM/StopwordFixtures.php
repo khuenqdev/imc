@@ -23,14 +23,13 @@ class StopwordFixtures extends AbstractDataFixture
 
         foreach ($words as $word) {
             $hash = sha1($word);
-            try {
+
+            if (!$manager->getRepository(Stopword::class)->findOneBy(['hash' => $hash])) {
                 $stopword = new Stopword($word);
                 $stopword->setHash($hash);
 
                 $manager->persist($stopword);
                 $manager->flush();
-            } catch (\Exception $e) {
-                
             }
         }
     }

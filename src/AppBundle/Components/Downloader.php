@@ -196,7 +196,7 @@ class Downloader
     protected function extractKeywords(Page $page)
     {
         // Extract keywords from the page
-        $extracted = $this->keywordHelper->extractKeywords($page->getText()->getContent());
+        $extracted = $this->keywordHelper->extractKeywordsFromText($page->getText()->getContent());
 
         // Initialize keyword collection
         $keywords = new ArrayCollection();
@@ -207,22 +207,18 @@ class Downloader
         // Check if extracted keyword exists in the database
         foreach ($extracted as $keyword => $tfidf) {
             /** @var Keyword $keywordObj */
-            try {
-                $keywordObj = $repo->findOneBy(['word' => $keyword, 'page' => $page]);
-                // If the keyword already exists, update its tfidf score
-                if ($keywordObj) {
-                    $keywordObj->setTfIdf($tfidf);
-                } else {
-                    // Otherwise, create a new keyword in the database
-                    $keywordObj = new Keyword($keyword, $tfidf);
-                    $keywordObj->setPage($page);
-                }
-
-                $this->em->persist($keywordObj);
-                $keywords->add($keywordObj);
-            } catch (NoResultException $e) {
-                echo '[Keyword Warning]' . $e->getMessage() . "\n";
+            $keywordObj = $repo->findOneBy(['word' => $keyword, 'page' => $page]);
+            // If the keyword already exists, update its tfidf score
+            if ($keywordObj) {
+                $keywordObj->setTfIdf($tfidf);
+            } else {
+                // Otherwise, create a new keyword in the database
+                $keywordObj = new Keyword($keyword, $tfidf);
+                $keywordObj->setPage($page);
             }
+
+            $this->em->persist($keywordObj);
+            $keywords->add($keywordObj);
         }
 
         return $keywords;
@@ -258,14 +254,14 @@ class Downloader
                 // Parse the Hyper Reference as URL
                 $url = $this->urlHelper->parse($href, $baseUrl);
 
-                // Calculate link relevance
-                $relevance = $this->computeRelevance($page, $url, $linkElement->textContent);
+                // Check if a link with the same URL already exists in the database and the link
+                // is not link of the current page we're downloading
+                if (!$linkRepo->findOneBy(['url' => $url]) && $url !== $page->getUrl()) {
+                    // Calculate link relevance
+                    $relevance = $this->computeRelevance($page, $url, $linkElement->textContent);
 
-                // Check if a link with the same URL already exists
-                try {
-                    $dbLink = $linkRepo->findOneBy(['url' => $url]);
-                    if (!$dbLink && $relevance > 0.0) {
-                        // If not, create new link entity object
+                    if ($relevance > 0.0) {
+                        // Create new link entity object
                         $link = new Link($url, $linkElement->textContent, $relevance);
                         $link->setPage($page);
 
@@ -273,8 +269,6 @@ class Downloader
                         $this->em->persist($link);
                         $links->add($link);
                     }
-                } catch (NoResultException $e) {
-                    echo "[Link Warning] " . $e->getMessage() . "\n";
                 }
             }
         }
@@ -319,6 +313,7 @@ class Downloader
     protected function computeRelevance(Page $page, $url, $title)
     {
         $score = 0;
+        $criteria = 1;
 
         // 1. Host domain relevance
         if (parse_url($page->getUrl(), PHP_URL_HOST) === parse_url($url, PHP_URL_HOST)) {
@@ -326,10 +321,19 @@ class Downloader
         }
 
         // 2. Context relevance
-        $pageTokens = $this->keywordHelper->extractKeywords($page->getText(), -1);
-        $titleTokens = $this->keywordHelper->tokenize($title);
+        $pageText = $page->getText()->getContent();
+        $linkTitleKeywords = $this->keywordHelper->extractKeywordsFromString($title);
+        $criteria += count($linkTitleKeywords);
 
-        return 1.0;
+        foreach ($linkTitleKeywords as $keyword) {
+            $tf = $this->keywordHelper->countWordOccurrence($keyword, $pageText);
+
+            if ($tf > 1) {
+                $score++;
+            }
+        }
+
+        return (float) $score / $criteria;
     }
 
 }

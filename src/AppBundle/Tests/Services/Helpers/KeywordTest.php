@@ -27,7 +27,7 @@ class KeywordTest extends KernelTestCase
     /**
      * Extract keywords from a text
      */
-    public function testExtractKeywords()
+    public function testExtractKeywordsFromText()
     {
         $text = "Pop outfits Little Glee Monster, Hey! Say! Jump and Twice will grace the stage for the first time at this year’s “Kohaku Uta Gassen,” with NHK appearing to court new viewers for its annual end-of-year musical extravaganza.
 
@@ -43,10 +43,32 @@ The weekly Shukan Bunshun released a survey this month that said people were sic
 
 This year’s team leaders, or hosts, are “Sekigahara” actress Kasumi Arimura for the Red team and Arashi member Kazunari Ninomiya for the White team.";
 
-        $keywords = $this->service->extractKeywords($text);
+        $keywords = $this->service->extractKeywordsFromText($text);
 
         $this->assertNotEmpty($keywords);
         var_dump($this->service->countWordOccurrence('Kohaku', $text));
+    }
+
+    /**
+     * Extract keywords from a string
+     */
+    public function testExtractKeywordsFromString()
+    {
+        $string1 = "Shibuya expo showcases innovations toward creating an inclusive society";
+        $string2 = "Peace speech in Geneva by Japanese student was canceled due to China pressure: government sources";
+        $string3 = "The colorful buildings at the coast of the \"Cinque Terre\"";
+
+        $keywords1 = $this->service->extractKeywordsFromString($string1);
+        $this->assertNotEmpty($keywords1);
+        var_dump($keywords1);
+
+        $keywords2 = $this->service->extractKeywordsFromString($string2);
+        $this->assertNotEmpty($keywords2);
+        var_dump($keywords2);
+
+        $keywords3 = $this->service->extractKeywordsFromString($string3);
+        $this->assertNotEmpty($keywords3);
+        var_dump($keywords3);
     }
 
     /**
@@ -85,9 +107,9 @@ This year’s team leaders, or hosts, are “Sekigahara” actress Kasumi Arimur
      * @depends testTokenize
      * @param $tokens
      */
-    public function testNormalize($tokens)
+    public function testNormalizeTokens($tokens)
     {
-        $normalizedTokens = $this->service->normalize($tokens);
+        $normalizedTokens = $this->service->normalizeTokens($tokens);
 
         $this->assertSame([
             'this', 'is', 'a', 'test', 'string',

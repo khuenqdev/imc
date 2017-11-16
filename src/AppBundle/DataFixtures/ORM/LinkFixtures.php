@@ -18,6 +18,7 @@ class LinkFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         $seed = new Link('https://www.locationscout.net/', 'Locationscout - Discover the best places for photography', 1);
+        $seed->setVisited(false);
         $manager->persist($seed);
         $manager->flush();
     }
