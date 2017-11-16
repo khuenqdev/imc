@@ -9,16 +9,12 @@
 namespace AppBundle\Services\Helpers;
 
 use AppBundle\Entity\Page;
+use AppBundle\Entity\Stopword;
 use Doctrine\ORM\EntityManager;
 use \AppBundle\Entity\Keyword as KeywordEntity;
 
 class Keyword
 {
-    /**
-     * Limit the number of keywords
-     */
-    const NO_OF_KEYWORDS = 10;
-
     /**
      * @var EntityManager
      */
@@ -91,9 +87,10 @@ class Keyword
      * Extract keywords from a text
      *
      * @param $text
+     * @param int $noOfKeywords
      * @return array
      */
-    public function extractKeywords($text)
+    public function extractKeywords($text, $noOfKeywords = 10)
     {
         // 1. Purify the text
         $text = $this->purify($text);
@@ -104,14 +101,34 @@ class Keyword
         // 3. Normalize all tokens (convert to lowercase)
         $normalizedTokens = $this->normalize($tokens);
 
-        // 4. Calculate tf-idf
-        $tfIdf = $this->calculateTfIdf($normalizedTokens);
+        // 4. Filter out stop words
+        $filteredTokens = $this->filterStopwords($normalizedTokens);
 
-        // 5. Sort the tf-idf descending
+        // 5. Calculate tf-idf
+        $tfIdf = $this->calculateTf($filteredTokens);
+
+        // 6. Sort the tf-idf descending
         arsort($tfIdf);
 
-        // 6. Select the top 10 tokens with the highest tf-idf score as keywords
-        return array_slice($tfIdf, 0, self::NO_OF_KEYWORDS, true);
+        // 7. Select the top tokens with the highest tf-idf score as keywords
+        if ($noOfKeywords > 0) {
+            $tfIdf = array_slice($tfIdf, 0, $noOfKeywords, true);
+        }
+
+        return array_keys($tfIdf);
+    }
+
+    /**
+     * Count the number of times a word occurs in a text
+     *
+     * @param $word
+     * @param $text
+     * @return int
+     */
+    public function countWordOccurrence($word, $text)
+    {
+        $normalized = mb_strtolower($text);
+        return mb_substr_count($normalized, mb_strtolower($word));
     }
 
     /**
@@ -151,6 +168,25 @@ class Keyword
     public function normalize($tokens)
     {
         return array_map('mb_strtolower', $tokens);
+    }
+
+    /**
+     * Remote stop words
+     *
+     * @param $tokens
+     * @return mixed
+     */
+    public function filterStopwords($tokens)
+    {
+        $repo = $this->em->getRepository(Stopword::class);
+
+        foreach ($tokens as $idx => $token) {
+            if ($repo->findOneBy(['hash' => sha1($token)])) {
+                unset($tokens[$idx]);
+            }
+        }
+
+        return $tokens;
     }
 
     /**

@@ -9,8 +9,12 @@ AppBundle\Entity\Stopword:
             generator:
                 strategy: AUTO
     fields:
-        word:
+        hash:
             type: string
             length: '512'
             unique: true
+        word:
+            type: string
+            length: '512'
+            unique: false
     lifecycleCallbacks: {  }

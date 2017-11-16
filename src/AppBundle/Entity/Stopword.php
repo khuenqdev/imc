@@ -15,6 +15,11 @@ class Stopword
     /**
      * @var string
      */
+    private $hash;
+
+    /**
+     * @var string
+     */
     private $word;
 
     /**
@@ -59,6 +64,26 @@ class Stopword
     public function getWord()
     {
         return $this->word;
+    }
+
+    /**
+     * Get hash
+     *
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
+
+    /**
+     * Set hash
+     *
+     * @param $hash
+     */
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
     }
 }
 

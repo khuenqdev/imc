@@ -126,7 +126,7 @@ class Downloader
                     $page->setText($this->extractText($dom));
 
                     // Extract keywords
-                    $page->setKeywords($this->extractKeywords($page));
+                    //$page->setKeywords($this->extractKeywords($page));
 
                     // Extract links on page and save them to the database
                     $page->setLinks($this->extractLinks($page, $dom));
@@ -318,6 +318,17 @@ class Downloader
      */
     protected function computeRelevance(Page $page, $url, $title)
     {
+        $score = 0;
+
+        // 1. Host domain relevance
+        if (parse_url($page->getUrl(), PHP_URL_HOST) === parse_url($url, PHP_URL_HOST)) {
+            $score++;
+        }
+
+        // 2. Context relevance
+        $pageTokens = $this->keywordHelper->extractKeywords($page->getText(), -1);
+        $titleTokens = $this->keywordHelper->tokenize($title);
+
         return 1.0;
     }
 

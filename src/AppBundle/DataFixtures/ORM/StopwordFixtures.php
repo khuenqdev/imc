@@ -17,17 +17,22 @@ class StopwordFixtures extends AbstractDataFixture
 {
     public function load(ObjectManager $manager)
     {
-        $csv = $this->container->get('router')->getContext()->getBaseUrl() . '/data/stop_words.csv';
-        echo $csv . "\n";
+        $csv = $this->container->get('kernel')->getRootDir() . '/data/stop_words.csv';
         $content = @file_get_contents($csv);
         $words = str_getcsv($content, "\n");
 
         foreach ($words as $word) {
-            $stopword = new Stopword($word);
-            $manager->persist($stopword);
-        }
+            $hash = sha1($word);
+            try {
+                $stopword = new Stopword($word);
+                $stopword->setHash($hash);
 
-        $manager->flush();
+                $manager->persist($stopword);
+                $manager->flush();
+            } catch (\Exception $e) {
+                
+            }
+        }
     }
 
     /**

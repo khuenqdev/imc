@@ -160,7 +160,7 @@
 يكون
 يمكن
 مليون
-﻿а
+а
 автентичен
 аз
 ако
@@ -419,7 +419,7 @@
 юмрук
 я
 як
-﻿a
+a
 à
 adeus
 agora
@@ -811,7 +811,7 @@ vossas
 vosso
 vossos
 zero
-﻿ačkoli
+ačkoli
 ahoj
 ale
 anebo
@@ -1067,7 +1067,7 @@ zač
 zatímco
 ze
 že
-﻿De
+De
 I
 af
 aldrig
@@ -1744,7 +1744,7 @@ zwölf
 των
 τον
 την
-και 
+και
 κι
 κ
 ειμαι
@@ -2380,7 +2380,7 @@ yourself
 yourselves
 z
 zero
-﻿él
+él
 ésta
 éstas
 éste
@@ -3063,7 +3063,7 @@ yo
 هنگامی
 مان
 تان
-﻿aiemmin
+aiemmin
 aika
 aikaa
 aikaan
@@ -3810,7 +3810,7 @@ ylemmäs
 yli
 ylös
 ympäri
-﻿a
+a
 à
 â
 abord
@@ -4273,11 +4273,11 @@ x
 y
 z
 zut
-﻿पर  
-इन 
-वह 
-यिह 
-वुह 
+पर
+इन
+वह
+यिह
+वुह
 जिन्हें
 जिन्हों
 तिन्हें
@@ -4436,7 +4436,7 @@ zut
 अत
 व
 न
-﻿a
+a
 abba
 abban
 abbÃ³l
@@ -5173,7 +5173,7 @@ volt
 voltak
 voltam
 voltunk
-﻿այդ
+այդ
 այլ
 այն
 այս
@@ -5218,8 +5218,6 @@ voltunk
 պիտի
 վրա
 և
-# from appendix D of: A Study of Stemming Effects on Information
-# Retrieval in Bahasa Indonesia
 ada
 adanya
 adalah
@@ -5577,7 +5575,7 @@ wong
 yaitu
 yakni
 yang
-﻿a
+a
 abbastanza
 accidenti
 ad
@@ -5645,7 +5643,7 @@ cioe
 cioÃ¨
 circa
 citta
-cittÃ 
+cittÃ
 codesta
 codesti
 codesto
@@ -5695,7 +5693,7 @@ dirimpetto
 dopo
 dove
 dovra
-dovrÃ 
+dovrÃ
 due
 dunque
 durante
@@ -5727,7 +5725,7 @@ forse
 fra
 fuori
 gia
-giÃ 
+giÃ
 giacche
 giorni
 giorno
@@ -5758,7 +5756,7 @@ invece
 io
 l
 la
-lÃ 
+lÃ
 lavoro
 le
 lei
@@ -5894,7 +5892,7 @@ quindi
 riecco
 salvo
 sara
-sarÃ 
+sarÃ
 sarebbe
 scopo
 scorso
@@ -5976,7 +5974,7 @@ vostra
 vostre
 vostri
 vostro
-﻿これ
+これ
 それ
 あれ
 この
@@ -6020,7 +6018,7 @@ vostro
 し
 それで
 しかし
-﻿aiz
+aiz
 ap
 ar
 apakš
@@ -6118,8 +6116,8 @@ tak
 iekams
 vien
 # modal verbs
-būt  
-biju 
+būt
+biju
 biji
 bija
 bijām
@@ -6127,8 +6125,8 @@ bijāt
 esmu
 esi
 esam
-esat 
-būšu     
+esat
+būšu
 būsi
 būs
 būsim
@@ -6446,7 +6444,7 @@ zowat
 zulke
 zullen
 zult
-﻿alle
+alle
 andre
 arbeid
 av
@@ -6703,7 +6701,7 @@ wy
 żaden
 zawsze
 że
-﻿a
+a
 à
 adeus
 agora
@@ -7095,7 +7093,7 @@ vossas
 vosso
 vossos
 zero
-﻿acea
+acea
 aceasta
 această
 aceea
@@ -7228,7 +7226,7 @@ ieri
 îl
 îmi
 împotriva
-în 
+în
 înainte
 înaintea
 încât
@@ -7376,7 +7374,7 @@ zece
 zero
 zi
 zice
-﻿а
+а
 е
 и
 ж
@@ -7797,7 +7795,7 @@ zice
 суть
 чуть
 тысяч
-﻿aderton
+aderton
 adertonde
 adjö
 aldrig
@@ -7881,10 +7879,10 @@ era
 ert
 ett
 ettusen
-få 
+få
 fanns
 får
-fått 
+fått
 fem
 femte
 femtio
@@ -8183,9 +8181,6 @@ vilka
 vilken
 vilket
 vill
-﻿# Turkish stopwords from LUCENE-559
-# merged with the list from "Information Retrieval on Turkish Texts"
-#   (http://www.users.muohio.edu/canf/papers/JASIST2008offPrint.pdf)
 acaba
 altmış
 altı
@@ -8395,7 +8390,7 @@ yirmi
 yoksa
 yüz
 zaten
-﻿的
+的
 一
 不
 在
