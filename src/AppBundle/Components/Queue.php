@@ -21,6 +21,12 @@ class Queue
     private $links = [];
 
     /**
+     * Keep track of link's hashes
+     * @var array
+     */
+    private $hash = [];
+
+    /**
      * @var EntityManager
      */
     private $em;
@@ -77,6 +83,7 @@ class Queue
 
         // 1. Place the link at the end of the heap
         $this->links[] = $link;
+        $this->hash[] = sha1($link->getUrl());
         $currentIdx = $this->getLength() - 1;
 
         // 2. Get temporary parent link in the heap
@@ -216,13 +223,14 @@ class Queue
 
     /**
      * Check if the link is already inside the queue
+     * by checking if its hash was already in our record
      *
-     * @param $link
+     * @param Link $link
      * @return bool
      */
-    public function hasLink($link)
+    public function hasLink(Link $link)
     {
-        return in_array($link, $this->links, true);
+        return in_array(sha1($link->getUrl()), $this->hash, true);
     }
 
     /**

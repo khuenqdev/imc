@@ -218,7 +218,7 @@ class Downloader
             }
 
             $this->em->persist($keywordObj);
-            $keywords->add($keywordObj);
+            $keywords->set(sha1($keyword), $keywordObj);
         }
 
         return $keywords;
@@ -238,25 +238,19 @@ class Downloader
         // Initialize a collection of links
         $links = new ArrayCollection();
 
-        // Get link repository
-        $linkRepo = $this->em->getRepository(Link::class);
-
         // Get link elements from the document object model
         $linkElements = $dom->getElementsByTagName('a');
 
         /** @var \DOMElement $linkElement */
         foreach ($linkElements as $linkElement) {
-            // Extract the Hyper Reference of the link element
-            $href = $linkElement->getAttribute('href');
-
             // If the link element has Hyper Reference
-            if ($href) {
+            if ($href = $linkElement->getAttribute('href')) {
                 // Parse the Hyper Reference as URL
                 $url = $this->urlHelper->parse($href, $baseUrl);
 
                 // Check if a link with the same URL already exists in the database and the link
                 // is not link of the current page we're downloading
-                if (!$linkRepo->findOneBy(['url' => $url]) && $url !== $page->getUrl()) {
+                if (!$this->em->getRepository(Link::class)->findOneBy(['url' => $url]) && $url !== $page->getUrl()) {
                     // Calculate link relevance
                     $relevance = $this->computeRelevance($page, $url, $linkElement->textContent);
 
@@ -267,7 +261,7 @@ class Downloader
 
                         // Persist and add the link to link collection
                         $this->em->persist($link);
-                        $links->add($link);
+                        $links->set(sha1($url), $link);
                     }
                 }
             }
