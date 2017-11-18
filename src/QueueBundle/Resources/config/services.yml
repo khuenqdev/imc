@@ -1,4 +1,4 @@
 services:
-#    queue.example:
-#        class: QueueBundle\Example
-#        arguments: ["@service_id", "plain_value", "%parameter%"]
+    queue:
+        class: QueueBundle\Queue
+        arguments: ["@doctrine.orm.queue_entity_manager"]

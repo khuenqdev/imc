@@ -3,6 +3,7 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
     - { resource: "@QueueBundle/Resources/config/services.yml" }
+    - { resource: "@DownloaderBundle/Resources/config/services.yml" }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -56,19 +57,20 @@ doctrine:
                 driver: pdo_sqlite
                 user: imc
                 path: "%queue_db_path%"
-                charset: utf8mb4
+                charset: UTF8
     orm:
-#        auto_generate_proxy_classes: '%kernel.debug%'
-#        naming_strategy: doctrine.orm.naming_strategy.underscore
-#        auto_mapping: true
         default_entity_manager: default
+        auto_generate_proxy_classes: '%kernel.debug%'
         entity_managers:
+            auto_mapping: true
             default:
                 connection: default
+                naming_strategy: doctrine.orm.naming_strategy.underscore
                 mappings:
                     AppBundle: ~
             queue:
                 connection: queue
+                naming_strategy: doctrine.orm.naming_strategy.underscore
                 mappings:
                     QueueBundle: ~
 

@@ -1,3 +1,7 @@
+downloader:
+    resource: "@DownloaderBundle/Resources/config/routing.yml"
+    prefix:   /
+
 queue:
     resource: "@QueueBundle/Resources/config/routing.yml"
     prefix:   /

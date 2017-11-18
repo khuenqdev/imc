@@ -1,0 +1,11 @@
+services:
+    downloader:
+        class: DownloaderBundle\Downloader
+        arguments: ["@doctrine.orm.entity_manager", "@queue", '@helpers']
+
+    helpers:
+        class: DownloaderBundle\Services\Helpers
+        arguments: ["@helper.keyword"]
+    helper.keyword:
+        class: DownloaderBundle\Services\Helpers\Keyword
+        arguments: ["@doctrine.orm.entity_manager"]

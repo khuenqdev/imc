@@ -1,0 +1,26 @@
+QueueBundle\Entity\Link:
+    type: entity
+    table: null
+    repositoryClass: QueueBundle\Repository\LinkRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        hash:
+            type: string
+            length: 255
+            unique: true
+        url:
+            type: string
+            length: '512'
+            unique: true
+        title:
+            type: string
+            length: '512'
+            nullable: true
+        relevance:
+            type: float
+    lifecycleCallbacks: {  }

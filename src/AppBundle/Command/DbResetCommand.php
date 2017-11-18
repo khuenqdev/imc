@@ -36,14 +36,42 @@ class DbResetCommand extends ContainerAwareCommand
 
         $databaseDrop = $this->getApplication()->find('doctrine:database:drop');
         $databaseDrop->run(new ArrayInput(['command' => 'doctrine:database:drop', '--force' => true]), $output);
+        $databaseDrop->run(new ArrayInput([
+            'command' => 'doctrine:database:drop',
+            '--force' => true,
+            '--connection' => 'queue',
+            '--env' => 'test'
+        ]), $output);
 
         $databaseCreate = $this->getApplication()->find('doctrine:database:create');
         $databaseCreate->run(new ArrayInput(['command' => 'doctrine:database:create']), $output);
+        $databaseCreate->run(new ArrayInput([
+            'command' => 'doctrine:database:create',
+            '--connection' => 'queue',
+            '--env' => 'dev'
+        ]), $output);
+        $databaseCreate->run(new ArrayInput([
+            'command' => 'doctrine:database:create',
+            '--connection' => 'queue',
+            '--env' => 'test'
+        ]), $output);
 
         $databaseUpdate = $this->getApplication()->find('doctrine:schema:update');
         $databaseUpdate->run(new ArrayInput(['command' => 'doctrine:schema:update', '--force' => true]), $output);
+        $databaseUpdate->run(new ArrayInput([
+            'command' => 'doctrine:schema:update',
+            '--force' => true,
+            '--em' => 'queue',
+            '--env' => 'dev'
+        ]), $output);
+        $databaseUpdate->run(new ArrayInput([
+            'command' => 'doctrine:schema:update',
+            '--force' => true,
+            '--em' => 'queue',
+            '--env' => 'test'
+        ]), $output);
 
         $initialFixtures = $this->getApplication()->find('doctrine:fixtures:load');
-        $initialFixtures->run(new ArrayInput(['command' => 'doctrine:fixtures:load']), $output);
+        $initialFixtures->run(new ArrayInput(['command' => 'doctrine:fixtures:load', '--no-interaction' => true]), $output);
     }
 }

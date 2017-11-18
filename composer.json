@@ -5,7 +5,8 @@
     "autoload": {
         "psr-4": {
             "AppBundle\\": "src/AppBundle",
-            "QueueBundle\\": "src/QueueBundle"
+            "QueueBundle\\": "src/QueueBundle",
+            "DownloaderBundle\\": "src/DownloaderBundle"
         },
         "classmap": [
             "app/AppKernel.php",
@@ -31,6 +32,8 @@
         "miljar/php-exif": "^0.6.3",
         "sensio/distribution-bundle": "~4.0",
         "sensio/framework-extra-bundle": "^3.0.2",
+        "symfony/css-selector": "^3.3",
+        "symfony/dom-crawler": "^3.3",
         "symfony/monolog-bundle": "^3.0.2",
         "symfony/swiftmailer-bundle": "~2.3,>=2.3.10",
         "symfony/symfony": "2.8.*",
