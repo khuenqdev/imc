@@ -1,4 +1,4 @@
 services:
     queue:
         class: QueueBundle\Queue
-        arguments: ["@doctrine.orm.queue_entity_manager"]
+        arguments: ["@doctrine.orm.entity_manager"]

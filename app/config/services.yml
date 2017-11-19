@@ -7,35 +7,3 @@ services:
     #service_name:
     #    class: AppBundle\Directory\ClassName
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
-
-    # Services
-
-    # Helpers
-    hlp.string:
-        class: AppBundle\Services\Helpers\String
-
-    hlp.url:
-        class: AppBundle\Services\Helpers\Url
-
-    hlp.image:
-        class: AppBundle\Services\Helpers\Image
-        arguments: ['@kernel']
-
-    hlp.keyword:
-        class: AppBundle\Services\Helpers\Keyword
-        arguments: ['@doctrine.orm.entity_manager']
-
-    # Components
-    cpn.queue:
-        class: AppBundle\Components\Queue
-        arguments: ['@doctrine.orm.entity_manager']
-
-    cpn.crawler:
-        class: AppBundle\Components\Crawler
-        arguments: ['@doctrine.orm.entity_manager', '@cpn.queue', '@cpn.downloader']
-
-    cpn.downloader:
-        class: AppBundle\Components\Downloader
-        arguments: ['@logger','@doctrine.orm.entity_manager', '@hlp.keyword', '@hlp.url']
-        tags:
-            - { name: monolog.logger, channel: imc }

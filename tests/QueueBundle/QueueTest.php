@@ -8,6 +8,7 @@
 
 namespace Tests\QueueBundle;
 
+use AppBundle\Entity\Link;
 use QueueBundle\Queue;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -26,10 +27,51 @@ class QueueTest extends KernelTestCase
 
     public function testAddLink()
     {
-        $this->service->addLink('http://example.com', 'Example', 1.0);
+        $link1 = new Link('http://example.com', '', 0.8);
+        $link2 = new Link('http://example1.com', '', 0.5);
+        $link3 = new Link('http://example2.com', '', 0.33);
+        $link4 = new Link('http://example3.com', '', 0.81);
+        $link5 = new Link('http://example4.com', '', 0.83);
+        $link6 = new Link('http://example5.com', '', 1.0);
+        $link7 = new Link('http://example6.com', '', 1.0);
+        $this->service->addLink($link1);
+        $this->service->addLink($link2);
+        $this->service->addLink($link3);
+        $this->service->addLink($link4);
+        $this->service->addLink($link5);
+        $this->service->addLink($link6);
+        $this->service->addLink($link7);
+
+//        dump($this->service->getLinks());
     }
 
     public function testGetNextLink()
+    {
+        $link1 = new Link('http://example.com', '', 0.8);
+        $link2 = new Link('http://example1.com', '', 0.5);
+        $link3 = new Link('http://example2.com', '', 0.33);
+        $link4 = new Link('http://example3.com', '', 0.81);
+        $link5 = new Link('http://example4.com', '', 0.83);
+        $link6 = new Link('http://example5.com', '', 1.0);
+        $link7 = new Link('http://example6.com', '', 1.0);
+        $this->service->addLink($link1);
+        $this->service->addLink($link2);
+        $this->service->addLink($link3);
+        $this->service->addLink($link4);
+        $this->service->addLink($link5);
+        $this->service->addLink($link6);
+        $this->service->addLink($link7);
+
+//        dump($this->service->getNextLink());
+//        dump($this->service->getNextLink());
+//        dump($this->service->getNextLink());
+//        dump($this->service->getNextLink());
+//        dump($this->service->getNextLink());
+//        dump($this->service->getNextLink());
+//        dump($this->service->getNextLink());
+    }
+
+    public function testIsEmpty()
     {
 
     }

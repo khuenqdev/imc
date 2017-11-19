@@ -18,5 +18,5 @@ parameters:
     # A secret key that's used to generate certain security-related tokens
     secret: ThisTokenIsNotSoSecretChangeIt
 
-    # Path to queue sqlite database
-    queue_db_path: "%kernel.cache_dir%/queue.db"
+    # Test database's name
+    test_database_name: imc_test

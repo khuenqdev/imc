@@ -8,16 +8,16 @@
 
 namespace DownloaderBundle;
 
+use AppBundle\Entity\Link;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Exception\DownloaderException;
 use DownloaderBundle\Services\Helpers;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\RequestException;
-use MyProject\Proxies\__CG__\stdClass;
 use Psr\Http\Message\ResponseInterface;
 use QueueBundle\Queue;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Link;
+use Symfony\Component\DomCrawler\Link as DomLink;
 use Symfony\Component\HttpFoundation\Response;
 
 class Downloader
@@ -43,7 +43,7 @@ class Downloader
     protected $queue;
 
     /**
-     * @var stdClass
+     * @var \stdClass
      */
     protected $page;
 
@@ -104,16 +104,27 @@ class Downloader
 
     /**
      * @param $url
+     *
+     * @return bool|string
      */
     public function download($url)
     {
         $this->initializePage($url);
 
-        $res = $this->client->get($url, ['timeout' => 3]);
+        try {
 
-        if ($res->getStatusCode() == Response::HTTP_OK) {
-            $this->fetchContent($res);
+            $res = $this->client->get($url, ['timeout' => 3]);
+
+            if ($res->getStatusCode() == Response::HTTP_OK) {
+                $this->fetchContent($res);
+                return true;
+            }
+
+        } catch (\Exception $e) {
+            return $e->getMessage();
         }
+
+        return false;
     }
 
     /**
@@ -126,7 +137,7 @@ class Downloader
         $this->page->html = $response->getBody()->getContents();
         $this->page->dom = new Crawler($this->page->html, $this->page->url);
         $this->page->text = $this->extractText();
-        $this->page->links = $this->extractLinks();
+        $this->extractLinks();
     }
 
     /**
@@ -136,26 +147,25 @@ class Downloader
     {
         $links = $this->page->dom->filter('a')->links();
 
-        $linkData = [];
+        /** @var DomLink $domLink */
+        foreach ($links as $domLink) {
 
-        /** @var Link $link */
-        foreach ($links as $link) {
-            $url = $link->getUri();
-            $title = empty($link->getNode()->textContent)
-                ? trim($link->getNode()->getAttribute('title'))
-                : trim($link->getNode()->textContent);
-            $relevance = $this->calculateRelevance($url, $title);
+            $url = $this->helpers->url->parse($domLink->getUri(), $this->page->url);
 
-            $linkData[sha1($url)] = [
-                'url' => $url,
-                'title' => $title,
-                'relevance' => $relevance
-            ];
+            if(!empty($url)) {
+                $title = empty($domLink->getNode()->textContent)
+                    ? trim($domLink->getNode()->getAttribute('title'))
+                    : trim($domLink->getNode()->textContent);
+                $relevance = $this->calculateRelevance($url, $title);
 
-            $this->queue->addLink($url, $title, $relevance);
+                // Create a database link entity if not exist
+                if (!$this->em->getRepository(Link::class)->findOneBy(['url' => $url])) {
+                    $link = new Link($url, $title, $relevance);
+                    $this->queue->addLink($link);
+                }
+            }
+
         }
-
-        return $linkData;
     }
 
     /**
@@ -206,7 +216,7 @@ class Downloader
     /**
      * Get page cache from the downloader
      *
-     * @return stdClass
+     * @return \stdClass
      */
     public function getPage()
     {
@@ -224,6 +234,5 @@ class Downloader
         $this->page->html = null;
         $this->page->dom = null;
         $this->page->text = null;
-        $this->page->links = null;
     }
 }

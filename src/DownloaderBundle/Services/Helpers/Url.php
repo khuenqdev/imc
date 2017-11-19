@@ -6,7 +6,7 @@
  * Time: 3:19 PM
  */
 
-namespace AppBundle\Services\Helpers;
+namespace DownloaderBundle\Services\Helpers;
 
 
 class Url

@@ -2,6 +2,8 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Entity\Link;
+
 /**
  * LinkRepository
  *
@@ -10,13 +12,24 @@ namespace AppBundle\Repository;
  */
 class LinkRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getMostRelevantLink()
+    /**
+     * Get the most relevant yet unvisited link
+     *
+     * @return Link|bool
+     */
+    public function getSeedLink()
     {
-        $qb = $this->createQueryBuilder('l');
-        /*$qb->select('l, MAX(l.relevance) as HIDDEN max_relevance')
+        $qb = $this->createQueryBuilder('l')
+            ->where('l.visited = :unvisited')
+            ->setParameter('unvisited', false)
+            ->orderBy('l.relevance', 'DESC')
             ->setMaxResults(1)
-            ->orderBy('max_relevance', 'DESC');*/
+            ->getQuery();
 
-        return $qb->getQuery()->getResult();
+        try {
+            return $qb->getSingleResult();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

@@ -9,13 +9,16 @@
 namespace DownloaderBundle\Services;
 
 use DownloaderBundle\Services\Helpers\Keyword;
+use DownloaderBundle\Services\Helpers\Url;
 
 class Helpers
 {
     public $keyword;
+    public $url;
 
-    public function __construct(Keyword $keyword)
+    public function __construct(Keyword $keyword, Url $url)
     {
         $this->keyword = $keyword;
+        $this->url = $url;
     }
 }

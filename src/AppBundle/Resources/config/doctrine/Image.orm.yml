@@ -9,18 +9,11 @@ AppBundle\Entity\Image:
             generator:
                 strategy: AUTO
     manyToOne:
-        page:
-            targetEntity: AppBundle\Entity\Page
-            inversedBy: images
+        source:
+            targetEntity: AppBundle\Entity\Link
             joinColumn:
-                name: page_id
-                referenceColumnName: id
-        location:
-            targetEntity: AppBundle\Entity\Location
-            inversedBy: images
-            joinColumn:
-                name: location_id
-                referenceColumnName: id
+                name: source
+                referenceColumnName: url
     fields:
         hash:
             type: string
@@ -65,4 +58,23 @@ AppBundle\Entity\Image:
             type: datetime
             nullable: true
             column: date_acquired
+        latitude:
+            type: decimal
+            precision: 10
+            scale: '6'
+        longitude:
+            type: decimal
+            precision: 10
+            scale: '6'
+        address:
+            type: string
+            length: '512'
+        zipcode:
+            type: string
+            length: 255
+            nullable: true
+        country:
+            type: string
+            length: 255
+            nullable: true
     lifecycleCallbacks: {  }
