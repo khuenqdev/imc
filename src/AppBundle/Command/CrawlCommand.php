@@ -84,10 +84,7 @@ class CrawlCommand extends ContainerAwareCommand
 
             if ($downloadResults === true) {
 
-                $link->visited = true;
-                $this->em->persist($link);
-                $this->em->flush($link);
-
+                $this->markLinkAsVisited($link);
                 $output->writeln(' <info>SUCCESS</info>');
 
             } else {
@@ -108,6 +105,18 @@ class CrawlCommand extends ContainerAwareCommand
         }
 
         $output->writeln('<comment>Crawling task finished!</comment>');
+    }
+
+    /**
+     * Mark a link as visited
+     *
+     * @param $link
+     */
+    protected function markLinkAsVisited($link)
+    {
+        $link->visited = true;
+        $this->em->persist($link);
+        $this->em->flush($link);
     }
 
     /**

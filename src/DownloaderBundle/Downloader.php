@@ -158,9 +158,9 @@ class Downloader
                     : trim($domLink->getNode()->textContent);
                 $relevance = $this->calculateRelevance($url, $title);
 
-                // Create a database link entity if not exist
+                // Create a database link entity if not exist and add new link to the queue
                 if (!$this->em->getRepository(Link::class)->findOneBy(['url' => $url])) {
-                    $link = new Link($url, $title, $relevance);
+                    $link = $this->saveLinkToDatabase($url, $title, $relevance);
                     $this->queue->addLink($link);
                 }
             }
@@ -221,6 +221,23 @@ class Downloader
     public function getPage()
     {
         return $this->page;
+    }
+
+    /**
+     * Save link to database
+     *
+     * @param $url
+     * @param $title
+     * @param $relevance
+     * @return Link
+     */
+    protected function saveLinkToDatabase($url, $title, $relevance)
+    {
+        $link = new Link($url, $title, $relevance);
+        $this->em->persist($link);
+        $this->em->flush($link);
+
+        return $link;
     }
 
     /**
