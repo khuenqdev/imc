@@ -41,9 +41,6 @@ class CrawlCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        //$this->queue = $this->getContainer()->get('queue');
-        //$this->downloader = $this->getContainer()->get('');
-
         $this->setName('crawler:crawl')
             ->setDescription('Perform a crawling task')
             ->setHelp('Perform a crawling task');
@@ -86,6 +83,7 @@ class CrawlCommand extends ContainerAwareCommand
 
                 $this->markLinkAsVisited($link);
                 $output->writeln(' <info>SUCCESS</info>');
+                $noOfPages++;
 
             } else {
 
@@ -96,8 +94,6 @@ class CrawlCommand extends ContainerAwareCommand
                 }
 
             }
-
-            $noOfPages++;
 
             if ($noOfPages % 100 === 0) {
                 $output->writeln("<fg=magenta;options=bold>[Memory Usage] " . $this->memoryUsage(true) . "</>");

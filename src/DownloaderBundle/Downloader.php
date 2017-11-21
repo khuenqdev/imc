@@ -152,7 +152,7 @@ class Downloader
 
             $url = $this->helpers->url->parse($domLink->getUri(), $this->page->url);
 
-            if(!empty($url)) {
+            if (!empty($url)) {
                 $title = empty($domLink->getNode()->textContent)
                     ? trim($domLink->getNode()->getAttribute('title'))
                     : trim($domLink->getNode()->textContent);
@@ -166,6 +166,11 @@ class Downloader
             }
 
         }
+    }
+
+    public function extractImages()
+    {
+
     }
 
     /**

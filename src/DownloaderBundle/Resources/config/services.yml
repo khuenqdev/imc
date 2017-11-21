@@ -11,3 +11,6 @@ services:
         arguments: ["@doctrine.orm.entity_manager"]
     helper.url:
         class: DownloaderBundle\Services\Helpers\Url
+    helper.image:
+        class: DownloaderBundle\Services\Helpers\Image
+        arguments: ['@kernel']
