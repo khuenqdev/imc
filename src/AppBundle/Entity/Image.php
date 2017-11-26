@@ -98,6 +98,11 @@ class Image
     public $longitude;
 
     /**
+     * @var float
+     */
+    public $altitude;
+
+    /**
      * @var string
      */
     public $address;
@@ -112,9 +117,41 @@ class Image
      */
     public $country;
 
-    public function __construct(Link $source, $src)
+    /**
+     * @var string
+     */
+    private $metadata;
+
+    public function __construct(Link $source, $src, $alt = "", $width = null, $height = null)
     {
         $this->src = $src;
         $this->source = $source;
+        $this->alt = $alt;
+        $this->width = $width;
+        $this->height = $height;
+        $this->hash = hash('sha256', $src);
+    }
+
+    /**
+     * Serialize image metadata
+     *
+     * @param $metadata
+     * @return $this
+     */
+    public function setMetadata($metadata)
+    {
+        $this->metadata = serialize($metadata);
+
+        return $this;
+    }
+
+    /**
+     * Get un-serialized metadata
+     *
+     * @return mixed
+     */
+    public function getMetadata()
+    {
+        return unserialize($this->metadata);
     }
 }

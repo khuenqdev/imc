@@ -18,6 +18,7 @@ AppBundle\Entity\Image:
         hash:
             type: string
             length: 255
+            unique: true
         src:
             type: string
             length: '1024'
@@ -31,6 +32,7 @@ AppBundle\Entity\Image:
         path:
             type: string
             length: '512'
+            nullable: true
         width:
             type: integer
         height:
@@ -62,13 +64,21 @@ AppBundle\Entity\Image:
             type: decimal
             precision: 10
             scale: '6'
+            nullable: true
         longitude:
             type: decimal
             precision: 10
             scale: '6'
+            nullable: true
+        altitude:
+            type: decimal
+            precision: 10
+            scale: '6'
+            nullable: true
         address:
             type: string
             length: '512'
+            nullable: true
         zipcode:
             type: string
             length: 255
@@ -77,4 +87,6 @@ AppBundle\Entity\Image:
             type: string
             length: 255
             nullable: true
+        metadata:
+            type: text
     lifecycleCallbacks: {  }

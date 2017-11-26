@@ -77,22 +77,15 @@ class CrawlCommand extends ContainerAwareCommand
             $link = $this->queue->getNextLink();
             $output->write('Fetch: ' . $link->url);
 
-            $downloadResults = $this->downloader->download($link->url);
+            $downloadResults = $this->downloader->download($link);
 
             if ($downloadResults === true) {
-
                 $this->markLinkAsVisited($link);
                 $output->writeln(' <info>SUCCESS</info>');
                 $noOfPages++;
-
             } else {
-
                 $output->writeln(' <fail>FAILED</fail>');
-
-                if (is_string($downloadResults)) {
-                    $output->writeln("<error>{$downloadResults}</error>");
-                }
-
+                $output->writeln("<error>{$this->downloader->getErrorMessage()}</error>");
             }
 
             if ($noOfPages % 100 === 0) {

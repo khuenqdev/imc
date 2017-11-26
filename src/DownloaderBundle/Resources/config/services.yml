@@ -5,7 +5,7 @@ services:
 
     helpers:
         class: DownloaderBundle\Services\Helpers
-        arguments: ["@helper.keyword", "@helper.url"]
+        arguments: ["@helper.keyword", "@helper.url", '@helper.image']
     helper.keyword:
         class: DownloaderBundle\Services\Helpers\Keyword
         arguments: ["@doctrine.orm.entity_manager"]
@@ -13,4 +13,4 @@ services:
         class: DownloaderBundle\Services\Helpers\Url
     helper.image:
         class: DownloaderBundle\Services\Helpers\Image
-        arguments: ['@kernel']
+        arguments: ['@kernel', '@doctrine.orm.entity_manager']

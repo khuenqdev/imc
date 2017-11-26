@@ -17,6 +17,7 @@ use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 use QueueBundle\Queue;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Image;
 use Symfony\Component\DomCrawler\Link as DomLink;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -46,6 +47,11 @@ class Downloader
      * @var \stdClass
      */
     protected $page;
+
+    /**
+     * @var string
+     */
+    protected $errorMessage = "";
 
     /**
      * List of HTML elements contain texts
@@ -82,13 +88,13 @@ class Downloader
     /**
      * Download content of a page (asynchronous)
      *
-     * @param $url
+     * @param Link $link
      */
-    public function downloadAsync($url)
+    public function downloadAsync(Link $link)
     {
-        $this->initializePage($url);
+        $this->initializePage($link);
 
-        $promise = $this->client->getAsync($url, ['timeout' => 3]);
+        $promise = $this->client->getAsync($this->page->link->url, ['timeout' => 3]);
 
         $promise->then(
             function (ResponseInterface $res) {
@@ -97,23 +103,23 @@ class Downloader
                 }
             },
             function (RequestException $e) {
-                throw new DownloaderException($e->getResponse()->getStatusCode(), $e->getMessage());
+                $this->errorMessage .= $e->getMessage() . "\n";
             }
         );
     }
 
     /**
-     * @param $url
+     * @param Link $link
      *
      * @return bool|string
      */
-    public function download($url)
+    public function download(Link $link)
     {
-        $this->initializePage($url);
+        $this->initializePage($link);
 
         try {
 
-            $res = $this->client->get($url, ['timeout' => 3]);
+            $res = $this->client->get($this->page->link->url, ['timeout' => 3, 'verify' => false]);
 
             if ($res->getStatusCode() == Response::HTTP_OK) {
                 $this->fetchContent($res);
@@ -121,10 +127,20 @@ class Downloader
             }
 
         } catch (\Exception $e) {
-            return $e->getMessage();
+            $this->errorMessage .= $e->getMessage() . "\n";
         }
 
         return false;
+    }
+
+    /**
+     * Get error message (if any)
+     *
+     * @return string
+     */
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
     }
 
     /**
@@ -135,22 +151,22 @@ class Downloader
     public function fetchContent(ResponseInterface $response)
     {
         $this->page->html = $response->getBody()->getContents();
-        $this->page->dom = new Crawler($this->page->html, $this->page->url);
+        $this->page->dom = new Crawler($this->page->html, $this->page->link->url);
         $this->page->text = $this->extractText();
         $this->extractLinks();
+        $this->extractImages();
     }
 
     /**
      * Extract links
      */
-    public function extractLinks()
+    protected function extractLinks()
     {
         $links = $this->page->dom->filter('a')->links();
 
         /** @var DomLink $domLink */
         foreach ($links as $domLink) {
-
-            $url = $this->helpers->url->parse($domLink->getUri(), $this->page->url);
+            $url = $this->helpers->url->parse($domLink->getUri(), $this->page->link->url);
 
             if (!empty($url)) {
                 $title = empty($domLink->getNode()->textContent)
@@ -164,13 +180,23 @@ class Downloader
                     $this->queue->addLink($link);
                 }
             }
-
         }
     }
 
-    public function extractImages()
+    /**
+     * Extract images
+     */
+    protected function extractImages()
     {
+        $imgElements = $this->page->dom->filter('img')->images();
 
+        /** @var Image $element */
+        foreach ($imgElements as $element) {
+            $src = $element->getUri();
+            $alt = $element->getNode()->getAttribute('alt');
+            $this->helpers->image->download($this->page->link, $src, $alt);
+            $this->errorMessage .= $this->helpers->image->getErrorMessage();
+        }
     }
 
     /**
@@ -247,12 +273,13 @@ class Downloader
 
     /**
      * Initialize downloader's page cache
+     * @param Link $link
      */
-    protected function initializePage($url)
+    protected function initializePage(Link $link)
     {
         $this->page = new \stdClass();
 
-        $this->page->url = $url;
+        $this->page->link = $link;
         $this->page->html = null;
         $this->page->dom = null;
         $this->page->text = null;
