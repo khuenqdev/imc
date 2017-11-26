@@ -55,5 +55,5 @@ after.sh
 aliases
 Homestead.yaml
 puphpet/config-custom.yaml
-/app/images/*
-!app/images/.gitkeep
+images/*
+!images/.gitkeep
