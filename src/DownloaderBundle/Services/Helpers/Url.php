@@ -26,6 +26,9 @@ class Url
             return false;
         }
 
+        // Remove fragments and query strings
+        $href = preg_replace('/(\#[a-zA-Z0-9\=\-\_]*)|(\?[a-zA-Z0-9\=\-\_\&\+]*)/i', '', $href);
+
         $hrefComponents = parse_url($href);
 
         if ($hrefComponents !== FALSE) {

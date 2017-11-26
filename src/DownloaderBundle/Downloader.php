@@ -10,7 +10,6 @@ namespace DownloaderBundle;
 
 use AppBundle\Entity\Link;
 use Doctrine\ORM\EntityManager;
-use DownloaderBundle\Exception\DownloaderException;
 use DownloaderBundle\Services\Helpers;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\RequestException;
@@ -82,7 +81,11 @@ class Downloader
         $this->em = $em;
         $this->queue = $queue;
         $this->helpers = $helpers;
-        $this->client = new HttpClient();
+        $this->client = new HttpClient([
+            'timeout' => 3,
+            'allow_redirects' => false,
+            'verify' => false
+        ]);
     }
 
     /**
@@ -92,9 +95,9 @@ class Downloader
      */
     public function downloadAsync(Link $link)
     {
-        $this->initializePage($link);
+        $this->initialize($link);
 
-        $promise = $this->client->getAsync($this->page->link->url, ['timeout' => 3]);
+        $promise = $this->client->getAsync($this->page->link->url);
 
         $promise->then(
             function (ResponseInterface $res) {
@@ -103,7 +106,7 @@ class Downloader
                 }
             },
             function (RequestException $e) {
-                $this->errorMessage .= $e->getMessage() . "\n";
+                $this->errorMessage = "[Downloader Error] " . $e->getMessage() . "\n";
             }
         );
     }
@@ -115,19 +118,20 @@ class Downloader
      */
     public function download(Link $link)
     {
-        $this->initializePage($link);
+        $this->initialize($link);
 
         try {
 
-            $res = $this->client->get($this->page->link->url, ['timeout' => 3, 'verify' => false]);
+            $res = $this->client->get($this->page->link->url);
 
             if ($res->getStatusCode() == Response::HTTP_OK) {
                 $this->fetchContent($res);
+                $this->markAsVisited($link);
                 return true;
             }
 
         } catch (\Exception $e) {
-            $this->errorMessage .= $e->getMessage() . "\n";
+            $this->errorMessage = "[Downloader Error] " . $e->getMessage() . "\n";
         }
 
         return false;
@@ -153,8 +157,8 @@ class Downloader
         $this->page->html = $response->getBody()->getContents();
         $this->page->dom = new Crawler($this->page->html, $this->page->link->url);
         $this->page->text = $this->extractText();
-        $this->extractLinks();
         $this->extractImages();
+        $this->extractLinks();
     }
 
     /**
@@ -201,7 +205,7 @@ class Downloader
             $src = $element->getUri();
             $alt = $element->getNode()->getAttribute('alt');
             $this->helpers->image->download($this->page->link, $src, $alt);
-            $this->errorMessage .= $this->helpers->image->getErrorMessage();
+            $this->errorMessage = $this->helpers->image->getErrorMessage();
         }
 
         return $this;
@@ -273,23 +277,49 @@ class Downloader
     protected function saveLinkToDatabase($url, $title, $relevance)
     {
         $link = new Link($url, $title, $relevance);
-        $this->em->persist($link);
-        $this->em->flush($link);
+
+        try {
+            $this->em->persist($link);
+            $this->em->flush($link);
+        } catch (\Exception $e) {
+            $this->errorMessage = "[Downloader Error] " . $e->getMessage() . "\n";
+        }
 
         return $link;
+    }
+
+    /**
+     * Mark a link as visited
+     *
+     * @param Link $link
+     */
+    protected function markAsVisited(Link $link)
+    {
+        $link->visited = true;
+
+        try{
+            $this->em->persist($link);
+            $this->em->flush($link);
+        } catch (\Exception $e) {
+            $this->errorMessage = "[Downloader Error] " . $e->getMessage() . "\n";
+        }
     }
 
     /**
      * Initialize downloader's page cache
      * @param Link $link
      */
-    protected function initializePage(Link $link)
+    protected function initialize(Link $link)
     {
-        $this->page = new \stdClass();
+        if (!$this->page) {
+            $this->page = new \stdClass();
+        }
 
         $this->page->link = $link;
         $this->page->html = null;
         $this->page->dom = null;
         $this->page->text = null;
+
+        $this->errorMessage = "";
     }
 }

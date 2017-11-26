@@ -39,11 +39,21 @@ class Image
      */
     protected $errorMessage = "";
 
+    /**
+     * @var Client
+     */
+    protected $client;
+
     public function __construct(Kernel $kernel, EntityManager $em)
     {
         $this->kernel = $kernel;
         $this->em = $em;
         $this->allowedAspectRatio = $this->initializeAspectRatios();
+        $this->client = new Client([
+            'timeout' => 3,
+            'allow_redirects' => false,
+            'verify' => $this->getParameter('http_verify_ssl')
+        ]);
     }
 
     /**
@@ -64,25 +74,19 @@ class Image
             return false;
         }
 
-        // Download the file using guzzle client
-        $client = new Client([
-            'timeout' => 0,
-            'allow_redirects' => false,
-            'verify' => $this->getParameter('http_verify_ssl')
-        ]);
-
+        // Download the image file
         if ($saveDir = $this->getDirectory($source->url)) {
             $filename = $saveDir . $imagePath['filename'] . "." . $imagePath['extension'];
 
             try {
-                $client->get($src, ['sink' => $filename]);
+                $this->client->get($src, ['sink' => $filename]);
 
                 if ($this->validate($filename)) {
                     $this->saveImage($source, $src, $alt, $this->getMetadata($filename));
                     return true;
                 }
             } catch (\Exception $e) {
-                $this->errorMessage .= $e->getMessage() . "\n";
+                $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
                 return false;
             }
         }
@@ -139,10 +143,12 @@ class Image
         }
 
         // Save to database
-        $this->em->persist($source);
-        $this->em->flush($source);
-        $this->em->persist($image);
-        $this->em->flush($image);
+        try {
+            $this->em->persist($image);
+            $this->em->flush($image);
+        } catch (\Exception $e) {
+            $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
+        }
 
         return $this;
     }
@@ -186,7 +192,7 @@ class Image
                 }
             }
         } catch (\Exception $e) {
-
+            $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
         }
     }
 
@@ -245,7 +251,7 @@ class Image
             || !in_array($ratio, $this->allowedAspectRatio)
         ) {
             unlink($filename);
-            $this->errorMessage .= "Invalid aspect ratio for image {$filename}. The image dimension is {$width} x {$height}.\n";
+            $this->errorMessage = "[Image Error] Invalid aspect ratio for image {$filename}. The image dimension is {$width} x {$height}.\n";
             return false;
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Services\Helpers;
+namespace DownloaderBundle\Services\Helpers;
 
 /**
  * Created by PhpStorm.
