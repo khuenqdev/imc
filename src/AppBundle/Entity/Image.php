@@ -22,11 +22,6 @@ class Image
     /**
      * @var string
      */
-    public $hash;
-
-    /**
-     * @var string
-     */
     public $src;
 
     /**
@@ -129,7 +124,6 @@ class Image
         $this->alt = $alt;
         $this->width = $width;
         $this->height = $height;
-        $this->hash = hash('sha256', $src);
     }
 
     /**

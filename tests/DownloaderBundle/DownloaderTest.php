@@ -38,15 +38,27 @@ class DownloaderTest extends KernelTestCase
     /**
      * Test download method
      */
-    public function testDownload()
+//    public function testDownload()
+//    {
+//        $link = $this->em->getRepository(Link::class)->findOneBy(['url' => 'https://www.locationscout.net/']);
+//
+//        if (!$link) {
+//            $link = new Link('https://www.locationscout.net/', 'Locationscout - Discover the best places for photography', 1.0, false);
+//        }
+//
+//        $this->service->download($link);
+//        echo $this->service->getErrorMessage() . "\n";
+//    }
+
+    public function testInsertLink()
     {
-        $link = $this->em->getRepository(Link::class)->findOneBy(['url' => 'https://www.locationscout.net/']);
+        $link = new Link('example.com', 'Example', 1.0, false);
 
-        if (!$link) {
-            $link = new Link('https://www.locationscout.net/', 'Locationscout - Discover the best places for photography', 1.0, false);
-        }
+        echo "Before insert: " . $link->id . "\n";
 
-        $this->service->download($link);
-        echo $this->service->getErrorMessage() . "\n";
+        $this->em->persist($link);
+        $this->em->flush($link);
+
+        echo "After insert: " . $link->id . "\n";
     }
 }

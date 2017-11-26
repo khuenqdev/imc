@@ -99,13 +99,19 @@ class CrawlCommand extends ContainerAwareCommand
     /**
      * Mark a link as visited
      *
-     * @param $link
+     * @param Link $link
      */
-    protected function markLinkAsVisited($link)
+    protected function markLinkAsVisited(Link $link)
     {
         $link->visited = true;
-        $this->em->persist($link);
-        $this->em->flush($link);
+
+        try{
+            $this->em->persist($link);
+            $this->em->flush($link);
+        } catch (\Exception $e) {
+            echo $e->getMessage() . "\n";
+            echo $this->downloader->getErrorMessage() . "\n";
+        }
     }
 
     /**

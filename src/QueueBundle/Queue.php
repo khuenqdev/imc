@@ -49,7 +49,7 @@ class Queue
     public function addLink(Link $link)
     {
         // 0. If the link already exist in queue or it has been visited or it is irrelevant then ignore
-        if ($this->hasLink($link) || $link->visited || $link->relevance == 0) {
+        if ($this->hasLink($link)) {
             return $this;
         }
 

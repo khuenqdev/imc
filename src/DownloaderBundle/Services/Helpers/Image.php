@@ -107,14 +107,15 @@ class Image
      * @param $src
      * @param string $alt
      * @param array $metadata
+     * @return $this
      */
     protected function saveImage($source, $src, $alt = '', array $metadata)
     {
         // Avoid duplication of image
         if ($this->em->getRepository(\AppBundle\Entity\Image::class)
-            ->findOneBy(['hash' => hash('sha256', $src)])
+            ->findOneBy(['src' => $src])
         ) {
-            return;
+            return $this;
         }
 
         $image = new \AppBundle\Entity\Image($source, $src, $alt);
@@ -142,6 +143,8 @@ class Image
         $this->em->flush($source);
         $this->em->persist($image);
         $this->em->flush($image);
+
+        return $this;
     }
 
     /**

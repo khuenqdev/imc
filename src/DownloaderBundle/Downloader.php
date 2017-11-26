@@ -148,7 +148,7 @@ class Downloader
      *
      * @param ResponseInterface $response
      */
-    public function fetchContent(ResponseInterface $response)
+    protected function fetchContent(ResponseInterface $response)
     {
         $this->page->html = $response->getBody()->getContents();
         $this->page->dom = new Crawler($this->page->html, $this->page->link->url);
@@ -159,6 +159,8 @@ class Downloader
 
     /**
      * Extract links
+     *
+     * @return $this
      */
     protected function extractLinks()
     {
@@ -181,10 +183,14 @@ class Downloader
                 }
             }
         }
+
+        return $this;
     }
 
     /**
      * Extract images
+     *
+     * @return $this
      */
     protected function extractImages()
     {
@@ -197,13 +203,15 @@ class Downloader
             $this->helpers->image->download($this->page->link, $src, $alt);
             $this->errorMessage .= $this->helpers->image->getErrorMessage();
         }
+
+        return $this;
     }
 
     /**
      * Extract page's text
      * @return string
      */
-    public function extractText()
+    protected function extractText()
     {
         $text = "";
 
@@ -222,7 +230,7 @@ class Downloader
      * @param $title
      * @return float
      */
-    public function calculateRelevance($uri, $title)
+    protected function calculateRelevance($uri, $title)
     {
         $score = 0;
 
