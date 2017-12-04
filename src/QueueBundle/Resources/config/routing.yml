@@ -1,3 +1,0 @@
-queue_homepage:
-    path:     /
-    defaults: { _controller: QueueBundle:Default:index }

@@ -18,7 +18,8 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new QueueBundle\QueueBundle(),
             new DownloaderBundle\DownloaderBundle(),
-            new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle()
+            new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
+            new GuiBundle\GuiBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

@@ -6,7 +6,8 @@
         "psr-4": {
             "AppBundle\\": "src/AppBundle",
             "QueueBundle\\": "src/QueueBundle",
-            "DownloaderBundle\\": "src/DownloaderBundle"
+            "DownloaderBundle\\": "src/DownloaderBundle",
+            "GuiBundle\\": "src/GuiBundle"
         },
         "classmap": [
             "app/AppKernel.php",

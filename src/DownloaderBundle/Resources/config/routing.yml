@@ -1,3 +1,0 @@
-downloader_homepage:
-    path:     /
-    defaults: { _controller: DownloaderBundle:Default:index }

@@ -20,3 +20,17 @@ parameters:
 
     # Test database's name
     test_database_name: imc_test
+
+    # Image default configurations
+    image_min_width: 400
+    image_min_height: 400
+    image_directory: 'images'
+
+    # Google Geocode API credentials
+    google_geocode_url: ~
+    google_geocode_key: ~
+
+    # Other configurations
+    http_verify_ssl: false
+    allowed_image_extensions: ['jpg', 'jpeg', 'png']
+    exif_tool_path: '%kernel.root_dir%/../exiftool/'

@@ -41,8 +41,6 @@ class QueueTest extends KernelTestCase
         $this->service->addLink($link5);
         $this->service->addLink($link6);
         $this->service->addLink($link7);
-
-//        dump($this->service->getLinks());
     }
 
     public function testGetNextLink()
@@ -61,14 +59,6 @@ class QueueTest extends KernelTestCase
         $this->service->addLink($link5);
         $this->service->addLink($link6);
         $this->service->addLink($link7);
-
-//        dump($this->service->getNextLink());
-//        dump($this->service->getNextLink());
-//        dump($this->service->getNextLink());
-//        dump($this->service->getNextLink());
-//        dump($this->service->getNextLink());
-//        dump($this->service->getNextLink());
-//        dump($this->service->getNextLink());
     }
 
     public function testIsEmpty()

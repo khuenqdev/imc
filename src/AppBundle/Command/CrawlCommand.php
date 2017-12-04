@@ -90,6 +90,8 @@ class CrawlCommand extends ContainerAwareCommand
             if ($noOfPages % 100 === 0) {
                 $output->writeln("<fg=magenta;options=bold>[Memory Usage] " . $this->memoryUsage(true) . "</>");
             }
+
+            $output->writeln('Number of links in queue: ' . $this->queue->getSize());
         }
 
         $output->writeln('<comment>Crawling task finished!</comment>');

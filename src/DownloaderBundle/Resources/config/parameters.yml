@@ -1,9 +1,0 @@
-parameters:
-    image_min_width: 400
-    image_min_height: 400
-    image_directory: 'images'
-    google_geocode_url: 'https://maps.googleapis.com/maps/api/geocode/json'
-    google_geocode_key: 'AIzaSyD-LeZbM9zpw3fLXsQC7uUcigLcg1cSiYM'
-    http_verify_ssl: false
-    allowed_image_extensions: ['jpg', 'jpeg', 'png']
-    exif_tool_path: '%kernel.root_dir%/../exiftool/'

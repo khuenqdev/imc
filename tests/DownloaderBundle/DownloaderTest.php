@@ -35,21 +35,6 @@ class DownloaderTest extends KernelTestCase
         $this->em = self::$kernel->getContainer()->get('doctrine.orm.entity_manager');
     }
 
-    /**
-     * Test download method
-     */
-//    public function testDownload()
-//    {
-//        $link = $this->em->getRepository(Link::class)->findOneBy(['url' => 'https://www.locationscout.net/']);
-//
-//        if (!$link) {
-//            $link = new Link('https://www.locationscout.net/', 'Locationscout - Discover the best places for photography', 1.0, false);
-//        }
-//
-//        $this->service->download($link);
-//        echo $this->service->getErrorMessage() . "\n";
-//    }
-
     public function testInsertLink()
     {
         $link = new Link('example.com', 'Example', 1.0, false);
