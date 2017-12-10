@@ -76,14 +76,6 @@ AppBundle\Entity\Image:
             type: string
             length: '512'
             nullable: true
-        zipcode:
-            type: string
-            length: 255
-            nullable: true
-        country:
-            type: string
-            length: 255
-            nullable: true
         metadata:
             type: text
     lifecycleCallbacks: {  }

@@ -112,8 +112,9 @@ class Downloader
     }
 
     /**
-     * @param Link $link
+     * Download content of a page (synchronous)
      *
+     * @param Link $link
      * @return bool|string
      */
     public function download(Link $link)

@@ -1,0 +1,4 @@
+app_gallery:
+    resource: "@AppBundle/Resources/config/routing/image.yml"
+    prefix:   /gallery
+

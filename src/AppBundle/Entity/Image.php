@@ -105,16 +105,6 @@ class Image
     /**
      * @var string
      */
-    public $zipcode;
-
-    /**
-     * @var string
-     */
-    public $country;
-
-    /**
-     * @var string
-     */
     private $metadata;
 
     public function __construct(Link $source, $src, $alt = "", $width = null, $height = null)

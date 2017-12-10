@@ -70,7 +70,8 @@ class Image
 
         if (!isset($imagePath['filename'])
             || !isset($imagePath['extension'])
-            || !in_array($imagePath['extension'], $this->getParameter('allowed_image_extensions'))) {
+            || !in_array($imagePath['extension'], $this->getParameter('allowed_image_extensions'))
+        ) {
             return false;
         }
 
@@ -139,7 +140,9 @@ class Image
         $image->setMetadata($metadata);
 
         if ($image->latitude && $image->longitude) {
-            $this->determineImageLocation($image, $image->latitude, $image->longitude);
+            $this->determineImageAddress($image, $image->latitude, $image->longitude);
+        } else {
+            $this->determineImageLocation($image);
         }
 
         // Save to database
@@ -154,21 +157,54 @@ class Image
     }
 
     /**
-     * Determine image's location
+     * Determine image's GPS location and address based on its description
+     *  - alt attribute
+     *  - text from surrounded elements
+     *
+     * @param \AppBundle\Entity\Image $image
+     */
+    protected function determineImageLocation(\AppBundle\Entity\Image &$image)
+    {
+        try {
+            $response = $this->client->get($this->getParameter('geoparser_url'), [
+                'query' => [
+                    'scantext' => $image->alt . " " . $this->sanitize($image->filename),
+                    'json' => 1
+                ]
+            ]);
+
+            $results = $response->getBody()->getContents();
+            $resultObj = @json_decode($results);
+
+            if ($resultObj->matches !== null) {
+                if (is_array($resultObj->match)) {
+                    $match = $resultObj->match[0];
+                } else {
+                    $match = $resultObj->match;
+                }
+
+                $image->address = $match->location;
+                $image->latitude = $resultObj->latt;
+                $image->longitude = $resultObj->longt;
+                $image->isExifLocation = false;
+            }
+
+        } catch (\Exception $e) {
+            $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+     * Determine image's address
      *
      * @param \AppBundle\Entity\Image $image
      * @param $latitude
      * @param $longitude
      */
-    protected function determineImageLocation(\AppBundle\Entity\Image &$image, $latitude, $longitude)
+    protected function determineImageAddress(\AppBundle\Entity\Image &$image, $latitude, $longitude)
     {
-        $client = new Client([
-            'base_uri' => $this->getParameter('google_geocode_url'),
-            'verify' => $this->getParameter('http_verify_ssl')
-        ]);
-
         try {
-            $response = $client->get('', [
+            $response = $this->client->get($this->getParameter('google_geocode_url'), [
                 'query' => [
                     'latlng' => "{$latitude},{$longitude}",
                     'key' => $this->getParameter('google_geocode_key'),
@@ -177,19 +213,10 @@ class Image
             ]);
 
             $results = $response->getBody()->getContents();
-            $resultObj = \GuzzleHttp\json_decode($results);
+            $resultObj = @json_decode($results);
 
             if ($resultObj->status === "OK" && is_array($resultObj->results) && !empty($resultObj->results)) {
                 $image->address = $resultObj->results[0]->formatted_address;
-                foreach ($resultObj->results[0]->address_components as $component) {
-                    if (in_array('postal_code', $component->types)) {
-                        $image->zipcode = $component->long_name;
-                    }
-
-                    if (in_array('country', $component->types)) {
-                        $image->country = $component->long_name;
-                    }
-                }
             }
         } catch (\Exception $e) {
             $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
@@ -266,7 +293,7 @@ class Image
      */
     protected function getDirectory($source)
     {
-        $imagePath = $this->kernel->getRootDir() . "/../" . $this->getParameter('image_directory') . "/";
+        $imagePath = $this->kernel->getRootDir() . "/downloaded/" . $this->getParameter('image_directory') . "/";
 
         $source = parse_url($source, PHP_URL_HOST);
 
@@ -317,5 +344,17 @@ class Image
     protected function getParameter($name)
     {
         return $this->kernel->getContainer()->getParameter($name);
+    }
+
+    /**
+     * Sanitize the file name to get words
+     * for image description
+     *
+     * @param $filename
+     * @return mixed
+     */
+    protected function sanitize($filename)
+    {
+        return preg_replace('/\W|(\bjpeg\b)|(\bpng\b)|(\bjpg\b)/i', ' ', $filename);
     }
 }

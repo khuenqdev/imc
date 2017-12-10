@@ -60,7 +60,7 @@ class CrawlCommand extends ContainerAwareCommand
         $style = new OutputFormatterStyle('red', null);
         $output->getFormatter()->setStyle('fail', $style);
 
-        ini_set('memory_limit', '3G');
+        ini_set('memory_limit', $this->getContainer()->getParameter('server_memory_limit'));
         $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $this->queue = $this->getContainer()->get('queue');
         $this->downloader = $this->getContainer()->get('downloader');
@@ -72,7 +72,7 @@ class CrawlCommand extends ContainerAwareCommand
 
         $noOfPages = 0;
 
-        while (!$this->queue->isEmpty() && $noOfPages < self::LIMIT) {
+        while (!$this->queue->isEmpty() && $noOfPages < $this->getContainer()->getParameter('crawling_task_limit')) {
 
             $link = $this->queue->getNextLink();
             $output->write('Fetch: ' . $link->url);
@@ -81,17 +81,18 @@ class CrawlCommand extends ContainerAwareCommand
 
             if ($downloadResults === true) {
                 $output->writeln(' <info>SUCCESS</info>');
-                $noOfPages++;
             } else {
                 $output->writeln(' <fail>FAILED</fail>');
                 $output->writeln("<error>{$this->downloader->getErrorMessage()}</error>");
             }
 
+            $noOfPages++;
+
             if ($noOfPages % 100 === 0) {
                 $output->writeln("<fg=magenta;options=bold>[Memory Usage] " . $this->memoryUsage(true) . "</>");
             }
 
-            $output->writeln('Number of links in queue: ' . $this->queue->getSize());
+            //$output->writeln('Number of links in queue: ' . $this->queue->getSize());
         }
 
         $output->writeln('<comment>Crawling task finished!</comment>');

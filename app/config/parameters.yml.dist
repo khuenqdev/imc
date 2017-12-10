@@ -30,7 +30,12 @@ parameters:
     google_geocode_url: ~
     google_geocode_key: ~
 
+    # Geoparser service API credentials
+    geoparser_url: ~
+
     # Other configurations
     http_verify_ssl: false
     allowed_image_extensions: ['jpg', 'jpeg', 'png']
     exif_tool_path: '%kernel.root_dir%/../exiftool/'
+    server_memory_limit: '3G'
+    crawling_task_limit: 5000
