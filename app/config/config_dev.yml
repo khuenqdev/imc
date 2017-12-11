@@ -13,7 +13,7 @@ web_profiler:
 
 monolog:
     handlers:
-        channels: ["amqp"]
+        channels: ["crawler"]
         main:
             type: stream
             path: '%kernel.logs_dir%/%kernel.environment%.log'

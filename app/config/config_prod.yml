@@ -15,7 +15,7 @@ imports:
 
 monolog:
     handlers:
-        channels: ["amqp"]
+        channels: ["crawler"]
         main:
             type: fingers_crossed
             action_level: error
