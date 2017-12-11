@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Services\Helpers;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\RequestException;
+use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use QueueBundle\Queue;
 use Symfony\Component\DomCrawler\Crawler;
@@ -53,6 +54,11 @@ class Downloader
     protected $errorMessage = "";
 
     /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
      * List of HTML elements contain texts
      *
      * @var array
@@ -76,11 +82,12 @@ class Downloader
      * @param Queue $queue
      * @param Helpers $helpers
      */
-    public function __construct(EntityManager $em, Queue $queue, Helpers $helpers)
+    public function __construct(EntityManager $em, Queue $queue, Helpers $helpers, Logger $logger)
     {
         $this->em = $em;
         $this->queue = $queue;
         $this->helpers = $helpers;
+        $this->logger = $logger;
         $this->client = new HttpClient([
             'timeout' => 3,
             'allow_redirects' => false,
@@ -106,7 +113,7 @@ class Downloader
                 }
             },
             function (RequestException $e) {
-                $this->errorMessage = "[Downloader Error] " . $e->getMessage() . "\n";
+                $this->saveLog("[Downloader Error] " . $e->getMessage());
             }
         );
     }
@@ -132,7 +139,7 @@ class Downloader
             }
 
         } catch (\Exception $e) {
-            $this->errorMessage = "[Downloader Error] " . $e->getMessage() . "\n";
+            $this->saveLog("[Downloader Error] " . $e->getMessage());
         }
 
         return false;
@@ -205,7 +212,7 @@ class Downloader
         foreach ($imgElements as $element) {
             $src = $element->getUri();
             $alt = $element->getNode()->getAttribute('alt');
-            $this->helpers->image->download($this->page->link, $src, $alt);
+            $this->helpers->image->download($element->getNode(), $this->page->link, $src, $alt);
             $this->errorMessage = $this->helpers->image->getErrorMessage();
         }
 
@@ -283,7 +290,7 @@ class Downloader
             $this->em->persist($link);
             $this->em->flush($link);
         } catch (\Exception $e) {
-            $this->errorMessage = "[Downloader Error] " . $e->getMessage() . "\n";
+            $this->saveLog("[Downloader Error] " . $e->getMessage());
         }
 
         return $link;
@@ -298,16 +305,17 @@ class Downloader
     {
         $link->visited = true;
 
-        try{
+        try {
             $this->em->persist($link);
             $this->em->flush($link);
         } catch (\Exception $e) {
-            $this->errorMessage = "[Downloader Error] " . $e->getMessage() . "\n";
+            $this->saveLog("[Downloader Error] " . $e->getMessage());
         }
     }
 
     /**
      * Initialize downloader's page cache
+     *
      * @param Link $link
      */
     protected function initialize(Link $link)
@@ -322,5 +330,16 @@ class Downloader
         $this->page->text = null;
 
         $this->errorMessage = "";
+    }
+
+    /**
+     * Log error messages
+     *
+     * @param $message
+     */
+    protected function saveLog($message)
+    {
+        $this->errorMessage = $message . "\n";
+        $this->logger->debug($message);
     }
 }

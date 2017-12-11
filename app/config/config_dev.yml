@@ -13,6 +13,7 @@ web_profiler:
 
 monolog:
     handlers:
+        channels: ["amqp"]
         main:
             type: stream
             path: '%kernel.logs_dir%/%kernel.environment%.log'
@@ -21,6 +22,11 @@ monolog:
         console:
             type: console
             channels: ['!event', '!doctrine']
+        crawler:
+            type: stream
+            path: '%kernel.logs_dir%/crawler_%kernel.environment%.log'
+            level: debug
+            channels: ['crawler']
         # uncomment to get logging in your browser
         # you may have to allow bigger header sizes in your Web server configuration
         #firephp:

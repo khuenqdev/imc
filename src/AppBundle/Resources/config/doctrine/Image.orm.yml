@@ -76,6 +76,10 @@ AppBundle\Entity\Image:
             type: string
             length: '512'
             nullable: true
+        description:
+            type: string
+            length: '512'
+            nullable: true
         metadata:
             type: text
     lifecycleCallbacks: {  }

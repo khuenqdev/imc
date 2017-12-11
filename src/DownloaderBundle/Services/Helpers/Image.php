@@ -11,6 +11,7 @@ namespace DownloaderBundle\Services\Helpers;
 use AppBundle\Entity\Link;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
+use Monolog\Logger;
 use PHPExif\Adapter\Exiftool;
 use PHPExif\Reader\Reader;
 use Symfony\Component\HttpKernel\KernelInterface as Kernel;
@@ -44,11 +45,17 @@ class Image
      */
     protected $client;
 
-    public function __construct(Kernel $kernel, EntityManager $em)
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    public function __construct(Kernel $kernel, EntityManager $em, Logger $logger)
     {
         $this->kernel = $kernel;
         $this->em = $em;
         $this->allowedAspectRatio = $this->initializeAspectRatios();
+        $this->logger = $logger;
         $this->client = new Client([
             'timeout' => 3,
             'allow_redirects' => false,
@@ -59,12 +66,13 @@ class Image
     /**
      * Download an image
      *
+     * @param \DOMElement $element
      * @param Link $source
      * @param $src
-     * @param $alt
+     * @param string $alt
      * @return bool
      */
-    public function download(Link $source, $src, $alt = "")
+    public function download(\DOMElement $element, Link $source, $src, $alt = "")
     {
         $imagePath = pathinfo($src);
 
@@ -83,11 +91,11 @@ class Image
                 $this->client->get($src, ['sink' => $filename]);
 
                 if ($this->validate($filename)) {
-                    $this->saveImage($source, $src, $alt, $this->getMetadata($filename));
+                    $this->saveImage($element, $source, $src, $alt, $this->getMetadata($filename));
                     return true;
                 }
             } catch (\Exception $e) {
-                $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
+                $this->saveLog("[Image Error] " . $e->getMessage());
                 return false;
             }
         }
@@ -108,13 +116,14 @@ class Image
     /**
      * Save image entity
      *
+     * @param \DOMElement $element
      * @param $source
      * @param $src
      * @param string $alt
      * @param array $metadata
      * @return $this
      */
-    protected function saveImage($source, $src, $alt = '', array $metadata)
+    protected function saveImage(\DOMElement $element, $source, $src, $alt = '', array $metadata)
     {
         // Avoid duplication of image
         if ($this->em->getRepository(\AppBundle\Entity\Image::class)
@@ -137,6 +146,7 @@ class Image
         $image->dateAcquired = new \DateTime(date('Y-m-d H:i:s'));
         $image->author = isset($metadata['author']) ? $metadata['author'] : null;
         $image->isExifLocation = !empty($image->latitude) && !empty($image->longitude);
+        $image->description = $this->extractImageDescription($element, $alt, $image->filename);
         $image->setMetadata($metadata);
 
         if ($image->latitude && $image->longitude) {
@@ -150,10 +160,37 @@ class Image
             $this->em->persist($image);
             $this->em->flush($image);
         } catch (\Exception $e) {
-            $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
+            $this->saveLog("[Image Error] " . $e->getMessage());
         }
 
         return $this;
+    }
+
+    /**
+     * Extract image description
+     *
+     * @param \DOMElement $element
+     * @param $alt
+     * @param $filename
+     * @return string
+     */
+    protected function extractImageDescription(\DOMElement $element, $alt, $filename)
+    {
+        $description = $alt . " " . $this->sanitize($filename);
+        $prev = $element->previousSibling;
+        $next = $element->nextSibling;
+
+        if (get_class($prev) === \DOMElement::class && $prev->tagName !== 'script') {
+            $textContent = $prev->textContent;
+            $description .= " " . trim(strip_tags($textContent));
+        }
+
+        if (get_class($next) === \DOMElement::class && $next->tagName !== 'script') {
+            $textContent = $next->textContent;
+            $description .= " " . trim(strip_tags($textContent));
+        }
+
+        return $description;
     }
 
     /**
@@ -168,7 +205,7 @@ class Image
         try {
             $response = $this->client->get($this->getParameter('geoparser_url'), [
                 'query' => [
-                    'scantext' => $image->alt . " " . $this->sanitize($image->filename),
+                    'scantext' => $image->description,
                     'json' => 1
                 ]
             ]);
@@ -190,7 +227,7 @@ class Image
             }
 
         } catch (\Exception $e) {
-            $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
+            $this->saveLog("[Image Error] " . $e->getMessage());
         }
     }
 
@@ -219,7 +256,7 @@ class Image
                 $image->address = $resultObj->results[0]->formatted_address;
             }
         } catch (\Exception $e) {
-            $this->errorMessage = "[Image Error] " . $e->getMessage() . "\n";
+            $this->saveLog("[Image Error] " . $e->getMessage());
         }
     }
 
@@ -293,7 +330,7 @@ class Image
      */
     protected function getDirectory($source)
     {
-        $imagePath = $this->kernel->getRootDir() . "/downloaded/" . $this->getParameter('image_directory') . "/";
+        $imagePath = $this->kernel->getRootDir() . "/../web/downloaded/" . $this->getParameter('image_directory') . "/";
 
         $source = parse_url($source, PHP_URL_HOST);
 
@@ -356,5 +393,16 @@ class Image
     protected function sanitize($filename)
     {
         return preg_replace('/\W|(\bjpeg\b)|(\bpng\b)|(\bjpg\b)/i', ' ', $filename);
+    }
+
+    /**
+     * Log error messages
+     *
+     * @param $message
+     */
+    protected function saveLog($message)
+    {
+        $this->errorMessage = $message . "\n";
+        $this->logger->debug($message);
     }
 }

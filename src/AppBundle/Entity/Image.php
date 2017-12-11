@@ -105,6 +105,11 @@ class Image
     /**
      * @var string
      */
+    public $description;
+
+    /**
+     * @var string
+     */
     private $metadata;
 
     public function __construct(Link $source, $src, $alt = "", $width = null, $height = null)

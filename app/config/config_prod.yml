@@ -15,6 +15,7 @@ imports:
 
 monolog:
     handlers:
+        channels: ["amqp"]
         main:
             type: fingers_crossed
             action_level: error
@@ -25,3 +26,8 @@ monolog:
             level: debug
         console:
             type: console
+        crawler:
+            type: stream
+            path: '%kernel.logs_dir%/crawler_%kernel.environment%.log'
+            level: debug
+            channels: ['crawler']
