@@ -12,8 +12,8 @@ web_profiler:
     intercept_redirects: false
 
 monolog:
+    channels: ["crawler"]
     handlers:
-        channels: ["crawler"]
         main:
             type: stream
             path: '%kernel.logs_dir%/%kernel.environment%.log'

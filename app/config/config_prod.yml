@@ -14,8 +14,8 @@ imports:
 #        query_cache_driver: apc
 
 monolog:
+    channels: ["crawler"]
     handlers:
-        channels: ["crawler"]
         main:
             type: fingers_crossed
             action_level: error
