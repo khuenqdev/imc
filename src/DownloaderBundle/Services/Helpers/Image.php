@@ -392,7 +392,7 @@ class Image
      */
     protected function sanitize($filename)
     {
-        return preg_replace('/\W|(\bjpeg\b)|(\bpng\b)|(\bjpg\b)/i', ' ', $filename);
+        return preg_replace('/\W|(\bjpeg\b)|(\bpng\b)|(\bjpg\b)|\_/i', ' ', $filename);
     }
 
     /**
