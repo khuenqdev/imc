@@ -244,7 +244,7 @@ class Image
             $response = $this->client->get($this->getParameter('google_geocode_url'), [
                 'query' => [
                     'latlng' => "{$latitude},{$longitude}",
-                    'key' => $this->getParameter('google_geocode_key'),
+                    'key' => $this->getParameter('google_map_api_key'),
                     'result_type' => "street_address|postal_code|country"
                 ]
             ]);

@@ -1,4 +1,4 @@
 services:
-#    gui.example:
-#        class: GuiBundle\Example
-#        arguments: ["@service_id", "plain_value", "%parameter%"]
+    gui.map:
+        class: GuiBundle\Services\Map
+        arguments: ["%google_map_api_key%"]

@@ -28,7 +28,9 @@ parameters:
 
     # Google Geocode API credentials
     google_geocode_url: ~
-    google_geocode_key: ~
+
+    # Google Map API key for rendering
+    google_map_api_key: ~
 
     # Geoparser service API credentials
     geoparser_url: ~

@@ -8,6 +8,8 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
-        return $this->render('GuiBundle:Default:index.html.twig');
+        return $this->render('GuiBundle:MopsiCrawler:image_locations.html.twig', [
+            'title' => 'MopsiCrawler - Image locations'
+        ]);
     }
 }
