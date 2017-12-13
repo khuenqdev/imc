@@ -396,7 +396,7 @@ class Image
     }
 
     /**
-     * Log error messages
+     * Log error messages and refresh/reopen entity manager
      *
      * @param $message
      */
@@ -404,5 +404,6 @@ class Image
     {
         $this->errorMessage = $message . "\n";
         $this->logger->debug($message);
+        $this->em->clear();
     }
 }

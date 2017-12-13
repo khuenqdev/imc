@@ -333,7 +333,7 @@ class Downloader
     }
 
     /**
-     * Log error messages
+     * Log error messages and refresh/reopen entity manager
      *
      * @param $message
      */
@@ -341,5 +341,6 @@ class Downloader
     {
         $this->errorMessage = $message . "\n";
         $this->logger->debug($message);
+        $this->em->clear();
     }
 }

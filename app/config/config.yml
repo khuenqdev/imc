@@ -2,6 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: services.yml }
+    - { resource: twig.yml }
     - { resource: "@QueueBundle/Resources/config/services.yml" }
     - { resource: "@DownloaderBundle/Resources/config/services.yml" }
     - { resource: "@GuiBundle/Resources/config/services.yml" }

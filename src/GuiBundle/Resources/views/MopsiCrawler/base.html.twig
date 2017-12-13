@@ -11,6 +11,7 @@
         <link href="{{ asset('assets/css/materialize.min.css') }}" type="text/css" rel="stylesheet"
               media="screen,projection"/>
         <link href="{{ asset('assets/css/style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+        {% block stylesheets %}{% endblock %}
     {% endblock %}
 </head>
 <body>
@@ -44,7 +45,7 @@
 </div>
 
 <!-- Footer -->
-<footer class="page-footer orange">
+<footer class="page-footer orange fixed-footer">
     {% block footer %}
         <div class="footer-copyright">
             <div class="container">
