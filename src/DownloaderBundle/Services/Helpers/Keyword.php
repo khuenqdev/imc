@@ -69,11 +69,6 @@ class Keyword
     ];
 
     /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
      * @var EntityManager
      */
     protected $em;
@@ -83,10 +78,9 @@ class Keyword
      *
      * @param Registry $doctrine
      */
-    public function __construct(Registry $doctrine)
+    public function __construct(EntityManager $em)
     {
-        $this->doctrine = $doctrine;
-        $this->em = $this->doctrine->getManager();
+        $this->em = $em;
     }
 
     /**

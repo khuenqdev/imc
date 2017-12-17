@@ -45,11 +45,6 @@ class Downloader
     protected $queue;
 
     /**
-     * @var \stdClass
-     */
-    protected $page;
-
-    /**
      * @var string
      */
     protected $errorMessage = "";
@@ -58,11 +53,6 @@ class Downloader
      * @var Logger
      */
     protected $logger;
-
-    /**
-     * @var Registry
-     */
-    protected $doctrine;
 
     /**
      * List of HTML elements contain texts
@@ -88,10 +78,9 @@ class Downloader
      * @param Queue $queue
      * @param Helpers $helpers
      */
-    public function __construct(Registry $doctrine, Queue $queue, Helpers $helpers, Logger $logger)
+    public function __construct(EntityManager $em, Queue $queue, Helpers $helpers, Logger $logger)
     {
-        $this->doctrine = $doctrine;
-        $this->em = $this->doctrine->getManager();
+        $this->em = $em;
         $this->queue = $queue;
         $this->helpers = $helpers;
         $this->logger = $logger;
@@ -109,18 +98,16 @@ class Downloader
      */
     public function downloadAsync(Link $link)
     {
-        $this->initialize($link);
-
-        $promise = $this->client->getAsync($this->page->link->url);
+        $promise = $this->client->getAsync($link->url);
 
         $promise->then(
-            function (ResponseInterface $res) {
+            function (ResponseInterface $res) use ($link) {
                 if ($res->getStatusCode() == Response::HTTP_OK) {
-                    $this->fetchContent($res);
+                    $this->fetchContent($res, $link);
                 }
             },
             function (RequestException $e) {
-                $this->saveLog("[Downloader Error] " . $e->getMessage());
+                $this->saveLog("[Downloader Error] downloadAsync() " . $e->getMessage());
             }
         );
     }
@@ -131,22 +118,20 @@ class Downloader
      * @param Link $link
      * @return bool|string
      */
-    public function download(Link $link)
+    public function download(Link &$link)
     {
-        $this->initialize($link);
-
         try {
 
-            $res = $this->client->get($this->page->link->url);
+            $res = $this->client->get($link->url);
 
             if ($res->getStatusCode() == Response::HTTP_OK) {
-                $this->fetchContent($res);
+                $this->fetchContent($res, $link);
                 $this->markAsVisited($link);
                 return true;
             }
 
         } catch (\Exception $e) {
-            $this->saveLog("[Downloader Error] " . $e->getMessage());
+            $this->saveLog("[Downloader Error] download() " . $e->getMessage());
         }
 
         return false;
@@ -167,13 +152,13 @@ class Downloader
      *
      * @param ResponseInterface $response
      */
-    protected function fetchContent(ResponseInterface $response)
+    protected function fetchContent(ResponseInterface $response, Link $link)
     {
-        $this->page->html = $response->getBody()->getContents();
-        $this->page->dom = new Crawler($this->page->html, $this->page->link->url);
-        $this->page->text = $this->extractText();
-        $this->extractImages();
-        $this->extractLinks();
+        $html = $response->getBody()->getContents();
+        $dom = new Crawler($html, $link->url);
+        $text = $this->extractText($dom);
+        $this->extractImages($dom, $link);
+        $this->extractLinks($dom, $link, $text);
     }
 
     /**
@@ -181,19 +166,19 @@ class Downloader
      *
      * @return $this
      */
-    protected function extractLinks()
+    protected function extractLinks(Crawler $dom, Link $link, $text)
     {
-        $links = $this->page->dom->filter('a')->links();
+        $links = $dom->filter('a')->links();
 
         /** @var DomLink $domLink */
         foreach ($links as $domLink) {
-            $url = $this->helpers->url->parse($domLink->getUri(), $this->page->link->url);
+            $url = $this->helpers->url->parse($domLink->getUri(), $link->url);
 
             if (!empty($url)) {
                 $title = empty($domLink->getNode()->textContent)
                     ? trim($domLink->getNode()->getAttribute('title'))
                     : trim($domLink->getNode()->textContent);
-                $relevance = $this->calculateRelevance($url, $title);
+                $relevance = $this->calculateRelevance($dom, $url, $title, $text);
 
                 // Create a database link entity if not exist and add new link to the queue
                 if (!$this->em->getRepository(Link::class)->findOneBy(['url' => $url])) {
@@ -211,15 +196,15 @@ class Downloader
      *
      * @return $this
      */
-    protected function extractImages()
+    protected function extractImages(Crawler $dom, Link $link)
     {
-        $imgElements = $this->page->dom->filter('img')->images();
+        $imgElements = $dom->filter('img')->images();
 
         /** @var Image $element */
         foreach ($imgElements as $element) {
             $src = $element->getUri();
             $alt = $element->getNode()->getAttribute('alt');
-            $this->helpers->image->download($element->getNode(), $this->page->link, $src, $alt);
+            $this->helpers->image->download($element->getNode(), $link, $src, $alt);
             $this->errorMessage = $this->helpers->image->getErrorMessage();
         }
 
@@ -230,12 +215,12 @@ class Downloader
      * Extract page's text
      * @return string
      */
-    protected function extractText()
+    protected function extractText(Crawler $dom)
     {
         $text = "";
 
         foreach ($this->elementsContainText as $tagName) {
-            $textValues = $this->page->dom->filter($tagName)->extract(['_text']);
+            $textValues = $dom->filter($tagName)->extract(['_text']);
             $text .= implode("\n", $textValues) . "\n";
         }
 
@@ -249,11 +234,11 @@ class Downloader
      * @param $title
      * @return float
      */
-    protected function calculateRelevance($uri, $title)
+    protected function calculateRelevance(Crawler $dom, $uri, $title, $text)
     {
         $score = 0;
 
-        if (parse_url($this->page->dom->getUri(), PHP_URL_HOST) === parse_url($uri, PHP_URL_HOST)) {
+        if (parse_url($dom->getUri(), PHP_URL_HOST) === parse_url($uri, PHP_URL_HOST)) {
             $score++;
         }
 
@@ -261,7 +246,7 @@ class Downloader
         $criteria = count($linkTitleKeywords) + 1;
 
         foreach ($linkTitleKeywords as $keyword) {
-            $tf = $this->helpers->keyword->countWordOccurrence($keyword, $this->page->text);
+            $tf = $this->helpers->keyword->countWordOccurrence($keyword, $text);
 
             if ($tf > 1) {
                 $score++;
@@ -269,16 +254,6 @@ class Downloader
         }
 
         return (float)$score / $criteria;
-    }
-
-    /**
-     * Get page cache from the downloader
-     *
-     * @return \stdClass
-     */
-    public function getPage()
-    {
-        return $this->page;
     }
 
     /**
@@ -296,8 +271,9 @@ class Downloader
         try {
             $this->em->persist($link);
             $this->em->flush($link);
+            $this->em->refresh($link);
         } catch (\Exception $e) {
-            $this->saveLog("[Downloader Error] " . $e->getMessage());
+            $this->saveLog("[Downloader Error] saveLinkToDatabase() " . $e->getMessage());
         }
 
         return $link;
@@ -315,28 +291,10 @@ class Downloader
         try {
             $this->em->persist($link);
             $this->em->flush($link);
+            $this->em->refresh($link);
         } catch (\Exception $e) {
-            $this->saveLog("[Downloader Error] " . $e->getMessage());
+            $this->saveLog("[Downloader Error] markAsVisited() " . $e->getMessage());
         }
-    }
-
-    /**
-     * Initialize downloader's page cache
-     *
-     * @param Link $link
-     */
-    protected function initialize(Link $link)
-    {
-        if (!$this->page) {
-            $this->page = new \stdClass();
-        }
-
-        $this->page->link = $link;
-        $this->page->html = null;
-        $this->page->dom = null;
-        $this->page->text = null;
-
-        $this->errorMessage = "";
     }
 
     /**
@@ -348,7 +306,5 @@ class Downloader
     {
         $this->errorMessage = $message . "\n";
         $this->logger->debug($message);
-        $this->doctrine->resetManager();
-        $this->em = $this->doctrine->getManager();
     }
 }

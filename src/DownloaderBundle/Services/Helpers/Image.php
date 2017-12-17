@@ -52,21 +52,16 @@ class Image
     protected $logger;
 
     /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
      * Image constructor.
      *
      * @param Kernel $kernel
+     * @param Registry $doctrine
      * @param Logger $logger
      */
-    public function __construct(Kernel $kernel, Logger $logger)
+    public function __construct(Kernel $kernel, EntityManager $em, Logger $logger)
     {
         $this->kernel = $kernel;
-        $this->doctrine = $this->getContainer()->get('doctrine');
-        $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->em = $em;
         $this->allowedAspectRatio = $this->initializeAspectRatios();
         $this->logger = $logger;
         $this->client = new Client([
@@ -108,7 +103,7 @@ class Image
                     return true;
                 }
             } catch (\Exception $e) {
-                $this->saveLog("[Image Error] " . $e->getMessage());
+                $this->saveLog("[ImageHelper Error] " . $e->getMessage());
                 return false;
             }
         }
@@ -173,7 +168,7 @@ class Image
             $this->em->persist($image);
             $this->em->flush($image);
         } catch (\Exception $e) {
-            $this->saveLog("[Image Error] " . $e->getMessage());
+            $this->saveLog("[ImageHelper Error] " . $e->getMessage());
         }
 
         return $this;
@@ -240,7 +235,7 @@ class Image
             }
 
         } catch (\Exception $e) {
-            $this->saveLog("[Image Error] " . $e->getMessage());
+            $this->saveLog("[ImageHelper Error] " . $e->getMessage());
         }
     }
 
@@ -269,7 +264,7 @@ class Image
                 $image->address = $resultObj->results[0]->formatted_address;
             }
         } catch (\Exception $e) {
-            $this->saveLog("[Image Error] " . $e->getMessage());
+            $this->saveLog("[ImageHelper Error] " . $e->getMessage());
         }
     }
 
@@ -328,7 +323,7 @@ class Image
             || !in_array($ratio, $this->allowedAspectRatio)
         ) {
             unlink($filename);
-            $this->errorMessage = "[Image Error] Invalid aspect ratio for image {$filename}. The image dimension is {$width} x {$height}.\n";
+            $this->errorMessage = "[ImageHelper Error] Invalid aspect ratio for image {$filename}. The image dimension is {$width} x {$height}.\n";
             return false;
         }
 
@@ -417,8 +412,6 @@ class Image
     {
         $this->errorMessage = $message . "\n";
         $this->logger->debug($message);
-        $this->doctrine->resetManager();
-        $this->em = $this->doctrine->getManager();
     }
 
     /**

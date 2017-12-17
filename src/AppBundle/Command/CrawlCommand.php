@@ -79,7 +79,7 @@ class CrawlCommand extends ContainerAwareCommand
 
             $downloadResults = $this->downloader->download($link);
 
-            if ($downloadResults === true) {
+            if ($downloadResults) {
                 $output->writeln(' <info>SUCCESS</info>');
             } else {
                 $output->writeln(' <fail>FAILED</fail>');
