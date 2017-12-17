@@ -9,6 +9,7 @@
 namespace DownloaderBundle\Services\Helpers;
 
 use AppBundle\Entity\Link;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use Monolog\Logger;
@@ -50,10 +51,22 @@ class Image
      */
     protected $logger;
 
-    public function __construct(Kernel $kernel, EntityManager $em, Logger $logger)
+    /**
+     * @var Registry
+     */
+    protected $doctrine;
+
+    /**
+     * Image constructor.
+     *
+     * @param Kernel $kernel
+     * @param Logger $logger
+     */
+    public function __construct(Kernel $kernel, Logger $logger)
     {
         $this->kernel = $kernel;
-        $this->em = $em;
+        $this->doctrine = $this->getContainer()->get('doctrine');
+        $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $this->allowedAspectRatio = $this->initializeAspectRatios();
         $this->logger = $logger;
         $this->client = new Client([
@@ -190,7 +203,7 @@ class Image
             $description .= " " . trim(strip_tags($textContent));
         }
 
-        return $description;
+        return trim($description);
     }
 
     /**
@@ -404,6 +417,17 @@ class Image
     {
         $this->errorMessage = $message . "\n";
         $this->logger->debug($message);
-        $this->em->clear();
+        $this->doctrine->resetManager();
+        $this->em = $this->doctrine->getManager();
+    }
+
+    /**
+     * Get container
+     *
+     * @return \Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    protected function getContainer()
+    {
+        return $this->kernel->getContainer();
     }
 }

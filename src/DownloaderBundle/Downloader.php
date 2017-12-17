@@ -9,6 +9,7 @@
 namespace DownloaderBundle;
 
 use AppBundle\Entity\Link;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Services\Helpers;
 use GuzzleHttp\Client as HttpClient;
@@ -59,6 +60,11 @@ class Downloader
     protected $logger;
 
     /**
+     * @var Registry
+     */
+    protected $doctrine;
+
+    /**
      * List of HTML elements contain texts
      *
      * @var array
@@ -78,13 +84,14 @@ class Downloader
 
     /**
      * Downloader constructor.
-     * @param EntityManager $em
+     * @param Registry $doctrine
      * @param Queue $queue
      * @param Helpers $helpers
      */
-    public function __construct(EntityManager $em, Queue $queue, Helpers $helpers, Logger $logger)
+    public function __construct(Registry $doctrine, Queue $queue, Helpers $helpers, Logger $logger)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
+        $this->em = $this->doctrine->getManager();
         $this->queue = $queue;
         $this->helpers = $helpers;
         $this->logger = $logger;
@@ -341,6 +348,7 @@ class Downloader
     {
         $this->errorMessage = $message . "\n";
         $this->logger->debug($message);
-        $this->em->clear();
+        $this->doctrine->resetManager();
+        $this->em = $this->doctrine->getManager();
     }
 }

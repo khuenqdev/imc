@@ -14,7 +14,7 @@ imports:
 #        query_cache_driver: apc
 
 monolog:
-    channels: ["crawler"]
+    channels: ["crawler", "managers"]
     handlers:
         main:
             type: fingers_crossed
@@ -31,3 +31,8 @@ monolog:
             path: '%kernel.logs_dir%/crawler_%kernel.environment%.log'
             level: debug
             channels: ['crawler']
+        managers:
+            type: stream
+            path: '%kernel.logs_dir%/managers_%kernel.environment%.log'
+            level: error
+            channels: ['managers']

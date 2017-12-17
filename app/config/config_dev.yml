@@ -12,7 +12,7 @@ web_profiler:
     intercept_redirects: false
 
 monolog:
-    channels: ["crawler"]
+    channels: ["crawler", "managers"]
     handlers:
         main:
             type: stream
@@ -27,6 +27,11 @@ monolog:
             path: '%kernel.logs_dir%/crawler_%kernel.environment%.log'
             level: debug
             channels: ['crawler']
+        managers:
+            type: stream
+            path: '%kernel.logs_dir%/managers_%kernel.environment%.log'
+            level: error
+            channels: ['managers']
         # uncomment to get logging in your browser
         # you may have to allow bigger header sizes in your Web server configuration
         #firephp:

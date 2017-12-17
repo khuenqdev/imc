@@ -10,6 +10,7 @@ namespace DownloaderBundle\Services\Helpers;
 
 
 use AppBundle\Entity\Stopword;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
 class Keyword
@@ -68,13 +69,24 @@ class Keyword
     ];
 
     /**
+     * @var Registry
+     */
+    protected $doctrine;
+
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
      * Keyword helper constructor.
      *
-     * @param EntityManager $em
+     * @param Registry $doctrine
      */
-    public function __construct(EntityManager $em)
+    public function __construct(Registry $doctrine)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
+        $this->em = $this->doctrine->getManager();
     }
 
     /**

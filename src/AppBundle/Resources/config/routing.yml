@@ -1,4 +1,7 @@
 app_gallery:
-    resource: "@AppBundle/Resources/config/routing/image.yml"
+    resource: "@AppBundle/Resources/config/routing/gallery.yml"
     prefix:   /gallery
 
+api_images:
+    resource: "@AppBundle/Resources/config/routing/api/image.yml"
+    prefix:   /api/images

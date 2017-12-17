@@ -1,7 +1,7 @@
 services:
     downloader:
         class: DownloaderBundle\Downloader
-        arguments: ["@doctrine.orm.entity_manager", "@queue", "@helpers", "@logger"]
+        arguments: ["@doctrine", "@queue", "@helpers", "@logger"]
         tags:
             - { name: monolog.logger, channel: crawler }
 
@@ -10,12 +10,12 @@ services:
         arguments: ["@helper.keyword", "@helper.url", '@helper.image']
     helper.keyword:
         class: DownloaderBundle\Services\Helpers\Keyword
-        arguments: ["@doctrine.orm.entity_manager"]
+        arguments: ["@doctrine"]
     helper.url:
         class: DownloaderBundle\Services\Helpers\Url
     helper.image:
         class: DownloaderBundle\Services\Helpers\Image
-        arguments: ['@kernel', '@doctrine.orm.entity_manager', '@logger']
+        arguments: ['@kernel', '@logger']
         tags:
             - { name: monolog.logger, channel: crawler }
     helper.string:

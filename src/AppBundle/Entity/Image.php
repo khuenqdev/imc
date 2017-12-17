@@ -3,39 +3,48 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Image
+ *
+ * @Serializer\ExclusionPolicy("all")
  */
 class Image
 {
     /**
      * @var int
+     * @Serializer\Expose
      */
     public $id;
 
     /**
      * @var string
+     * @Serializer\Expose
      */
     public $filename;
 
     /**
      * @var string
+     * @Serializer\Expose
      */
     public $src;
 
     /**
      * @var string
+     * @Serializer\Expose
      */
     public $path;
 
     /**
      * @var int
+     * @Serializer\Expose
      */
     public $width;
 
     /**
      * @var int
+     * @Serializer\Expose
      */
     public $height;
 
@@ -46,6 +55,7 @@ class Image
 
     /**
      * @var string
+     * @Serializer\Expose
      */
     public $alt;
 
@@ -84,26 +94,31 @@ class Image
 
     /**
      * @var float
+     * @Serializer\Expose
      */
     public $latitude;
 
     /**
      * @var float
+     * @Serializer\Expose
      */
     public $longitude;
 
     /**
      * @var float
+     * @Serializer\Expose
      */
     public $altitude;
 
     /**
      * @var string
+     * @Serializer\Expose
      */
     public $address;
 
     /**
      * @var string
+     * @Serializer\Expose
      */
     public $description;
 
@@ -112,7 +127,16 @@ class Image
      */
     private $metadata;
 
-    public function __construct(Link $source, $src, $alt = "", $width = null, $height = null)
+    /**
+     * Image constructor.
+     *
+     * @param Link|null $source
+     * @param $src
+     * @param string $alt
+     * @param null $width
+     * @param null $height
+     */
+    public function __construct($source = null, $src, $alt = "", $width = null, $height = null)
     {
         $this->src = $src;
         $this->source = $source;

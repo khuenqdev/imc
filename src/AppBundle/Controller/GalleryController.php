@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Image controller.
  *
  */
-class ImageController extends Controller
+class GalleryController extends Controller
 {
     /**
      * Lists all image entities.

@@ -3,6 +3,7 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
     - { resource: twig.yml }
+    - { resource: "@AppBundle/Resources/config/services.yml" }
     - { resource: "@QueueBundle/Resources/config/services.yml" }
     - { resource: "@DownloaderBundle/Resources/config/services.yml" }
     - { resource: "@GuiBundle/Resources/config/services.yml" }
@@ -71,3 +72,40 @@ doctrine_migrations:
     table_name: migration_versions
     name: Application Migrations
     organize_migrations: false # Version >=1.2 Possible values are: "BY_YEAR", "BY_YEAR_AND_MONTH", false
+
+fos_rest:
+    body_listener: true
+    format_listener:  true
+    param_fetcher_listener: force
+    view:
+        view_response_listener: 'force'
+        formats:
+            json: true
+            jsonp: false
+            xml: false
+            rss: false
+        mime_types:
+            json: ['application/json', 'application/x-json']
+    routing_loader:
+        default_format:  json
+    exception:
+        enabled: true
+        messages:
+            Symfony\Component\HttpKernel\Exception\BadRequestHttpException: true
+            Symfony\Component\HttpKernel\Exception\HttpException: true
+    serializer:
+        serialize_null: true
+
+knp_paginator:
+    page_range: 5                       # number of links showed in the pagination menu (e.g: you have 10 pages, a page_range of 3, on the 5th page you'll see links to page 4, 5, 6)
+    default_options:
+        page_name: page                 # page query parameter name
+        sort_field_name: sort           # sort field query parameter name
+        sort_direction_name: direction  # sort direction query parameter name
+        distinct: true                  # ensure distinct results, useful when ORM queries are using GROUP BY statements
+        filter_field_name: filter_field  # filter field query parameter name
+        filter_value_name: filter_value  # filter value query paameter name
+    template:
+        pagination: '@KnpPaginator/Pagination/sliding.html.twig'     # sliding pagination controls template
+        sortable: '@KnpPaginator/Pagination/sortable_link.html.twig' # sort link template
+        filtration: '@KnpPaginator/Pagination/filtration.html.twig'  # filters template
