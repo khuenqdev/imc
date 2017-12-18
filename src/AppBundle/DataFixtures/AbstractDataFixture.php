@@ -52,12 +52,18 @@ abstract class AbstractDataFixture implements ContainerAwareInterface, FixtureIn
      *
      * @param ObjectManager $manager The object manager.
      */
-    abstract protected function doLoad(ObjectManager $manager);
+    protected function doLoad(ObjectManager $manager)
+    {
+        // TODO: Implement doLoad() method.
+    }
 
     /**
      * Returns the environments the fixtures may be loaded in.
      *
      * @return array The name of the environments.
      */
-    abstract protected function getEnvironments();
+    protected function getEnvironments()
+    {
+        return ['prod', 'dev', 'test'];
+    }
 }

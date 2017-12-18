@@ -8,14 +8,13 @@
 
 namespace DownloaderBundle\Services\Helpers;
 
-use AppBundle\Entity\Link;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use Monolog\Logger;
 use PHPExif\Adapter\Exiftool;
 use PHPExif\Reader\Reader;
 use Symfony\Component\HttpKernel\KernelInterface as Kernel;
+use Symfony\Component\DomCrawler\Image as DomCrawlerImage;
 
 class Image
 {
@@ -37,16 +36,6 @@ class Image
     protected $em;
 
     /**
-     * @var string
-     */
-    protected $errorMessage = "";
-
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
      * @var Logger
      */
     protected $logger;
@@ -55,7 +44,7 @@ class Image
      * Image constructor.
      *
      * @param Kernel $kernel
-     * @param Registry $doctrine
+     * @param EntityManager $em
      * @param Logger $logger
      */
     public function __construct(Kernel $kernel, EntityManager $em, Logger $logger)
@@ -64,83 +53,63 @@ class Image
         $this->em = $em;
         $this->allowedAspectRatio = $this->initializeAspectRatios();
         $this->logger = $logger;
-        $this->client = new Client([
-            'timeout' => 3,
-            'allow_redirects' => false,
-            'verify' => $this->getParameter('http_verify_ssl')
-        ]);
     }
 
     /**
      * Download an image
      *
-     * @param \DOMElement $element
-     * @param Link $source
-     * @param $src
-     * @param string $alt
-     * @return bool
+     * @param $pageUrl
+     * @param DomCrawlerImage $element
+     * @throws \Exception
      */
-    public function download(\DOMElement $element, Link $source, $src, $alt = "")
+    public function download($pageUrl, DomCrawlerImage $element)
     {
-        $imagePath = pathinfo($src);
+        $src = $element->getUri();
+        $alt = $element->getNode()->getAttribute('alt');
 
-        if (!isset($imagePath['filename'])
-            || !isset($imagePath['extension'])
-            || !in_array($imagePath['extension'], $this->getParameter('allowed_image_extensions'))
-        ) {
-            return false;
-        }
-
-        // Download the image file
-        if ($saveDir = $this->getDirectory($source->url)) {
-            $filename = $saveDir . $imagePath['filename'] . "." . $imagePath['extension'];
+        if ($saveDir = $this->getDirectory($pageUrl)) {
+            $filename = pathinfo($src, PATHINFO_FILENAME);
+            $extension = pathinfo($src, PATHINFO_EXTENSION);
+            $imageFilePath = $saveDir . $filename . "." . $extension;
 
             try {
-                $this->client->get($src, ['sink' => $filename]);
+                $client = new Client([
+                    'timeout' => 3,
+                    'allow_redirects' => false,
+                    'verify' => $this->getParameter('http_verify_ssl')
+                ]);
 
-                if ($this->validate($filename)) {
-                    $this->saveImage($element, $source, $src, $alt, $this->getMetadata($filename));
-                    return true;
+                $client->get($src, ['sink' => $imageFilePath]);
+
+                if ($this->isValid($imageFilePath)) {
+                    $metadata = $this->getMetadata($imageFilePath);
+                    $this->saveImage($element->getNode(), $src, $alt, $metadata);
                 }
             } catch (\Exception $e) {
-                $this->saveLog("[ImageHelper Error] " . $e->getMessage());
-                return false;
+                $this->saveLog("[ImageHelper] At line {$e->getLine()}: {$e->getMessage()}");
+                throw $e;
             }
         }
-
-        return false;
-    }
-
-    /**
-     * Get error message (if any)
-     *
-     * @return string
-     */
-    public function getErrorMessage()
-    {
-        return $this->errorMessage;
     }
 
     /**
      * Save image entity
      *
      * @param \DOMElement $element
-     * @param $source
      * @param $src
      * @param string $alt
      * @param array $metadata
      * @return $this
+     * @throws \Exception
      */
-    protected function saveImage(\DOMElement $element, $source, $src, $alt = '', array $metadata)
+    protected function saveImage(\DOMElement $element, $src, $alt = '', array $metadata)
     {
         // Avoid duplication of image
-        if ($this->em->getRepository(\AppBundle\Entity\Image::class)
-            ->findOneBy(['src' => $src])
-        ) {
+        if ($this->em->getRepository(\AppBundle\Entity\Image::class)->findOneBy(['src' => $src])) {
             return $this;
         }
 
-        $image = new \AppBundle\Entity\Image($source, $src, $alt);
+        $image = new \AppBundle\Entity\Image($src, $alt);
         $image->filename = isset($metadata['System:FileName']) ? $metadata['System:FileName'] : null;
         $image->path = isset($metadata['System:Directory']) ? substr($metadata['System:Directory'], strpos($metadata['System:Directory'], 'images')) : null;
         $image->width = isset($metadata['File:ImageWidth']) ? $metadata['File:ImageWidth'] : null;
@@ -168,7 +137,8 @@ class Image
             $this->em->persist($image);
             $this->em->flush($image);
         } catch (\Exception $e) {
-            $this->saveLog("[ImageHelper Error] " . $e->getMessage());
+            $this->saveLog("[ImageHelper] saveImage() at line {$e->getLine()}: {$e->getMessage()}");
+            throw $e;
         }
 
         return $this;
@@ -207,11 +177,18 @@ class Image
      *  - text from surrounded elements
      *
      * @param \AppBundle\Entity\Image $image
+     * @throws \Exception
      */
     protected function determineImageLocation(\AppBundle\Entity\Image &$image)
     {
         try {
-            $response = $this->client->get($this->getParameter('geoparser_url'), [
+            $client = new Client([
+                'timeout' => 3,
+                'allow_redirects' => false,
+                'verify' => $this->getParameter('http_verify_ssl')
+            ]);
+
+            $response = $client->get($this->getParameter('geoparser_url'), [
                 'query' => [
                     'scantext' => $image->description,
                     'json' => 1
@@ -235,7 +212,8 @@ class Image
             }
 
         } catch (\Exception $e) {
-            $this->saveLog("[ImageHelper Error] " . $e->getMessage());
+            $this->saveLog("[ImageHelper] determineImageLocation() at line {$e->getLine()}: {$e->getMessage()}");
+            throw $e;
         }
     }
 
@@ -245,11 +223,18 @@ class Image
      * @param \AppBundle\Entity\Image $image
      * @param $latitude
      * @param $longitude
+     * @throws \Exception
      */
     protected function determineImageAddress(\AppBundle\Entity\Image &$image, $latitude, $longitude)
     {
         try {
-            $response = $this->client->get($this->getParameter('google_geocode_url'), [
+            $client = new Client([
+                'timeout' => 3,
+                'allow_redirects' => false,
+                'verify' => $this->getParameter('http_verify_ssl')
+            ]);
+
+            $response = $client->get($this->getParameter('google_geocode_url'), [
                 'query' => [
                     'latlng' => "{$latitude},{$longitude}",
                     'key' => $this->getParameter('google_map_api_key'),
@@ -264,7 +249,8 @@ class Image
                 $image->address = $resultObj->results[0]->formatted_address;
             }
         } catch (\Exception $e) {
-            $this->saveLog("[ImageHelper Error] " . $e->getMessage());
+            $this->saveLog("[ImageHelper] determineImageAddress() at line {$e->getLine()}: {$e->getMessage()}");
+            throw $e;
         }
     }
 
@@ -308,12 +294,18 @@ class Image
     /**
      * Check whether the image is valid
      *
-     * @param $filename
+     * @param $imageFilePath
      * @return bool
      */
-    protected function validate($filename)
+    protected function isValid($imageFilePath)
     {
-        list($width, $height) = @getimagesize($filename);
+        list($width, $height) = @getimagesize($imageFilePath);
+
+        if (!$width || !$height) {
+            unlink($imageFilePath);
+            $this->saveLog("[ImageHelper] Invalid aspect ratio for image {$imageFilePath}. The image dimension is {$width} x {$height}.");
+            return false;
+        }
 
         // Only proceed further if image size is larger than 400px in each dimension and
         // follow standard photography aspect ratios
@@ -322,8 +314,8 @@ class Image
                 && $height < $this->getParameter('image_min_height'))
             || !in_array($ratio, $this->allowedAspectRatio)
         ) {
-            unlink($filename);
-            $this->errorMessage = "[ImageHelper Error] Invalid aspect ratio for image {$filename}. The image dimension is {$width} x {$height}.\n";
+            unlink($imageFilePath);
+            $this->saveLog("[ImageHelper] Invalid aspect ratio for image {$imageFilePath}. The image dimension is {$width} x {$height}.");
             return false;
         }
 
@@ -331,27 +323,27 @@ class Image
     }
 
     /**
-     * Get directory for saving
+     * Get directory path for saving
      *
-     * @param $source
+     * @param string $pageUrl
      * @return string
      */
-    protected function getDirectory($source)
+    protected function getDirectory($pageUrl)
     {
-        $imagePath = $this->kernel->getRootDir() . "/../web/downloaded/" . $this->getParameter('image_directory') . "/";
+        $imageDirectory = $this->getParameter('image_directory');
 
-        $source = parse_url($source, PHP_URL_HOST);
+        $pageUrl = parse_url($pageUrl, PHP_URL_HOST);
 
-        if (!$source) {
-            return $imagePath;
+        if (!$pageUrl) {
+            return $imageDirectory;
         }
 
-        $savePath = $imagePath . $source . "/";
+        $savePath = $imageDirectory . $pageUrl . "/";
 
         if (!file_exists($savePath)) {
             $canMkdir = @mkdir($savePath);
             if (!$canMkdir) {
-                return $imagePath;
+                return $imageDirectory;
             }
         }
 
@@ -410,7 +402,6 @@ class Image
      */
     protected function saveLog($message)
     {
-        $this->errorMessage = $message . "\n";
         $this->logger->debug($message);
     }
 

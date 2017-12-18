@@ -17,7 +17,7 @@ class LinkRepository extends \Doctrine\ORM\EntityRepository
      *
      * @return Link|bool
      */
-    public function getSeedLink()
+    public function getLastUnvisitedLink()
     {
         $qb = $this->createQueryBuilder('l')
             ->where('l.visited = :unvisited')

@@ -24,7 +24,7 @@ parameters:
     # Image default configurations
     image_min_width: 400
     image_min_height: 400
-    image_directory: 'images'
+    image_directory: '%kernel.root_dir%/../web/downloaded/images/'
 
     # Google Geocode API credentials
     google_geocode_url: ~
@@ -39,5 +39,5 @@ parameters:
     http_verify_ssl: false
     allowed_image_extensions: ['jpg', 'jpeg', 'png']
     exif_tool_path: '%kernel.root_dir%/../exiftool/'
-    server_memory_limit: '3G'
+    server_memory_limit: '6G'
     crawling_task_limit: 5000

@@ -1,0 +1,21 @@
+AppBundle\Entity\Seed:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\SeedRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        url:
+            type: string
+            length: '512'
+            unique: true
+        title:
+            type: string
+            length: 255
+        isDone:
+            type: boolean
+    lifecycleCallbacks: {  }

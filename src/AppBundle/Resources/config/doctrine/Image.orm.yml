@@ -8,12 +8,6 @@ AppBundle\Entity\Image:
             id: true
             generator:
                 strategy: AUTO
-    manyToOne:
-        source:
-            targetEntity: AppBundle\Entity\Link
-            joinColumn:
-                name: source
-                referenceColumnName: url
     fields:
         src:
             type: string

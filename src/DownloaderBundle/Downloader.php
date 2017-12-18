@@ -9,17 +9,14 @@
 namespace DownloaderBundle;
 
 use AppBundle\Entity\Link;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Services\Helpers;
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Exception\RequestException;
 use Monolog\Logger;
-use Psr\Http\Message\ResponseInterface;
 use QueueBundle\Queue;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Image;
-use Symfony\Component\DomCrawler\Link as DomLink;
+use Symfony\Component\DomCrawler\Crawler as DomCrawler;
+use Symfony\Component\DomCrawler\Image as DomCrawlerImage;
+use Symfony\Component\DomCrawler\Link as DomCrawlerLink;
 use Symfony\Component\HttpFoundation\Response;
 
 class Downloader
@@ -30,11 +27,6 @@ class Downloader
     protected $em;
 
     /**
-     * @var HttpClient
-     */
-    protected $client;
-
-    /**
      * @var Helpers
      */
     protected $helpers;
@@ -43,11 +35,6 @@ class Downloader
      * @var Queue
      */
     protected $queue;
-
-    /**
-     * @var string
-     */
-    protected $errorMessage = "";
 
     /**
      * @var Logger
@@ -73,8 +60,13 @@ class Downloader
     ];
 
     /**
+     * @var string
+     */
+    public $outputMessages = "";
+
+    /**
      * Downloader constructor.
-     * @param Registry $doctrine
+     * @param EntityManager $em
      * @param Queue $queue
      * @param Helpers $helpers
      */
@@ -92,130 +84,142 @@ class Downloader
     }
 
     /**
-     * Download content of a page (asynchronous)
-     *
-     * @param Link $link
+     * @param $url
+     * @throws \Exception
      */
-    public function downloadAsync(Link $link)
+    public function download($url)
     {
-        $promise = $this->client->getAsync($link->url);
+        // Reset output message string
+        $this->outputMessages = "";
 
-        $promise->then(
-            function (ResponseInterface $res) use ($link) {
-                if ($res->getStatusCode() == Response::HTTP_OK) {
-                    $this->fetchContent($res, $link);
-                }
-            },
-            function (RequestException $e) {
-                $this->saveLog("[Downloader Error] downloadAsync() " . $e->getMessage());
-            }
-        );
-    }
-
-    /**
-     * Download content of a page (synchronous)
-     *
-     * @param Link $link
-     * @return bool|string
-     */
-    public function download(Link &$link)
-    {
         try {
+            $client = new HttpClient([
+                'base_uri' => $url,
+                'timeout' => 3,
+                'allow_redirects' => false,
+                'verify' => false
+            ]);
 
-            $res = $this->client->get($link->url);
+            $response = $client->get($url);
 
-            if ($res->getStatusCode() == Response::HTTP_OK) {
-                $this->fetchContent($res, $link);
-                $this->markAsVisited($link);
-                return true;
+            if ($response->getStatusCode() == Response::HTTP_OK) {
+                $dom = new DomCrawler($response->getBody()->getContents(), $url);
+                $this->fetchContent($dom);
             }
-
         } catch (\Exception $e) {
-            $this->saveLog("[Downloader Error] download() " . $e->getMessage());
+            $this->saveLog("[Downloader] At line {$e->getLine()}: {$e->getMessage()}");
+            throw $e;
         }
-
-        return false;
     }
 
     /**
-     * Get error message (if any)
+     * Fetch content of the DOM document
      *
-     * @return string
-     */
-    public function getErrorMessage()
-    {
-        return $this->errorMessage;
-    }
-
-    /**
-     * Fetch content of the page from response
-     *
-     * @param ResponseInterface $response
-     */
-    protected function fetchContent(ResponseInterface $response, Link $link)
-    {
-        $html = $response->getBody()->getContents();
-        $dom = new Crawler($html, $link->url);
-        $text = $this->extractText($dom);
-        $this->extractImages($dom, $link);
-        $this->extractLinks($dom, $link, $text);
-    }
-
-    /**
-     * Extract links
-     *
+     * @param DomCrawler $dom
      * @return $this
      */
-    protected function extractLinks(Crawler $dom, Link $link, $text)
+    public function fetchContent(DomCrawler $dom)
     {
-        $links = $dom->filter('a')->links();
-
-        /** @var DomLink $domLink */
-        foreach ($links as $domLink) {
-            $url = $this->helpers->url->parse($domLink->getUri(), $link->url);
-
-            if (!empty($url)) {
-                $title = empty($domLink->getNode()->textContent)
-                    ? trim($domLink->getNode()->getAttribute('title'))
-                    : trim($domLink->getNode()->textContent);
-                $relevance = $this->calculateRelevance($dom, $url, $title, $text);
-
-                // Create a database link entity if not exist and add new link to the queue
-                if (!$this->em->getRepository(Link::class)->findOneBy(['url' => $url])) {
-                    $link = $this->saveLinkToDatabase($url, $title, $relevance);
-                    $this->queue->addLink($link);
-                }
-            }
-        }
+        $this->downloadImages($dom);
+        $this->extractLinks($dom);
 
         return $this;
     }
 
     /**
-     * Extract images
+     * Get entity manager
      *
+     * @return EntityManager
+     */
+    public function getEntityManager()
+    {
+        return $this->em;
+    }
+
+    /**
+     * Download images from the DOM content
+     *
+     * @param DomCrawler $dom
      * @return $this
      */
-    protected function extractImages(Crawler $dom, Link $link)
+    protected function downloadImages(DomCrawler $dom)
     {
         $imgElements = $dom->filter('img')->images();
 
-        /** @var Image $element */
-        foreach ($imgElements as $element) {
-            $src = $element->getUri();
-            $alt = $element->getNode()->getAttribute('alt');
-            $this->helpers->image->download($element->getNode(), $link, $src, $alt);
-            $this->errorMessage = $this->helpers->image->getErrorMessage();
+        /** @var DomCrawlerImage $image */
+        foreach ($imgElements as $image) {
+            try {
+                $this->helpers->image->download($dom->getUri(), $image);
+            } catch (\Exception $e) {
+                $this->saveLog("[Downloader] downloadImages() at line {$e->getLine()}: {$e->getMessage()}");
+                $this->outputMessages .= "<info>[Downloader] downloadImages() at line {$e->getLine()}: {$e->getMessage()}</info> \n";
+            }
         }
 
         return $this;
+    }
+
+    /**
+     * Extract links from the page
+     *
+     * @param DomCrawler $dom
+     * @return $this
+     */
+    protected function extractLinks(DomCrawler $dom)
+    {
+        // Extract page text, used for relevance calculation
+        $pageText = $this->extractText($dom);
+        $linkElements = $dom->filter('a')->links();
+
+        /** @var DomCrawlerLink $domLink */
+        foreach ($linkElements as $domLink) {
+            $linkUrl = $this->helpers->url->parse($domLink->getUri(), $dom->getUri());
+
+            if (!empty($linkUrl)) {
+                $linkTitle = trim($domLink->getNode()->textContent);
+                $relevance = $this->calculateRelevance($dom->getUri(), $linkUrl, $pageText, $linkTitle);
+
+                // Create a database link entity if not exist and add new link to the queue
+                $this->saveLinkToDatabase($linkUrl, $linkTitle, $relevance);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Save link to database
+     *
+     * @param $linkUrl
+     * @param $linkTitle
+     * @param $linkRelevance
+     */
+    protected function saveLinkToDatabase($linkUrl, $linkTitle, $linkRelevance)
+    {
+        $link = $this->em->getRepository(Link::class)->findOneBy(['url' => $linkUrl]);
+
+        if (!$link) {
+            $link = new Link($linkUrl, $linkTitle, $linkRelevance);
+
+            try {
+                $this->em->persist($link);
+                $this->em->flush($link);
+                $this->em->refresh($link);
+            } catch (\Exception $e) {
+                $this->saveLog("[Downloader] saveLinkToDatabase() at line {$e->getLine()}: {$e->getMessage()}");
+                $this->outputMessages .= "<info>[Downloader] saveLinkToDatabase() at line {$e->getLine()}: {$e->getMessage()}</info>\n";
+            }
+        }
+
+        $this->queue->addLink($link);
     }
 
     /**
      * Extract page's text
+     * @param DomCrawler $dom
      * @return string
      */
-    protected function extractText(Crawler $dom)
+    protected function extractText(DomCrawler $dom)
     {
         $text = "";
 
@@ -228,25 +232,32 @@ class Downloader
     }
 
     /**
-     * Calculate relevance score between a URL and the page contains it
+     * Calculate relevance score between a page and a link in it
+     * Relevance calculation depends on 4 factors:
+     *      - Url of the page
+     *      - Url of the link
+     *      - Page's text content
+     *      - Link's title description
      *
-     * @param $uri
-     * @param $title
+     * @param string $pageUrl
+     * @param string $linkUrl
+     * @param string $pageText
+     * @param string $linkTitle
      * @return float
      */
-    protected function calculateRelevance(Crawler $dom, $uri, $title, $text)
+    protected function calculateRelevance($pageUrl, $linkUrl, $pageText, $linkTitle)
     {
         $score = 0;
 
-        if (parse_url($dom->getUri(), PHP_URL_HOST) === parse_url($uri, PHP_URL_HOST)) {
+        if (parse_url($pageUrl, PHP_URL_HOST) === parse_url($linkUrl, PHP_URL_HOST)) {
             $score++;
         }
 
-        $linkTitleKeywords = $this->helpers->keyword->extract($title);
+        $linkTitleKeywords = $this->helpers->keyword->extract($linkTitle);
         $criteria = count($linkTitleKeywords) + 1;
 
         foreach ($linkTitleKeywords as $keyword) {
-            $tf = $this->helpers->keyword->countWordOccurrence($keyword, $text);
+            $tf = $this->helpers->keyword->countWordOccurrence($keyword, $pageText);
 
             if ($tf > 1) {
                 $score++;
@@ -257,54 +268,12 @@ class Downloader
     }
 
     /**
-     * Save link to database
-     *
-     * @param $url
-     * @param $title
-     * @param $relevance
-     * @return Link
-     */
-    protected function saveLinkToDatabase($url, $title, $relevance)
-    {
-        $link = new Link($url, $title, $relevance);
-
-        try {
-            $this->em->persist($link);
-            $this->em->flush($link);
-            $this->em->refresh($link);
-        } catch (\Exception $e) {
-            $this->saveLog("[Downloader Error] saveLinkToDatabase() " . $e->getMessage());
-        }
-
-        return $link;
-    }
-
-    /**
-     * Mark a link as visited
-     *
-     * @param Link $link
-     */
-    protected function markAsVisited(Link $link)
-    {
-        $link->visited = true;
-
-        try {
-            $this->em->persist($link);
-            $this->em->flush($link);
-            $this->em->refresh($link);
-        } catch (\Exception $e) {
-            $this->saveLog("[Downloader Error] markAsVisited() " . $e->getMessage());
-        }
-    }
-
-    /**
      * Log error messages and refresh/reopen entity manager
      *
      * @param $message
      */
     protected function saveLog($message)
     {
-        $this->errorMessage = $message . "\n";
         $this->logger->debug($message);
     }
 }

@@ -9,6 +9,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Entity\Link;
+use AppBundle\Entity\Seed;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Downloader;
 use QueueBundle\Queue;
@@ -37,6 +38,11 @@ class CrawlCommand extends ContainerAwareCommand
     private $downloader;
 
     /**
+     * @var Seed
+     */
+    private $seed;
+
+    /**
      * Configure the command
      */
     protected function configure()
@@ -52,39 +58,46 @@ class CrawlCommand extends ContainerAwareCommand
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|null|void
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // Initialize the crawler
+        // Set server memory limit before execution
+        ini_set('memory_limit', $this->getContainer()->getParameter('server_memory_limit'));
+
+        // Do styling for outputs
         $output->writeln('<comment>Initializing...</comment>');
         $style = new OutputFormatterStyle('red', null);
         $output->getFormatter()->setStyle('fail', $style);
 
-        ini_set('memory_limit', $this->getContainer()->getParameter('server_memory_limit'));
-        $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->queue = $this->getContainer()->get('queue');
-        $this->downloader = $this->getContainer()->get('downloader');
+        // Initialize the crawler
+        $this->initializeCrawler();
 
-        /** @var Link $seed */
-        if ($seed = $this->em->getRepository(Link::class)->getSeedLink()) {
-            $this->queue->addLink($seed);
-        }
-
+        // Number of crawl pages
         $noOfPages = 0;
 
+        // Main crawler loop
         while (!$this->queue->isEmpty() && $noOfPages < $this->getContainer()->getParameter('crawling_task_limit')) {
 
             $link = $this->queue->getNextLink();
             $output->write('Fetch: ' . $link->url);
 
-            $downloadResults = $this->downloader->download($link);
+            try {
+                // Download content from the link
+                $this->downloader->download($link->url);
 
-            if ($downloadResults) {
+                // Mark the link as visited
+                $link->visited = true;
+                $this->updateLink($link);
+
+                // Output success message
                 $output->writeln(' <info>SUCCESS</info>');
-            } else {
+            } catch (\Exception $e) {
                 $output->writeln(' <fail>FAILED</fail>');
-                $output->writeln("<error>{$this->downloader->getErrorMessage()}</error>");
             }
+
+            // If there exists any output messages from the downloader, show it to the console
+            $output->writeln($this->downloader->outputMessages);
 
             $noOfPages++;
 
@@ -95,6 +108,14 @@ class CrawlCommand extends ContainerAwareCommand
             //$output->writeln('Number of links in queue: ' . $this->queue->getSize());
         }
 
+        // If there aren't any unvisited link left for the current seed, mark it as done and update to the database
+        if (!$this->em->getRepository(Link::class)->getLastUnvisitedLink()) {
+            $this->seed->isDone = true;
+            $this->em->persist($this->seed);
+            $this->em->flush($this->seed);
+            $output->writeln("<info>All children pages of seed link {$this->seed->url} have been crawled!</info>");
+        }
+
         $output->writeln('<comment>Crawling task finished!</comment>');
     }
 
@@ -103,10 +124,74 @@ class CrawlCommand extends ContainerAwareCommand
      * @param bool $realUsage
      * @return string
      */
-    protected function memoryUsage($realUsage = false)
+    private function memoryUsage($realUsage = false)
     {
         $size = memory_get_usage($realUsage);
         $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
         return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
+    }
+
+    /**
+     * Initialize the crawler
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function initializeCrawler()
+    {
+        // Initialize services
+        $this->queue = $this->getContainer()->get('queue');
+        $this->downloader = $this->getContainer()->get('downloader');
+        $this->em = $this->downloader->getEntityManager();
+
+        // Get an undone seed
+        $this->seed = $this->em->getRepository(Seed::class)->findOneBy(['isDone' => false]);
+
+        // Get last unvisited link with highest relevance score as start link for the crawler
+        /** @var Link $startLink */
+        $startLink = $this->em->getRepository(Link::class)->getLastUnvisitedLink();
+
+        // If no such link exists
+        if (!$startLink) {
+            // Use the seed instead
+            if ($this->seed) {
+                // Convert the seed to start link
+                $startLink = $this->convertSeedToLink($this->seed);
+            }
+        }
+
+        // Check once more before add start link to queue
+        if ($startLink) {
+            $this->queue->addLink($startLink);
+        }
+    }
+
+    /**
+     * Convert a seed to a link
+     *
+     * @param Seed $seed
+     * @return Link
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function convertSeedToLink(Seed $seed)
+    {
+        $link = new Link($seed->url, $seed->title);
+
+        return $this->updateLink($link);
+    }
+
+    /**
+     * Update link to the database
+     *
+     * @param $link
+     * @return Link
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function updateLink(Link $link)
+    {
+        $this->em->persist($link);
+        $this->em->flush($link);
+        $this->em->refresh($link);
+
+        return $link;
     }
 }

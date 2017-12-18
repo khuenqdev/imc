@@ -86,13 +86,6 @@ class Image
     public $dateAcquired;
 
     /**
-     * Link to page contains the image
-     *
-     * @var Link
-     */
-    public $source;
-
-    /**
      * @var float
      * @Serializer\Expose
      */
@@ -130,16 +123,14 @@ class Image
     /**
      * Image constructor.
      *
-     * @param Link|null $source
      * @param $src
      * @param string $alt
      * @param null $width
      * @param null $height
      */
-    public function __construct($source = null, $src, $alt = "", $width = null, $height = null)
+    public function __construct($src, $alt = "", $width = null, $height = null)
     {
         $this->src = $src;
-        $this->source = $source;
         $this->alt = $alt;
         $this->width = $width;
         $this->height = $height;
