@@ -120,8 +120,8 @@ class Downloader
      */
     public function fetchContent(DomCrawler $dom)
     {
-        $this->downloadImages($dom);
         $this->extractLinks($dom);
+        $this->downloadImages($dom);
 
         return $this;
     }

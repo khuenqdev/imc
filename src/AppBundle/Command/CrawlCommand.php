@@ -141,7 +141,7 @@ class CrawlCommand extends ContainerAwareCommand
         // Initialize services
         $this->queue = $this->getContainer()->get('queue');
         $this->downloader = $this->getContainer()->get('downloader');
-        $this->em = $this->downloader->getEntityManager();
+        $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         // Get an undone seed
         $this->seed = $this->em->getRepository(Seed::class)->findOneBy(['isDone' => false]);

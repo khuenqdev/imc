@@ -1,0 +1,73 @@
+AppBundle\Entity\GeoName:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\GeoNameRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: '200'
+        asciiName:
+            type: string
+            length: '200'
+            column: ascii_name
+        alternateNames:
+            type: text
+            column: alternate_names
+        latitude:
+            type: decimal
+            precision: 10
+            scale: '7'
+        longitude:
+            type: decimal
+            precision: '10'
+            scale: '7'
+        featureClass:
+            type: string
+            length: '1'
+            column: feature_class
+        featureCode:
+            type: string
+            length: '10'
+            column: feature_code
+        countryCode:
+            type: string
+            length: '2'
+            column: country_code
+        cc2:
+            type: string
+            length: '60'
+        admin1Code:
+            type: string
+            length: '20'
+            column: admin1_code
+        admin2Code:
+            type: string
+            length: '80'
+            column: admin2_code
+        admin3Code:
+            type: string
+            length: '20'
+            column: admin3_code
+        admin4Code:
+            type: string
+            length: '20'
+            column: admin4_code
+        population:
+            type: bigint
+        elevation:
+            type: integer
+        dem:
+            type: integer
+        timezone:
+            type: string
+            length: '100'
+        modificationDate:
+            type: date
+            column: modification_date
+    lifecycleCallbacks: {  }

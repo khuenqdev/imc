@@ -41,11 +41,16 @@ class DownloaderTest extends KernelTestCase
      */
     public function testDownload()
     {
-        try {
-            $this->service->download('https://www.locationscout.net/');
-        } catch (\Exception $e) {
-            echo $e->getMessage() . "\n";
-        }
+//        try {
+//            $this->service->download('https://www.locationscout.net/');
+//        } catch (\Exception $e) {
+//            echo $e->getMessage() . "\n";
+//        }
+    }
+
+    public function testAddressDetection()
+    {
+
     }
 
     /**

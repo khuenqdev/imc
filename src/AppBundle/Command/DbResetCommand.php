@@ -42,8 +42,5 @@ class DbResetCommand extends ContainerAwareCommand
 
         $databaseUpdate = $this->getApplication()->find('doctrine:schema:update');
         $databaseUpdate->run(new ArrayInput(['command' => 'doctrine:schema:update', '--force' => true]), $output);
-
-        $initialFixtures = $this->getApplication()->find('doctrine:fixtures:load');
-        $initialFixtures->run(new ArrayInput(['command' => 'doctrine:fixtures:load', '--no-interaction' => true]), $output);
     }
 }

@@ -9,13 +9,15 @@
 namespace AppBundle\DataFixtures;
 
 
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-abstract class AbstractDataFixture implements ContainerAwareInterface, FixtureInterface
+abstract class AbstractDataFixture extends Fixture implements ContainerAwareInterface, FixtureInterface, DependentFixtureInterface
 {
     /**
      * The dependency injection container.

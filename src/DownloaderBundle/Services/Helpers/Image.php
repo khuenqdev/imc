@@ -87,6 +87,7 @@ class Image
                 }
             } catch (\Exception $e) {
                 $this->saveLog("[ImageHelper] At line {$e->getLine()}: {$e->getMessage()}");
+                unlink($imageFilePath);
                 throw $e;
             }
         }
@@ -133,13 +134,8 @@ class Image
         }
 
         // Save to database
-        try {
-            $this->em->persist($image);
-            $this->em->flush($image);
-        } catch (\Exception $e) {
-            $this->saveLog("[ImageHelper] saveImage() at line {$e->getLine()}: {$e->getMessage()}");
-            throw $e;
-        }
+        $this->em->persist($image);
+        $this->em->flush($image);
 
         return $this;
     }
@@ -177,7 +173,6 @@ class Image
      *  - text from surrounded elements
      *
      * @param \AppBundle\Entity\Image $image
-     * @throws \Exception
      */
     protected function determineImageLocation(\AppBundle\Entity\Image &$image)
     {
@@ -213,7 +208,6 @@ class Image
 
         } catch (\Exception $e) {
             $this->saveLog("[ImageHelper] determineImageLocation() at line {$e->getLine()}: {$e->getMessage()}");
-            throw $e;
         }
     }
 
@@ -223,7 +217,6 @@ class Image
      * @param \AppBundle\Entity\Image $image
      * @param $latitude
      * @param $longitude
-     * @throws \Exception
      */
     protected function determineImageAddress(\AppBundle\Entity\Image &$image, $latitude, $longitude)
     {
@@ -250,7 +243,6 @@ class Image
             }
         } catch (\Exception $e) {
             $this->saveLog("[ImageHelper] determineImageAddress() at line {$e->getLine()}: {$e->getMessage()}");
-            throw $e;
         }
     }
 
