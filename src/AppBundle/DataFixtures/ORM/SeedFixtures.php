@@ -14,6 +14,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class SeedFixtures extends AbstractDataFixture
 {
+    /**
+     * @param ObjectManager $manager
+     */
     public function load(ObjectManager $manager)
     {
         $csv = $this->container->get('kernel')->getRootDir() . '/data/seed_links.csv';

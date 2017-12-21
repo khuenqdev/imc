@@ -2,19 +2,19 @@
 /**
  * Created by PhpStorm.
  * User: khuen
- * Date: 12/19/2017
- * Time: 8:18 PM
+ * Date: 12/21/2017
+ * Time: 11:46 AM
  */
 
 namespace AppBundle\DataFixtures\ORM;
 
-
 use AppBundle\DataFixtures\AbstractDataFixture;
-use AppBundle\Entity\GeoName;
+use AppBundle\Entity\Country;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class GeoNameFixtures extends AbstractDataFixture
+class CountryFixtures extends AbstractDataFixture
 {
+
     /**
      * Load fixture data
      *
@@ -22,13 +22,8 @@ class GeoNameFixtures extends AbstractDataFixture
      */
     public function load(ObjectManager $manager)
     {
-        $file1 = $this->container->get('kernel')->getRootDir() . '/data/cities/cities1000.txt';
-        $file2 = $this->container->get('kernel')->getRootDir() . '/data/cities/cities5000.txt';
-        $file3 = $this->container->get('kernel')->getRootDir() . '/data/cities/cities15000.txt';
-
-        $this->importCities($manager, $file1);
-        $this->importCities($manager, $file2);
-        $this->importCities($manager, $file3);
+        $file = $this->container->get('kernel')->getRootDir() . '/data/countries.txt';
+        $this->importCountries($manager, $file);
     }
 
     /**
@@ -37,20 +32,20 @@ class GeoNameFixtures extends AbstractDataFixture
      * @param ObjectManager $manager
      * @param $filename
      */
-    private function importCities(ObjectManager $manager, $filename)
+    private function importCountries(ObjectManager $manager, $filename)
     {
         $content = @file_get_contents($filename);
         $lines = str_getcsv($content, "\n");
 
-        $cities = [];
+        $countries = [];
 
         foreach ($lines as $line) {
             $line = preg_replace("/\"/", "", $line);
-            $cities[] = str_getcsv($line, "\t", "");
+            $countries[] = str_getcsv($line, "\t", "");
         }
 
-        foreach ($cities as $city) {
-            $geoName = GeoName::createFromTxtData($city);
+        foreach ($countries as $country) {
+            $geoName = Country::createFromTxtData($country);
             $manager->persist($geoName);
         }
 
@@ -63,7 +58,7 @@ class GeoNameFixtures extends AbstractDataFixture
     public function getDependencies()
     {
         return [
-            SeedFixtures::class,
+            SeedFixtures::class
         ];
     }
 }

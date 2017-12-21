@@ -49,4 +49,16 @@ class StopwordFixtures extends AbstractDataFixture
         return $wordCollection;
     }
 
+    /**
+     * @return array
+     */
+    public function getDependencies()
+    {
+        return [
+            SeedFixtures::class,
+            CountryFixtures::class,
+            CityFixtures::class,
+        ];
+    }
+
 }

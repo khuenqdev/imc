@@ -5,7 +5,7 @@ namespace AppBundle\Entity;
 /**
  * GeoName
  */
-class GeoName
+class City
 {
     /**
      * @var int
@@ -106,11 +106,11 @@ class GeoName
      * Create a new geo name data
      *
      * @param array $data
-     * @return GeoName
+     * @return City
      */
     public static function createFromTxtData(array $data)
     {
-        $geoName = new GeoName();
+        $geoName = new City();
         $geoName->id = (int)$data[0];
         $geoName->name = $data[1];
         $geoName->asciiName = $data[2];
@@ -149,7 +149,7 @@ class GeoName
      *
      * @param string $name
      *
-     * @return GeoName
+     * @return City
      */
     public function setName($name)
     {
@@ -173,7 +173,7 @@ class GeoName
      *
      * @param string $asciiName
      *
-     * @return GeoName
+     * @return City
      */
     public function setAsciiName($asciiName)
     {
@@ -197,7 +197,7 @@ class GeoName
      *
      * @param string $alternateNames
      *
-     * @return GeoName
+     * @return City
      */
     public function setAlternateNames($alternateNames)
     {
@@ -221,7 +221,7 @@ class GeoName
      *
      * @param string $latitude
      *
-     * @return GeoName
+     * @return City
      */
     public function setLatitude($latitude)
     {
@@ -245,7 +245,7 @@ class GeoName
      *
      * @param string $longitude
      *
-     * @return GeoName
+     * @return City
      */
     public function setLongitude($longitude)
     {
@@ -269,7 +269,7 @@ class GeoName
      *
      * @param string $featureClass
      *
-     * @return GeoName
+     * @return City
      */
     public function setFeatureClass($featureClass)
     {
@@ -293,7 +293,7 @@ class GeoName
      *
      * @param string $featureCode
      *
-     * @return GeoName
+     * @return City
      */
     public function setFeatureCode($featureCode)
     {
@@ -317,7 +317,7 @@ class GeoName
      *
      * @param string $countryCode
      *
-     * @return GeoName
+     * @return City
      */
     public function setCountryCode($countryCode)
     {
@@ -341,7 +341,7 @@ class GeoName
      *
      * @param string $cc2
      *
-     * @return GeoName
+     * @return City
      */
     public function setCc2($cc2)
     {
@@ -365,7 +365,7 @@ class GeoName
      *
      * @param string $admin1Code
      *
-     * @return GeoName
+     * @return City
      */
     public function setAdmin1Code($admin1Code)
     {
@@ -389,7 +389,7 @@ class GeoName
      *
      * @param string $admin2Code
      *
-     * @return GeoName
+     * @return City
      */
     public function setAdmin2Code($admin2Code)
     {
@@ -413,7 +413,7 @@ class GeoName
      *
      * @param string $admin3Code
      *
-     * @return GeoName
+     * @return City
      */
     public function setAdmin3Code($admin3Code)
     {
@@ -437,7 +437,7 @@ class GeoName
      *
      * @param string $admin4Code
      *
-     * @return GeoName
+     * @return City
      */
     public function setAdmin4Code($admin4Code)
     {
@@ -461,7 +461,7 @@ class GeoName
      *
      * @param integer $population
      *
-     * @return GeoName
+     * @return City
      */
     public function setPopulation($population)
     {
@@ -485,7 +485,7 @@ class GeoName
      *
      * @param integer $elevation
      *
-     * @return GeoName
+     * @return City
      */
     public function setElevation($elevation)
     {
@@ -509,7 +509,7 @@ class GeoName
      *
      * @param integer $dem
      *
-     * @return GeoName
+     * @return City
      */
     public function setDem($dem)
     {
@@ -533,7 +533,7 @@ class GeoName
      *
      * @param string $timezone
      *
-     * @return GeoName
+     * @return City
      */
     public function setTimezone($timezone)
     {
@@ -557,7 +557,7 @@ class GeoName
      *
      * @param \DateTime $modificationDate
      *
-     * @return GeoName
+     * @return City
      */
     public function setModificationDate($modificationDate)
     {

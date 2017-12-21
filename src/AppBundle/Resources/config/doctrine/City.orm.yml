@@ -1,7 +1,7 @@
-AppBundle\Entity\GeoName:
+AppBundle\Entity\City:
     type: entity
     table: null
-    repositoryClass: AppBundle\Repository\GeoNameRepository
+    repositoryClass: AppBundle\Repository\CityRepository
     id:
         id:
             type: integer
