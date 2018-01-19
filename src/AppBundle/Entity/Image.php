@@ -60,30 +60,9 @@ class Image
     public $alt;
 
     /**
-     * @var string
-     */
-    public $author;
-
-    /**
-     * @var string
-     */
-    public $copyright;
-
-    /**
      * @var bool
      */
     public $isExifLocation;
-
-    /**
-     * @var \DateTime
-     */
-    public $dateTaken;
-
-
-    /**
-     * @var \DateTime
-     */
-    public $dateAcquired;
 
     /**
      * @var float
@@ -98,12 +77,6 @@ class Image
     public $longitude;
 
     /**
-     * @var float
-     * @Serializer\Expose
-     */
-    public $altitude;
-
-    /**
      * @var string
      * @Serializer\Expose
      */
@@ -114,6 +87,11 @@ class Image
      * @Serializer\Expose
      */
     public $description;
+
+    /**
+     * @var bool
+     */
+    public $geoparsed;
 
     /**
      * @var string
@@ -134,6 +112,7 @@ class Image
         $this->alt = $alt;
         $this->width = $width;
         $this->height = $height;
+        $this->geoparsed = false;
     }
 
     /**

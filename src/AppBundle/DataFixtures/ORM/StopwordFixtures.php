@@ -55,9 +55,7 @@ class StopwordFixtures extends AbstractDataFixture
     public function getDependencies()
     {
         return [
-            SeedFixtures::class,
-            CountryFixtures::class,
-            CityFixtures::class,
+            SeedFixtures::class
         ];
     }
 

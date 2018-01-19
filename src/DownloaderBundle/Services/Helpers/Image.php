@@ -15,6 +15,7 @@ use PHPExif\Adapter\Exiftool;
 use PHPExif\Reader\Reader;
 use Symfony\Component\HttpKernel\KernelInterface as Kernel;
 use Symfony\Component\DomCrawler\Image as DomCrawlerImage;
+use DownloaderBundle\Services\Helpers\Keyword as KeywordHelper;
 
 class Image
 {
@@ -64,12 +65,17 @@ class Image
      */
     public function download($pageUrl, DomCrawlerImage $element)
     {
-        $src = $element->getUri();
+        $src = strtok($element->getUri(), '?');
         $alt = $element->getNode()->getAttribute('alt');
 
         if ($saveDir = $this->getDirectory($pageUrl)) {
-            $filename = pathinfo($src, PATHINFO_FILENAME);
             $extension = pathinfo($src, PATHINFO_EXTENSION);
+
+            if (!in_array($extension, $this->getParameter('allowed_image_extensions'))) {
+                throw new \Exception("[ImageHelper] Invalid image extension: {$extension}");
+            }
+
+            $filename = pathinfo($src, PATHINFO_FILENAME);
             $imageFilePath = $saveDir . $filename . "." . $extension;
 
             try {
@@ -111,26 +117,20 @@ class Image
         }
 
         $image = new \AppBundle\Entity\Image($src, $alt);
-        $image->filename = isset($metadata['System:FileName']) ? $metadata['System:FileName'] : null;
+        $image->filename = isset($metadata['System:FileName']) ? $metadata['System:FileName'] : (pathinfo($src, PATHINFO_FILENAME) . '.' . pathinfo($src, PATHINFO_EXTENSION));
         $image->path = isset($metadata['System:Directory']) ? substr($metadata['System:Directory'], strpos($metadata['System:Directory'], 'images')) : null;
-        $image->width = isset($metadata['File:ImageWidth']) ? $metadata['File:ImageWidth'] : null;
-        $image->height = isset($metadata['File:ImageHeight']) ? $metadata['File:ImageHeight'] : null;
-        $image->latitude = isset($metadata['GPS:GPSLatitude']) ? $metadata['GPS:GPSLatitude'] : null;
-        $image->longitude = isset($metadata['GPS:GPSLongitude']) ? $metadata['GPS:GPSLongitude'] : null;
-        $image->altitude = isset($metadata['GPS:GPSAltitude']) ? $metadata['GPS:GPSAltitude'] : null;
-        $image->type = isset($metadata['File:FileType']) ? $metadata['File:FileType'] : null;
-        $image->copyright = isset($metadata['copyright']) ? $metadata['copyright'] : null;
-        $image->dateTaken = isset($metadata['creationdate']) ? $metadata['creationdate'] : null;
-        $image->dateAcquired = new \DateTime(date('Y-m-d H:i:s'));
-        $image->author = isset($metadata['author']) ? $metadata['author'] : null;
+        $image->width = isset($metadata['File:ImageWidth']) ? $metadata['File:ImageWidth'] : 0;
+        $image->height = isset($metadata['File:ImageHeight']) ? $metadata['File:ImageHeight'] : 0;
+        $image->latitude = isset($metadata['GPS:GPSLatitude']) ? (float) $metadata['GPS:GPSLatitude'] : null;
+        $image->longitude = isset($metadata['GPS:GPSLongitude']) ? (float) $metadata['GPS:GPSLongitude'] : null;
+        $image->type = isset($metadata['File:FileType']) ? $metadata['File:FileType'] : pathinfo($src, PATHINFO_EXTENSION);
         $image->isExifLocation = !empty($image->latitude) && !empty($image->longitude);
         $image->description = $this->extractImageDescription($element, $alt, $image->filename);
         $image->setMetadata($metadata);
 
         if ($image->latitude && $image->longitude) {
-            $this->determineImageAddress($image, $image->latitude, $image->longitude);
-        } else {
-            $this->determineImageLocation($image);
+            $image->geoparsed = true;
+            $this->determineImageAddress($image);
         }
 
         // Save to database
@@ -168,57 +168,11 @@ class Image
     }
 
     /**
-     * Determine image's GPS location and address based on its description
-     *  - alt attribute
-     *  - text from surrounded elements
-     *
-     * @param \AppBundle\Entity\Image $image
-     */
-    protected function determineImageLocation(\AppBundle\Entity\Image &$image)
-    {
-        try {
-            $client = new Client([
-                'timeout' => 3,
-                'allow_redirects' => false,
-                'verify' => $this->getParameter('http_verify_ssl')
-            ]);
-
-            $response = $client->get($this->getParameter('geoparser_url'), [
-                'query' => [
-                    'scantext' => $image->description,
-                    'json' => 1
-                ]
-            ]);
-
-            $results = $response->getBody()->getContents();
-            $resultObj = @json_decode($results);
-
-            if ($resultObj->matches !== null) {
-                if (is_array($resultObj->match)) {
-                    $match = $resultObj->match[0];
-                } else {
-                    $match = $resultObj->match;
-                }
-
-                $image->address = $match->location;
-                $image->latitude = $resultObj->latt;
-                $image->longitude = $resultObj->longt;
-                $image->isExifLocation = false;
-            }
-
-        } catch (\Exception $e) {
-            $this->saveLog("[ImageHelper] determineImageLocation() at line {$e->getLine()}: {$e->getMessage()}");
-        }
-    }
-
-    /**
      * Determine image's address
      *
      * @param \AppBundle\Entity\Image $image
-     * @param $latitude
-     * @param $longitude
      */
-    protected function determineImageAddress(\AppBundle\Entity\Image &$image, $latitude, $longitude)
+    protected function determineImageAddress(\AppBundle\Entity\Image &$image)
     {
         try {
             $client = new Client([
@@ -229,7 +183,7 @@ class Image
 
             $response = $client->get($this->getParameter('google_geocode_url'), [
                 'query' => [
-                    'latlng' => "{$latitude},{$longitude}",
+                    'latlng' => "{$image->latitude},{$image->longitude}",
                     'key' => $this->getParameter('google_map_api_key'),
                     'result_type' => "street_address|postal_code|country"
                 ]
@@ -299,13 +253,8 @@ class Image
             return false;
         }
 
-        // Only proceed further if image size is larger than 400px in each dimension and
-        // follow standard photography aspect ratios
-        $ratio = floatval($width / $height);
-        if (($width < $this->getParameter('image_min_width')
-                && $height < $this->getParameter('image_min_height'))
-            || !in_array($ratio, $this->allowedAspectRatio)
-        ) {
+        // Only proceed further if image size is larger than 400px in each dimension
+        if ($width < $this->getParameter('image_min_width') && $height < $this->getParameter('image_min_height')) {
             unlink($imageFilePath);
             $this->saveLog("[ImageHelper] Invalid aspect ratio for image {$imageFilePath}. The image dimension is {$width} x {$height}.");
             return false;

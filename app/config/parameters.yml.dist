@@ -37,7 +37,11 @@ parameters:
 
     # Other configurations
     http_verify_ssl: false
-    allowed_image_extensions: ['jpg', 'jpeg', 'png']
+    allowed_image_extensions:
+        - jpg
+        - jpeg
+        - png
+        - svg
     exif_tool_path: '%kernel.root_dir%/../exiftool/'
     server_memory_limit: '6G'
     crawling_task_limit: 5000
