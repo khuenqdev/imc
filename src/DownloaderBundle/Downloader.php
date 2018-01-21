@@ -95,7 +95,7 @@ class Downloader
         try {
             $client = new HttpClient([
                 'base_uri' => $url,
-                'timeout' => 3,
+                'timeout' => 60,
                 'allow_redirects' => false,
                 'verify' => false
             ]);

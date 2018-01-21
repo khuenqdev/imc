@@ -47,6 +47,7 @@ class GeoparseCommand extends ContainerAwareCommand
         /** @var Image $image */
         foreach ($images as $image) {
             try {
+                $output->writeln("Geoparsing {$image->path}/{$image->filename}");
                 $this->geoparse($image);
 
                 if ($image->latitude && $image->longitude) {
@@ -57,6 +58,7 @@ class GeoparseCommand extends ContainerAwareCommand
                 $em->flush($image);
             } catch (\Exception $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
+                break; // Break as soon as there is error
             }
         }
     }
@@ -64,12 +66,12 @@ class GeoparseCommand extends ContainerAwareCommand
     /**
      * Perform geoparsing
      *
-     * @param $image
+     * @param Image $image
      */
-    private function geoparse(&$image)
+    private function geoparse(Image &$image)
     {
         $client = new Client([
-            'timeout' => 3,
+            'timeout' => 60,
             'allow_redirects' => false,
             'verify' => $this->getContainer()->getParameter('http_verify_ssl')
         ]);
@@ -95,6 +97,7 @@ class GeoparseCommand extends ContainerAwareCommand
             $image->latitude = $resultObj->latt;
             $image->longitude = $resultObj->longt;
             $image->isExifLocation = false;
+            $image->geoparsed = true;
         }
     }
 

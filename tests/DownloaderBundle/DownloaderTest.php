@@ -12,6 +12,7 @@ use AppBundle\Entity\Link;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Downloader;
+use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DownloaderTest extends KernelTestCase
@@ -42,15 +43,26 @@ class DownloaderTest extends KernelTestCase
     public function testDownload()
     {
 //        try {
-//            $this->service->download('https://www.locationscout.net/');
+//            $this->service->download('https://www.pexels.com/photo/adult-beautiful-blue-bouquet-458627/');
 //        } catch (\Exception $e) {
 //            echo $e->getMessage() . "\n";
 //        }
-    }
 
-    public function testAddressDetection()
-    {
+        $client = new Client([
+            'timeout' => 10,
+            'allow_redirects' => false,
+            'verify' => false
+        ]);
 
+        $response = $client->get('https://geocode.xyz/', [
+            'query' => [
+                'scantext' => "Women's Black Zip Up Hooded Jacket pexels photo 54200",
+                'json' => 1
+            ]
+        ]);
+
+        $results = $response->getBody()->getContents();
+        $resultObj = @json_decode($results);
     }
 
     /**

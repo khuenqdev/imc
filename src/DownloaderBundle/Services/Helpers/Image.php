@@ -20,13 +20,6 @@ use DownloaderBundle\Services\Helpers\Keyword as KeywordHelper;
 class Image
 {
     /**
-     * Allowed image aspect ratio
-     *
-     * @var array
-     */
-    protected $allowedAspectRatio;
-
-    /**
      * @var Kernel
      */
     protected $kernel;
@@ -52,7 +45,6 @@ class Image
     {
         $this->kernel = $kernel;
         $this->em = $em;
-        $this->allowedAspectRatio = $this->initializeAspectRatios();
         $this->logger = $logger;
     }
 
@@ -80,7 +72,7 @@ class Image
 
             try {
                 $client = new Client([
-                    'timeout' => 3,
+                    'timeout' => 60,
                     'allow_redirects' => false,
                     'verify' => $this->getParameter('http_verify_ssl')
                 ]);
@@ -292,28 +284,6 @@ class Image
     }
 
     /**
-     * Initialize standard aspect ratios list
-     */
-    protected function initializeAspectRatios()
-    {
-        return [
-            floatval(1 / 1),
-            floatval(5 / 4),
-            floatval(4 / 5),
-            floatval(4 / 3),
-            floatval(3 / 4),
-            floatval(3 / 2),
-            floatval(2 / 3),
-            floatval(5 / 3),
-            floatval(3 / 5),
-            floatval(16 / 9),
-            floatval(9 / 16),
-            floatval(3 / 1),
-            floatval(1 / 3),
-        ];
-    }
-
-    /**
      * Get application parameter
      *
      * @param $name
@@ -333,7 +303,7 @@ class Image
      */
     protected function sanitize($filename)
     {
-        return preg_replace('/\W|(\bjpeg\b)|(\bpng\b)|(\bjpg\b)|\_/i', ' ', $filename);
+        return preg_replace('/\W|(\bjpeg\b)|(\bpng\b)|(\bjpg\b)|(\bsvg\b)|\_/i', ' ', $filename);
     }
 
     /**
