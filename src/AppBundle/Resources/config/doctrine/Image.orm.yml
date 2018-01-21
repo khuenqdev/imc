@@ -12,7 +12,6 @@ AppBundle\Entity\Image:
         src:
             type: string
             length: 255
-            unique: true
         alt:
             type: string
             length: 255

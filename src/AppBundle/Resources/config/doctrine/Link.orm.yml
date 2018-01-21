@@ -12,7 +12,6 @@ AppBundle\Entity\Link:
         url:
             type: string
             length: 255
-            unique: true
         title:
             type: string
             length: 255

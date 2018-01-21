@@ -12,9 +12,7 @@ AppBundle\Entity\Stopword:
         hash:
             type: string
             length: 255
-            unique: true
         word:
             type: string
             length: 255
-            unique: false
     lifecycleCallbacks: {  }
