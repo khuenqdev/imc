@@ -11,10 +11,10 @@ AppBundle\Entity\Stopword:
     fields:
         hash:
             type: string
-            length: '512'
+            length: 255
             unique: true
         word:
             type: string
-            length: '512'
+            length: 255
             unique: false
     lifecycleCallbacks: {  }

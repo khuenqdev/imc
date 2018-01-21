@@ -11,7 +11,7 @@ AppBundle\Entity\Seed:
     fields:
         url:
             type: string
-            length: '512'
+            length: 255
             unique: true
         title:
             type: string

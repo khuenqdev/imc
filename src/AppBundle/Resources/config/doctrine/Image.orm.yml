@@ -11,18 +11,18 @@ AppBundle\Entity\Image:
     fields:
         src:
             type: string
-            length: '512'
+            length: 255
             unique: true
         alt:
             type: string
-            length: '512'
+            length: 255
             nullable: true
         filename:
             type: string
             length: 255
         path:
             type: string
-            length: '512'
+            length: 255
             nullable: true
         width:
             type: integer
@@ -47,11 +47,11 @@ AppBundle\Entity\Image:
             nullable: true
         address:
             type: string
-            length: '512'
+            length: 255
             nullable: true
         description:
             type: string
-            length: '512'
+            length: 255
             nullable: true
         metadata:
             type: text

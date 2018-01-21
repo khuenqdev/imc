@@ -11,11 +11,11 @@ AppBundle\Entity\Link:
     fields:
         url:
             type: string
-            length: '512'
+            length: 255
             unique: true
         title:
             type: string
-            length: 512
+            length: 255
         visited:
             type: boolean
             default: false
