@@ -48,12 +48,15 @@ class GeoparseCommand extends ContainerAwareCommand
         foreach ($images as $image) {
             try {
                 $output->writeln("Geoparsing {$image->path}/{$image->filename}");
-                $this->geoparse($image);
 
                 if ($image->latitude && $image->longitude) {
                     $this->determineImageAddress($image);
+                } else {
+                    $this->geoparse($image);
+                    $image->isExifLocation = false;
                 }
 
+                $image->geoparsed = true;
                 $em->persist($image);
                 $em->flush($image);
             } catch (\Exception $e) {
@@ -96,8 +99,6 @@ class GeoparseCommand extends ContainerAwareCommand
             $image->address = $match->location;
             $image->latitude = $resultObj->latt;
             $image->longitude = $resultObj->longt;
-            $image->isExifLocation = false;
-            $image->geoparsed = true;
         }
     }
 

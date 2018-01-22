@@ -120,11 +120,6 @@ class Image
         $image->description = $this->extractImageDescription($element, $alt, $image->filename);
         $image->setMetadata($metadata);
 
-        if ($image->latitude && $image->longitude) {
-            $image->geoparsed = true;
-            $this->determineImageAddress($image);
-        }
-
         // Save to database
         $this->em->persist($image);
         $this->em->flush($image);
@@ -157,39 +152,6 @@ class Image
         }
 
         return trim($description);
-    }
-
-    /**
-     * Determine image's address
-     *
-     * @param \AppBundle\Entity\Image $image
-     */
-    protected function determineImageAddress(\AppBundle\Entity\Image &$image)
-    {
-        try {
-            $client = new Client([
-                'timeout' => 3,
-                'allow_redirects' => false,
-                'verify' => $this->getParameter('http_verify_ssl')
-            ]);
-
-            $response = $client->get($this->getParameter('google_geocode_url'), [
-                'query' => [
-                    'latlng' => "{$image->latitude},{$image->longitude}",
-                    'key' => $this->getParameter('google_map_api_key'),
-                    'result_type' => "street_address|postal_code|country"
-                ]
-            ]);
-
-            $results = $response->getBody()->getContents();
-            $resultObj = @json_decode($results);
-
-            if ($resultObj->status === "OK" && is_array($resultObj->results) && !empty($resultObj->results)) {
-                $image->address = $resultObj->results[0]->formatted_address;
-            }
-        } catch (\Exception $e) {
-            $this->saveLog("[ImageHelper] determineImageAddress() at line {$e->getLine()}: {$e->getMessage()}");
-        }
     }
 
     /**

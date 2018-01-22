@@ -18,8 +18,5 @@ services:
         arguments: ['@kernel', '@doctrine.orm.entity_manager', '@logger', '@helper.keyword']
         tags:
             - { name: monolog.logger, channel: crawler }
-    helper.address:
-        class: DownloaderBundle\Services\Helpers\Address
-        arguments: ['@doctrine.orm.entity_manager', '@helper.string', '@helper.keyword']
     helper.string:
         class: DownloaderBundle\Services\Helpers\String
