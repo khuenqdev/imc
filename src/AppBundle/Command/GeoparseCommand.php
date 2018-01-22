@@ -50,7 +50,7 @@ class GeoparseCommand extends ContainerAwareCommand
                 $output->writeln("Geoparsing {$image->path}/{$image->filename}");
 
                 if ($image->latitude && $image->longitude) {
-                    $this->determineImageAddress($image);
+                    $this->geocode($image);
                 } else {
                     $this->geoparse($image);
                     $image->isExifLocation = false;
@@ -103,14 +103,14 @@ class GeoparseCommand extends ContainerAwareCommand
     }
 
     /**
-     * Determine image's address
+     * Perform geocoding process
      *
      * @param Image $image
      */
-    protected function determineImageAddress(Image &$image)
+    protected function geocode(Image &$image)
     {
         $client = new Client([
-            'timeout' => 3,
+            'timeout' => 60,
             'allow_redirects' => false,
             'verify' => $this->getContainer()->getParameter('http_verify_ssl')
         ]);
