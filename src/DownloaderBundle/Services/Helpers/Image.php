@@ -120,6 +120,10 @@ class Image
         $image->description = $this->extractImageDescription($element, $alt, $image->filename);
         $image->setMetadata($metadata);
 
+        if ($image->isExifLocation) {
+            $image->isLocationCorrect = true;
+        }
+
         // Save to database
         $this->em->persist($image);
         $this->em->flush($image);

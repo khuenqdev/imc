@@ -94,6 +94,13 @@ class Image
     public $geoparsed;
 
     /**
+     * Flag to check whether the location is correct (if it comes from EXIF then it is automatically correct)
+     *
+     * @var bool
+     */
+    public $isLocationCorrect;
+
+    /**
      * @var string
      */
     private $metadata;

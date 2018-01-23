@@ -56,4 +56,8 @@ AppBundle\Entity\Image:
             type: text
         geoparsed:
             type: boolean
+        isLocationCorrect:
+            type: boolean
+            nullable: true
+            column: is_location_correct
     lifecycleCallbacks: {  }

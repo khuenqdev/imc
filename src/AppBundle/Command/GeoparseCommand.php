@@ -81,8 +81,10 @@ class GeoparseCommand extends ContainerAwareCommand
         ]);
         
         try {
+            // Try the primary geo parser first
             $this->geoparsePrimary($client, $image);
         } catch (\Exception $e) {
+            // Try the secondary also whenever there's an exception with the first
             $this->geoparseSecondary($client, $image);
         }
     }
@@ -97,7 +99,7 @@ class GeoparseCommand extends ContainerAwareCommand
     {
         // Do geoparsing process with primary geoparser
         $response = $client->post($this->getContainer()->getParameter('geoparser_url'), [
-            'body' => [
+            'form_params' => [
                 'inputText' => $image->description
             ],
             'headers' => ['Authorization' => 'apiKey ' . $this->getContainer()->getParameter('geoparser_api_key')]
