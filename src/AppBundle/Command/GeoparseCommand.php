@@ -73,23 +73,68 @@ class GeoparseCommand extends ContainerAwareCommand
      */
     private function geoparse(Image &$image)
     {
+        // Initialize client
         $client = new Client([
             'timeout' => 60,
             'allow_redirects' => false,
             'verify' => $this->getContainer()->getParameter('http_verify_ssl')
         ]);
+        
+        try {
+            $this->geoparsePrimary($client, $image);
+        } catch (\Exception $e) {
+            $this->geoparseSecondary($client, $image);
+        }
+    }
 
-        $response = $client->get($this->getContainer()->getParameter('geoparser_url'), [
-            'query' => [
-                'scantext' => $image->description,
-                'json' => 1
-            ]
+    /**
+     * Request for primary geo parser (geoparser.io)
+     *
+     * @param Client $client
+     * @param Image $image
+     */
+    private function geoparsePrimary(Client $client, Image &$image)
+    {
+        // Do geoparsing process with primary geoparser
+        $response = $client->post($this->getContainer()->getParameter('geoparser_url'), [
+            'body' => [
+                'inputText' => $image->description
+            ],
+            'headers' => ['Authorization' => 'apiKey ' . $this->getContainer()->getParameter('geoparser_api_key')]
         ]);
 
         $results = $response->getBody()->getContents();
         $resultObj = @json_decode($results);
 
-        if ($resultObj->matches !== null) {
+        if ($resultObj && is_array($resultObj->features) && !empty($resultObj->features)) {
+            $feature = reset($resultObj->features);
+            $image->address = $feature->properties->name . ',' . $feature->properties->country;
+            $image->latitude = $feature->geometry->coordinates[0];
+            $image->longitude = $feature->geometry->coordinates[1];
+        }
+    }
+
+    /**
+     * Request for secondary geo parser (geocode.xyz) in case the primary failed
+     *
+     * @param Client $client
+     * @param Image $image
+     */
+    private function geoparseSecondary(Client $client, Image &$image)
+    {
+        // Do geoparsing process with secondary geoparser
+        $response = $client->get($this->getContainer()->getParameter('secondary_geoparser_url'), [
+            'query' => [
+                'scantext' => $image->description,
+                'json' => 1,
+                'auth' => $this->getContainer()->getParameter('secondary_geoparser_api_key')
+            ],
+        ]);
+
+        $results = $response->getBody()->getContents();
+        $resultObj = @json_decode($results);
+
+        if ($resultObj && $resultObj->matches !== null) {
             if (is_array($resultObj->match)) {
                 $match = $resultObj->match[0];
             } else {

@@ -27,13 +27,16 @@ parameters:
     image_directory: '%kernel.root_dir%/../web/downloaded/images/'
 
     # Google Geocode API credentials
-    google_geocode_url: ~
+    google_geocode_url: 'https://maps.googleapis.com/maps/api/geocode/json'
 
     # Google Map API key for rendering
     google_map_api_key: ~
 
     # Geoparser service API credentials
-    geoparser_url: ~
+    geoparser_url: 'https://geoparser.io/api/geoparser'
+    geoparser_api_key: ~
+    secondary_geoparser_url: 'https://geocode.xyz/'
+    secondary_geoparser_api_key: ~
 
     # Other configurations
     http_verify_ssl: false
