@@ -35,33 +35,13 @@ class ImageController extends Controller
      * @Rest\View(statusCode=200)
      * @param $page
      * @param $limit
-     * @return PaginationInterface
+     * @return array
      */
     public function listAction($page, $limit)
     {
-        $images = $this->get('image_manager')->listImages();
-        $paginated = $this->get('knp_paginator')->paginate($images, $page, $limit);
+        $images = $this->getManager()->listImages();
 
-        return $paginated;
-    }
-
-    /**
-     * Create an image
-     * (Does not seem to be reasonable as the system crawls for images)
-     *
-     * @deprecated
-     * @Rest\RequestParam(name="source", key="source", default=null, nullable=true)
-     * @Rest\RequestParam(name="src", key="src", default="", nullable=false, strict=true)
-     * @ParamConverter("source", class="AppBundle:Link", options={}, optional=true)
-     * @Rest\View(statusCode=201)
-     * @param Request $request
-     * @param null $source
-     * @throws \Exception
-     */
-    public function createAction(Request $request, $source = null)
-    {
-        $payload = $request->request->all();
-        $this->get('image_manager')->createImage($source, $payload);
+        return $this->get('knp_paginator')->paginate($images, $page, $limit)->getItems();
     }
 
     /**
@@ -87,7 +67,7 @@ class ImageController extends Controller
     public function updateAction(Request $request, Image $image)
     {
         $payload = $request->request->all();
-        $this->get('image_manager')->updateImage($image, $payload);
+        $this->getManager()->updateImage($image, $payload);
     }
 
     /**
@@ -99,6 +79,16 @@ class ImageController extends Controller
      */
     public function deleteAction(Image $image)
     {
-        $this->get('image_manager')->deleteImage($image);
+        $this->getManager()->deleteImage($image);
+    }
+
+    /**
+     * Get image manager
+     *
+     * @return \AppBundle\Services\ImageManager|object
+     */
+    public function getManager()
+    {
+        return $this->get('image_manager');
     }
 }

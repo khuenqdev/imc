@@ -13,8 +13,7 @@ AppBundle\Entity\Image:
             type: string
             length: 255
         alt:
-            type: string
-            length: 255
+            type: text
             nullable: true
         filename:
             type: string
