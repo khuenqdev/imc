@@ -12,8 +12,7 @@ AppBundle\Entity\Link:
         url:
             type: text
         title:
-            type: string
-            length: 255
+            type: text
         visited:
             type: boolean
             default: false
