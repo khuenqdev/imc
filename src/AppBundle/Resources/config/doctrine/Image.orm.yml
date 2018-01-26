@@ -10,8 +10,7 @@ AppBundle\Entity\Image:
                 strategy: AUTO
     fields:
         src:
-            type: string
-            length: 255
+            type: text
         alt:
             type: text
             nullable: true
@@ -48,8 +47,7 @@ AppBundle\Entity\Image:
             length: 255
             nullable: true
         description:
-            type: string
-            length: 255
+            type: text
             nullable: true
         metadata:
             type: text

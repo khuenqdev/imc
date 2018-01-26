@@ -10,8 +10,7 @@ AppBundle\Entity\Seed:
                 strategy: AUTO
     fields:
         url:
-            type: string
-            length: 255
+            type: text
         title:
             type: string
             length: 255

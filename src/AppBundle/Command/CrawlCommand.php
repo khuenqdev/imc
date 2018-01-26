@@ -62,6 +62,7 @@ class CrawlCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $executionStartTime = microtime(true);
         // Set server memory limit before execution
         ini_set('memory_limit', $this->getContainer()->getParameter('server_memory_limit'));
 
@@ -117,6 +118,9 @@ class CrawlCommand extends ContainerAwareCommand
         }
 
         $output->writeln('<comment>Crawling task finished!</comment>');
+        $executionEndTime = microtime(true);
+        $seconds = $executionEndTime - $executionStartTime;
+        $output->writeln("<comment>Total execution time: $seconds seconds</comment>");
     }
 
     /**

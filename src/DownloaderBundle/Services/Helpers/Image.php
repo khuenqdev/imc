@@ -141,7 +141,7 @@ class Image
      */
     protected function extractImageDescription(\DOMElement $element, $alt, $filename)
     {
-        $description = $alt . " " . $this->sanitize($filename);
+        $description = strip_tags($alt) . " " . $this->sanitize($filename);
         $prev = $element->previousSibling;
         $next = $element->nextSibling;
 
