@@ -32,6 +32,7 @@ class GeoparseCommand extends ContainerAwareCommand
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|null|void
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -43,6 +44,8 @@ class GeoparseCommand extends ContainerAwareCommand
 
         // Get all images that have not been geoparsed
         $images = $em->getRepository(Image::class)->findBy(['geoparsed' => false]);
+
+        $maxRetries = $this->getContainer()->getParameter('maximum_geoparser_retry');
 
         /** @var Image $image */
         foreach ($images as $image) {
@@ -58,12 +61,22 @@ class GeoparseCommand extends ContainerAwareCommand
 
                 $image->geoparsed = true;
                 $em->persist($image);
-                $em->flush($image);
             } catch (\Exception $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
+
+                if ($image->geoparserRetries < $maxRetries) {
+                    $image->geoparserRetries += 1;
+                } else {
+                    $image->geoparsed = true;
+                    $image->isLocationCorrect = false;
+                }
+
+                $em->persist($image);
                 break; // Break as soon as there is error
             }
         }
+
+        $em->flush($image);
     }
 
     /**
@@ -79,7 +92,7 @@ class GeoparseCommand extends ContainerAwareCommand
             'allow_redirects' => false,
             'verify' => $this->getContainer()->getParameter('http_verify_ssl')
         ]);
-        
+
         try {
             // Try the primary geo parser first
             $this->geoparsePrimary($client, $image);

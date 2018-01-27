@@ -48,3 +48,4 @@ parameters:
     exif_tool_path: '%kernel.root_dir%/../exiftool/'
     server_memory_limit: '6G'
     crawling_task_limit: 5000
+    maximum_geoparser_retry: 3

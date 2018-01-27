@@ -101,6 +101,11 @@ class Image
     public $isLocationCorrect;
 
     /**
+     * @var integer
+     */
+    public $geoparserRetries;
+
+    /**
      * @var string
      */
     private $metadata;
@@ -120,6 +125,7 @@ class Image
         $this->width = $width;
         $this->height = $height;
         $this->geoparsed = false;
+        $this->geoparserRetries = 0;
     }
 
     /**
