@@ -61,6 +61,7 @@ class GeoparseCommand extends ContainerAwareCommand
 
                 $image->geoparsed = true;
                 $em->persist($image);
+                $em->flush($image);
             } catch (\Exception $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
 
@@ -72,11 +73,10 @@ class GeoparseCommand extends ContainerAwareCommand
                 }
 
                 $em->persist($image);
+                $em->flush($image);
                 break; // Break as soon as there is error
             }
         }
-
-        $em->flush($image);
     }
 
     /**

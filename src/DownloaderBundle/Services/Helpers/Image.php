@@ -63,7 +63,7 @@ class Image
         if ($saveDir = $this->getDirectory($pageUrl)) {
             $extension = pathinfo($src, PATHINFO_EXTENSION);
 
-            if (!in_array($extension, $this->getParameter('allowed_image_extensions'))) {
+            if (!in_array(strtolower($extension), $this->getParameter('allowed_image_extensions'))) {
                 throw new \Exception("[ImageHelper] Invalid image extension: {$extension}");
             }
 
