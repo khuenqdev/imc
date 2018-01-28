@@ -1,0 +1,16 @@
+verifification_show_image:
+    path:     /show_image
+    defaults: { _controller: "AppBundle:Verification:showImage" }
+    methods:  GET
+verifification_correct:
+    path:     /correct/{id}
+    defaults: { _controller: "AppBundle:Verification:markAsCorrect" }
+    methods:  POST
+verifification_incorrect:
+    path:     /incorrect/{id}
+    defaults: { _controller: "AppBundle:Verification:markAsIncorrect" }
+    methods:  POST
+verifification_ignore:
+    path:     /ignore/{id}
+    defaults: { _controller: "AppBundle:Verification:ignore" }
+    methods:  POST
