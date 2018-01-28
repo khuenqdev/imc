@@ -1,0 +1,12 @@
+verifification_show_image:
+    path:     /show_image
+    defaults: { _controller: "GuiBundle:Verification:showImage" }
+    methods:  GET
+verifification_verify:
+    path:     /correct/{id}
+    defaults: { _controller: "GuiBundle:Verification:verify" }
+    methods:  GET
+verifification_ignore:
+    path:     /ignore/{id}
+    defaults: { _controller: "GuiBundle:Verification:ignore" }
+    methods:  GET

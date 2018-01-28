@@ -1,0 +1,28 @@
+{% extends '@Gui/base.html.twig' %}
+
+{% block content %}
+    <div class="col s12 m7">
+        <h3 class="header">Is this image's location information correct?</h3>
+        <div class="card horizontal">
+            <div class="card-image">
+                <img src="{{ '/downloaded/'~ image.path ~ '/' ~ image.filename }}">
+            </div>
+            <div class="card-stacked">
+                <div class="card-content">
+                    <h5>Extracted image description</h5>
+                    <p>{{ image.description }}</p>
+                    <h5>Geoparsed location information</h5>
+                    <div>
+                        <p><b>Latitude</b> {{ image.latitude }} &nbsp;&nbsp;&nbsp; <b>Longitude</b> {{ image.longitude }} </p>
+                        <p><b>Address</b> {{ image.address }}</p>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="{{ path('verifification_verify', {'id': image.id, 'is_correct': 1}) }}">Correct</a>
+                    <a href="{{ path('verifification_verify', {'id': image.id, 'is_correct': 0}) }}">Incorrect</a>
+                    <a href="{{ path('verifification_ignore', {'id': image.id}) }}">Don't know</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

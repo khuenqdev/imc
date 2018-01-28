@@ -32,4 +32,41 @@ class LinkRepository extends \Doctrine\ORM\EntityRepository
             return false;
         }
     }
+
+    /**
+     * Get number of links
+     *
+     * @return mixed|null
+     */
+    public function getNumberOfLinks()
+    {
+        $query = $this->createQueryBuilder('l')
+            ->select('COUNT(l.id)')
+            ->getQuery();
+
+        try {
+            return $query->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get number of visited links
+     *
+     * @return mixed|null
+     */
+    public function getNumberOfVisitedLinks()
+    {
+        $query = $this->createQueryBuilder('l')
+            ->select('COUNT(l.id)')
+            ->where('l.visited = true')
+            ->getQuery();
+
+        try {
+            return $query->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

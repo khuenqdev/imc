@@ -19,15 +19,17 @@
 {% block navigation %}
     <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container">
-            <a id="logo-container" href="#" class="brand-logo">
+            <a id="logo-container" href="/" class="brand-logo">
                 <img src="{{ asset("assets/images/logo.png") }}" alt="MopsiCrawler" />
             </a>
             <ul class="right hide-on-med-and-down">
-                <li><a href="{{ path('gallery_index') }}">Gallery</a></li>
+                <li><a href="{{ path('gallery_index') }}">Image Gallery</a></li>
+                <li><a href="{{ path('verifification_show_image') }}">Verify Image Location</a></li>
             </ul>
 
             <ul id="nav-mobile" class="side-nav">
-                <li><a href="{{ path('gallery_index') }}">Gallery</a></li>
+                <li><a href="{{ path('gallery_index') }}">Image Gallery</a></li>
+                <li><a href="{{ path('verifification_show_image') }}">Verify Image Location</a></li>
             </ul>
             <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
         </div>

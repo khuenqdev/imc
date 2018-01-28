@@ -97,6 +97,7 @@ class Image
      * Flag to check whether the location is correct (if it comes from EXIF then it is automatically correct)
      *
      * @var bool
+     * @Serializer\Expose
      */
     public $isLocationCorrect;
 

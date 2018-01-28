@@ -2,10 +2,6 @@ app_gallery:
     resource: "@AppBundle/Resources/config/routing/gallery.yml"
     prefix:   /gallery
 
-app_verification:
-    resource: "@AppBundle/Resources/config/routing/verification.yml"
-    prefix: /verification
-
 api_images:
     resource: "@AppBundle/Resources/config/routing/api/image.yml"
     prefix:   /api/images

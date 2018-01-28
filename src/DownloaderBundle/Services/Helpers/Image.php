@@ -82,7 +82,10 @@ class Image
                 if ($this->isValid($imageFilePath)) {
                     $metadata = $this->getMetadata($imageFilePath);
                     $this->saveImage($element->getNode(), $src, $alt, $metadata);
+                } else {
+                    unlink($imageFilePath);
                 }
+
             } catch (\Exception $e) {
                 $this->saveLog("[ImageHelper] At line {$e->getLine()}: {$e->getMessage()}");
                 unlink($imageFilePath);
@@ -101,7 +104,7 @@ class Image
      * @return $this
      * @throws \Exception
      */
-    protected function saveImage(\DOMElement $element, $src, $alt = '', array $metadata)
+    protected function saveImage(\DOMElement $element, $src, $alt = '', array $metadata = [])
     {
         // Avoid duplication of image
         if ($this->em->getRepository(\AppBundle\Entity\Image::class)->findOneBy(['src' => $src])) {
@@ -109,13 +112,16 @@ class Image
         }
 
         $image = new \AppBundle\Entity\Image($src, $alt);
-        $image->filename = isset($metadata['System:FileName']) ? $metadata['System:FileName'] : (pathinfo($src, PATHINFO_FILENAME) . '.' . pathinfo($src, PATHINFO_EXTENSION));
-        $image->path = isset($metadata['System:Directory']) ? substr($metadata['System:Directory'], strpos($metadata['System:Directory'], 'images')) : null;
+        $image->filename = isset($metadata['System:FileName']) ? $metadata['System:FileName'] : (pathinfo($src,
+                PATHINFO_FILENAME) . '.' . pathinfo($src, PATHINFO_EXTENSION));
+        $image->path = isset($metadata['System:Directory']) ? substr($metadata['System:Directory'],
+            strpos($metadata['System:Directory'], 'images')) : null;
         $image->width = isset($metadata['File:ImageWidth']) ? $metadata['File:ImageWidth'] : 0;
         $image->height = isset($metadata['File:ImageHeight']) ? $metadata['File:ImageHeight'] : 0;
-        $image->latitude = isset($metadata['GPS:GPSLatitude']) ? (float) $metadata['GPS:GPSLatitude'] : null;
-        $image->longitude = isset($metadata['GPS:GPSLongitude']) ? (float) $metadata['GPS:GPSLongitude'] : null;
-        $image->type = isset($metadata['File:FileType']) ? $metadata['File:FileType'] : pathinfo($src, PATHINFO_EXTENSION);
+        $image->latitude = isset($metadata['GPS:GPSLatitude']) ? (float)$metadata['GPS:GPSLatitude'] : null;
+        $image->longitude = isset($metadata['GPS:GPSLongitude']) ? (float)$metadata['GPS:GPSLongitude'] : null;
+        $image->type = isset($metadata['File:FileType']) ? $metadata['File:FileType'] : pathinfo($src,
+            PATHINFO_EXTENSION);
         $image->isExifLocation = !empty($image->latitude) && !empty($image->longitude);
         $image->description = $this->extractImageDescription($element, $alt, $image->filename);
         $image->setMetadata($metadata);
@@ -206,14 +212,12 @@ class Image
         list($width, $height) = @getimagesize($imageFilePath);
 
         if (!$width || !$height) {
-            unlink($imageFilePath);
             $this->saveLog("[ImageHelper] Invalid aspect ratio for image {$imageFilePath}. The image dimension is {$width} x {$height}.");
             return false;
         }
 
         // Only proceed further if image size is larger than 400px in each dimension
         if ($width < $this->getParameter('image_min_width') && $height < $this->getParameter('image_min_height')) {
-            unlink($imageFilePath);
             $this->saveLog("[ImageHelper] Invalid aspect ratio for image {$imageFilePath}. The image dimension is {$width} x {$height}.");
             return false;
         }

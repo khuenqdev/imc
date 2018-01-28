@@ -1,3 +1,7 @@
 gui_homepage:
     path:     /
     defaults: { _controller: GuiBundle:Default:index }
+
+gui_verification:
+    resource: "@GuiBundle/Resources/config/routing/verification.yml"
+    prefix:   /verification

@@ -3,6 +3,8 @@
 namespace AppBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 
 /**
  * ImageRepository
@@ -12,4 +14,201 @@ use Doctrine\ORM\EntityRepository;
  */
 class ImageRepository extends EntityRepository
 {
+
+    /**
+     * Get total number of images
+     *
+     * @return mixed|null
+     */
+    public function getNumberOfImages()
+    {
+        $query = $this->getCountQuery();
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get number of images with EXIF location metadata
+     *
+     * @return mixed|null
+     */
+    public function getNoOfImagesWithExifLocation()
+    {
+        $query = $this->getCountQuery()
+            ->where('i.isExifLocation = true');
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get number of images without EXIF location metadata
+     *
+     * @return mixed|null
+     */
+    public function getNoOfImagesWithoutExifLocation()
+    {
+        $query = $this->getCountQuery()
+            ->where('i.isExifLocation = false');
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get number of successful geoparsed images
+     *
+     * @return mixed|null
+     */
+    public function getNoOfSuccessGeoparsedImages()
+    {
+        $query = $this->getCountQuery()
+            ->where('i.geoparsed = true')
+            ->andWhere('i.latitude IS NOT NULL')
+            ->andWhere('i.longitude IS NOT NULL');
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get number of unsuccessful geoparsed images
+     *
+     * @return mixed|null
+     */
+    public function getNoOfUnsuccessGeoparsedImages()
+    {
+        $query = $this->getCountQuery()
+            ->where('i.geoparsed = true');
+        $query->andWhere($query->expr()->orX(
+            $query->expr()->isNull('i.latitude'),
+            $query->expr()->isNull('i.longitude')
+        ));
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get number of correct location images
+     *
+     * @return mixed|null
+     */
+    public function getNoOfCorrectLocationImages()
+    {
+        $query = $this->getCountQuery()
+            ->where('i.geoparsed = true')
+            ->andWhere('i.latitude IS NOT NULL')
+            ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.isLocationCorrect = true');
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get number of incorrect location images
+     *
+     * @return mixed|null
+     */
+    public function getNoOfIncorrectLocationImages()
+    {
+        $query = $this->getCountQuery()
+            ->where('i.geoparsed = true')
+            ->andWhere('i.latitude IS NOT NULL')
+            ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.isLocationCorrect = false');
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get number of unverified-location images
+     *
+     * @return mixed|null
+     */
+    public function getNoOfUnverifiedLocationImages()
+    {
+        $query = $this->getCountQuery()
+            ->where('i.geoparsed = true')
+            ->andWhere('i.latitude IS NOT NULL')
+            ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.isLocationCorrect IS NULL');
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Find an unverified image
+     *
+     * @param array $ignoredImageIds
+     * @return mixed|null
+     */
+    public function findUnverifiedImage($ignoredImageIds = [])
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->where('i.latitude IS NOT NULL')
+            ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.geoparsed = true')
+            ->andWhere('i.isLocationCorrect IS NULL');
+
+        if (!empty($ignoredImageIds)) {
+            $qb->andWhere('i.id NOT IN (:ignored_ids)')
+                ->setParameter(':ignored_ids', $ignoredImageIds);
+        }
+
+        try {
+            return $qb->setMaxResults(1)
+                ->getQuery()
+                ->getSingleResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get count query
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    private function getCountQuery()
+    {
+        return $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)');
+    }
 }

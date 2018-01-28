@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\Paginator;
 use Monolog\Logger;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\KernelInterface as Kernel;
 
 class ImageManager
@@ -40,17 +41,23 @@ class ImageManager
     private $paginator;
 
     /**
+     * @var Session
+     */
+    private $session;
+
+    /**
      * ImageManager constructor.
      *
      * @param EntityManager $em
      * @param Kernel $kernel
      */
-    public function __construct(EntityManager $em, Kernel $kernel, Logger $logger, Paginator $paginator)
+    public function __construct(EntityManager $em, Kernel $kernel, Logger $logger, Paginator $paginator, Session $session)
     {
         $this->em = $em;
         $this->kernel = $kernel;
         $this->logger = $logger;
         $this->paginator = $paginator;
+        $this->session = $session;
     }
 
     /**
@@ -124,6 +131,33 @@ class ImageManager
             $this->logger->debug("[ImageManager] {$e->getMessage()}");
             throw $e;
         }
+    }
+
+    /**
+     * Get an unverified image
+     *
+     * @return Image|null|object
+     */
+    public function fetchUnverifiedImage()
+    {
+        // Get an image that is geoparsed but has yet to be verified
+        return $this->em->getRepository(Image::class)->findUnverifiedImage(
+            $this->session->get('ignored_image_ids')
+        );
+    }
+
+    /**
+     * Verify location information of an image
+     *
+     * @param Image $image
+     * @param $isCorrect
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function verifyImageLocation(Image $image, $isCorrect)
+    {
+        $image->isLocationCorrect = (bool) $isCorrect;
+        $this->em->persist($image);
+        $this->em->flush($image);
     }
 
     /**
