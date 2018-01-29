@@ -74,6 +74,7 @@ class CrawlCommand extends ContainerAwareCommand
         // Initialize the crawler
         $this->initializeCrawler();
 
+
         // Number of crawl pages
         $noOfPages = 0;
 

@@ -198,7 +198,18 @@ class Image
         $reader = new Reader($adapter);
         $exif = $reader->read($filename);
 
-        return array_merge($exif->getRawData(), $exif->getData());
+        $metadata = array_merge($exif->getRawData(), $exif->getData());
+        list($width, $height) = @getimagesize($filename);
+
+        if(!isset($metadata['File:ImageWidth']) || empty($metadata['File:ImageWidth'])) {
+            $metadata['File:ImageWidth'] = $width;
+        }
+
+        if(!isset($metadata['File:ImageHeight']) || empty($metadata['File:ImageHeight'])) {
+            $metadata['File:ImageHeight'] = $height;
+        }
+
+        return $metadata;
     }
 
     /**

@@ -95,8 +95,12 @@ class Queue
 
         /** Reorganize the queue */
         if (!$this->isEmpty()) {
-            $this->links[0] = array_pop($this->links);
-            $this->maxHeapify(0);
+            if ($this->getSize() > 1) {
+                $this->links[0] = array_pop($this->links);
+                $this->maxHeapify(0);
+            } else {
+                array_pop($this->links);
+            }
         }
 
         return $next;

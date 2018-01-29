@@ -149,7 +149,8 @@ class GeoparseCommand extends ContainerAwareCommand
         $results = $response->getBody()->getContents();
         $resultObj = @json_decode($results);
 
-        if ($resultObj && $resultObj->matches !== null) {
+        if ($resultObj && property_exists(get_class($resultObj), 'matches')
+            && $resultObj->matches !== null) {
             if (is_array($resultObj->match)) {
                 $match = $resultObj->match[0];
             } else {
