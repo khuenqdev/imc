@@ -39,6 +39,7 @@
         "miljar/php-exif": "^0.6.3",
         "sensio/distribution-bundle": "~4.0",
         "sensio/framework-extra-bundle": "^3.0.2",
+        "symfony/apache-pack": "^1.0",
         "symfony/assetic-bundle": "^2.8",
         "symfony/css-selector": "^3.3",
         "symfony/dom-crawler": "^3.3",
