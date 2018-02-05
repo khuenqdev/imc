@@ -5,3 +5,7 @@ gui_homepage:
 gui_verification:
     resource: "@GuiBundle/Resources/config/routing/verification.yml"
     prefix:   /verification
+
+gui_clear_cache:
+    path:   /
+    defaults: { _controller: GuiBundlerCache }
