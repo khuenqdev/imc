@@ -10,13 +10,16 @@ use Symfony\Component\HttpFoundation\Response;
 class DefaultController extends Controller
 {
     /**
-     *
+     Dashboard
      *
      * @return Response
      */
     public function indexAction()
     {
-        return $this->render('@Gui/gui/image_locations.html.twig', $this->get(''));
+        return $this->render(
+            '@Gui/gui/image_locations.html.twig',
+            $this->get('gui.statistics')->getStatistics()
+        );
     }
 
     /**
