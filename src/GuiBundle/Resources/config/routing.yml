@@ -7,5 +7,5 @@ gui_verification:
     prefix:   /verification
 
 gui_clear_cache:
-    path:   /
+    path:   /clear_cache
     defaults: { _controller: GuiBundlerCache }
