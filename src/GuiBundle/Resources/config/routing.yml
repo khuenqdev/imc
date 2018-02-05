@@ -8,4 +8,4 @@ gui_verification:
 
 gui_clear_cache:
     path:   /clear_cache
-    defaults: { _controller: GuiBundlerCache }
+    defaults: { _controller: GuiBundle:Default:clearCache }
