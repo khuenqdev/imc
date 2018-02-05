@@ -3,8 +3,6 @@
 namespace AppBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 
 /**
  * ImageRepository
@@ -14,7 +12,6 @@ use Doctrine\ORM\NoResultException;
  */
 class ImageRepository extends EntityRepository
 {
-
     /**
      * Get total number of images
      *
@@ -73,7 +70,7 @@ class ImageRepository extends EntityRepository
      *
      * @return mixed|null
      */
-    public function getNoOfSuccessGeoparsedImages()
+    public function getNoOfSuccessfulGeoparsedImages()
     {
         $query = $this->getCountQuery()
             ->where('i.geoparsed = true')
@@ -93,7 +90,7 @@ class ImageRepository extends EntityRepository
      *
      * @return mixed|null
      */
-    public function getNoOfUnsuccessGeoparsedImages()
+    public function getNoOfUnsuccessfulGeoparsedImages()
     {
         $query = $this->getCountQuery()
             ->where('i.geoparsed = true');
