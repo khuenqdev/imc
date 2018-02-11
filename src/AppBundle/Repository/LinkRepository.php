@@ -69,4 +69,22 @@ class LinkRepository extends \Doctrine\ORM\EntityRepository
             return null;
         }
     }
+
+    public function isLinkVisited(Link $link)
+    {
+        $query = $this->createQueryBuilder('l')
+            ->select('l.id')
+            ->where('l.visited = true')
+            ->andWhere('l.url = :url')
+            ->setParameter('url', $link->url)
+            ->getQuery();
+
+        try {
+            $link = $query->getSingleScalarResult();
+        } catch (\Exception $e) {
+            $link = null;
+        }
+
+        return !is_null($link);
+    }
 }

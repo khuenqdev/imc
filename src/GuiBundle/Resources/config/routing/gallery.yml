@@ -1,0 +1,18 @@
+gallery_index:
+    path:     /
+    defaults: { _controller: "GuiBundle:Gallery:index" }
+    methods:  GET
+
+gallery_show:
+    path:     /{id}
+    defaults: { _controller: "GuiBundle:Gallery:show" }
+    methods:  GET
+
+gallery_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "GuiBundle:Gallery:edit" }
+    methods:  [GET, POST]
+
+gallery_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "GuiBundle:Gallery:delete" }

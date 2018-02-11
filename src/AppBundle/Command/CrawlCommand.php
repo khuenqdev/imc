@@ -74,7 +74,6 @@ class CrawlCommand extends ContainerAwareCommand
         // Initialize the crawler
         $this->initializeCrawler();
 
-
         // Number of crawl pages
         $noOfPages = 0;
 
@@ -83,6 +82,11 @@ class CrawlCommand extends ContainerAwareCommand
 
             $link = $this->queue->getNextLink();
             $output->write('Fetch: ' . $link->url);
+
+            if($this->em->getRepository(Link::class)->isLinkVisited($link)) {
+                $output->writeln(' <comment>SKIP</comment>');
+                continue;
+            }
 
             try {
                 // Download content from the link

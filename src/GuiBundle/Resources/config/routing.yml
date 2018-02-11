@@ -1,11 +1,15 @@
 gui_homepage:
-    path:     /
+    path: /
     defaults: { _controller: GuiBundle:Default:index }
 
+gui_gallery:
+    prefix: /gallery
+    resource: "@GuiBundle/Resources/config/routing/gallery.yml"
+
 gui_verification:
+    prefix: /verification
     resource: "@GuiBundle/Resources/config/routing/verification.yml"
-    prefix:   /verification
 
 gui_clear_cache:
-    path:   /clear_cache
+    path: /clear_cache
     defaults: { _controller: GuiBundle:Default:clearCache }
