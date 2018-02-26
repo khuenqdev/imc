@@ -73,7 +73,7 @@ class Image
             try {
                 $client = new Client([
                     'timeout' => 60,
-                    'allow_redirects' => false,
+                    'allow_redirects' => true,
                     'verify' => $this->getParameter('http_verify_ssl')
                 ]);
 
@@ -227,13 +227,33 @@ class Image
             return false;
         }
 
-        // Only proceed further if image size is larger than 400px in each dimension
-        if ($width < $this->getParameter('image_min_width') && $height < $this->getParameter('image_min_height')) {
+        $allowedRatios = $this->getContainer()->getParameter('allowed_aspect_ratios');
+        $ratio = $this->getRatio($width, $height);
+
+        // Only proceed further if image size is larger than 400px in each dimension and aspect ratio is valid
+        if ($width < $this->getParameter('image_min_width')
+            && $height < $this->getParameter('image_min_height')
+            && in_array($ratio, $allowedRatios)
+        ) {
             $this->saveLog("[ImageHelper] Invalid aspect ratio for image {$imageFilePath}. The image dimension is {$width} x {$height}.");
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Get image ratio from width and height
+     *
+     * @param $width
+     * @param $height
+     * @return float
+     */
+    protected function getRatio($width, $height)
+    {
+        $ratio = $width / $height;
+
+        return (float) number_format($ratio, 2, '.', '');
     }
 
     /**

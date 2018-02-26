@@ -24,3 +24,7 @@
 #statistics {
     text-align: left;
 }
+
+.imc-image {
+    max-height: 600px !important;
+}

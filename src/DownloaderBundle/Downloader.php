@@ -179,6 +179,11 @@ class Downloader
                 $linkTitle = trim($domLink->getNode()->textContent);
                 $relevance = $this->calculateRelevance($dom->getUri(), $linkUrl, $pageText, $linkTitle);
 
+                // Ignore completely irrelevant links
+                if ($relevance == 0) {
+                    return $this;
+                }
+
                 // Create a database link entity if not exist and add new link to the queue
                 $this->saveLinkToDatabase($linkUrl, $linkTitle, $relevance);
             }

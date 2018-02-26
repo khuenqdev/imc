@@ -35,15 +35,5 @@ class ImageTest extends KernelTestCase
 
     public function testDownload()
     {
-        $source = $this->em->getRepository(Link::class)->findOneBy(['url' => 'https://www.locationscout.net/']);
-
-        if (!$source) {
-            $source = new Link('https://www.locationscout.net/', 'Locationscout - Discover the best places for photography', 1.0, false);
-        }
-
-        $src = 'https://farm5.staticflickr.com/4365/35988358033_5faa341d9e_o_d.jpg';
-        $result = $this->service->download($source, $src);
-        echo $this->service->getErrorMessage() . "\n";
-        $this->assertTrue($result);
     }
 }

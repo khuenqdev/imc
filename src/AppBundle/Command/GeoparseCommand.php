@@ -141,6 +141,7 @@ class GeoparseCommand extends ContainerAwareCommand
         $response = $client->get($this->getContainer()->getParameter('secondary_geoparser_url'), [
             'query' => [
                 'scantext' => $image->description,
+                'moreinfo' => 1,
                 'json' => 1,
                 'auth' => $this->getContainer()->getParameter('secondary_geoparser_api_key')
             ],
