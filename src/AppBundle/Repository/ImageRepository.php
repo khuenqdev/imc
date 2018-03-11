@@ -13,6 +13,42 @@ use Doctrine\ORM\EntityRepository;
 class ImageRepository extends EntityRepository
 {
     /**
+     * Simple method for finding images
+     *
+     * @param array $filters
+     * @return array
+     */
+    public function findImages(array $filters = [])
+    {
+        $qb = $this->createQueryBuilder('i');
+        $qb->where('i.geoparsed = 1')
+            ->andWhere('i.latitude IS NOT NULL')
+            ->andWhere('i.longitude IS NOT NULL');
+
+        if (isset($filters['search'])) {
+            $qb->andWhere("i.description LIKE \"%{$filters['search']}%\"");
+        }
+
+        if (isset($filters['min_lat'])) {
+            $qb->andWhere("i.latitude >= {$filters['min_lat']}");
+        }
+
+        if (isset($filters['max_lat'])) {
+            $qb->andWhere("i.latitude <= {$filters['max_lat']}");
+        }
+
+        if (isset($filters['min_lng'])) {
+            $qb->andWhere("i.longitude >= {$filters['min_lng']}");
+        }
+
+        if (isset($filters['max_lng'])) {
+            $qb->andWhere("i.longitude <= {$filters['max_lng']}");
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * Get total number of images
      *
      * @return mixed|null

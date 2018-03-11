@@ -58,7 +58,6 @@ class Image
     public function download($pageUrl, DomCrawlerImage $element)
     {
         $src = strtok($element->getUri(), '?');
-        $alt = $element->getNode()->getAttribute('alt');
 
         if ($saveDir = $this->getDirectory($pageUrl)) {
             $extension = pathinfo($src, PATHINFO_EXTENSION);
@@ -81,7 +80,7 @@ class Image
 
                 if ($this->isValid($imageFilePath)) {
                     $metadata = $this->getMetadata($imageFilePath);
-                    $this->saveImage($element->getNode(), $src, $alt, $metadata);
+                    $this->saveImage($element->getNode(), $src, $metadata);
                 } else {
                     unlink($imageFilePath);
                 }
@@ -99,19 +98,19 @@ class Image
      *
      * @param \DOMElement $element
      * @param $src
-     * @param string $alt
      * @param array $metadata
      * @return $this
      * @throws \Exception
      */
-    protected function saveImage(\DOMElement $element, $src, $alt = '', array $metadata = [])
+    protected function saveImage(\DOMElement $element, $src, array $metadata = [])
     {
         // Avoid duplication of image
         if ($this->em->getRepository(\AppBundle\Entity\Image::class)->findOneBy(['src' => $src])) {
             return $this;
         }
 
-        $image = new \AppBundle\Entity\Image($src, $alt);
+        $image = new \AppBundle\Entity\Image($src);
+        $image->alt = $element->getAttribute('alt');
         $image->filename = isset($metadata['System:FileName']) ? $metadata['System:FileName'] : (pathinfo($src,
                 PATHINFO_FILENAME) . '.' . pathinfo($src, PATHINFO_EXTENSION));
         $image->path = isset($metadata['System:Directory']) ? substr($metadata['System:Directory'],
@@ -123,7 +122,7 @@ class Image
         $image->type = isset($metadata['File:FileType']) ? $metadata['File:FileType'] : pathinfo($src,
             PATHINFO_EXTENSION);
         $image->isExifLocation = !empty($image->latitude) && !empty($image->longitude);
-        $image->description = $this->extractImageDescription($element, $alt, $image->filename);
+        $image->description = $this->extractImageDescription($element, $image->filename);
         $image->setMetadata($metadata);
 
         if ($image->isExifLocation) {
@@ -145,9 +144,11 @@ class Image
      * @param $filename
      * @return string
      */
-    protected function extractImageDescription(\DOMElement $element, $alt, $filename)
+    protected function extractImageDescription(\DOMElement $element, $filename)
     {
-        $description = strip_tags($alt) . " " . $this->sanitize($filename);
+        $alt = trim($element->getAttribute('alt'));
+        $title = trim($element->getAttribute('title'));
+        $description =  "{$alt} {$title} {$this->sanitize($filename)}";
         $prev = $element->previousSibling;
         $next = $element->nextSibling;
 

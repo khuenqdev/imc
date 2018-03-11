@@ -60,12 +60,13 @@
     {% endblock %}
 </footer>
 
-{% block scripts %}
+<div>
     <!--  Scripts-->
     <script src="{{ asset('assets/js/jquery-3.2.1.min.js') }}"></script>
     <script src="{{ asset('assets/js/materialize.min.js') }}"></script>
     <script src="{{ asset('assets/js/init.js') }}"></script>
-{% endblock %}
+    {% block scripts %}{% endblock %}
+</div>
 
 </body>
 </html>

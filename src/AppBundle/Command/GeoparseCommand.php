@@ -124,8 +124,8 @@ class GeoparseCommand extends ContainerAwareCommand
         if ($resultObj && is_array($resultObj->features) && !empty($resultObj->features)) {
             $feature = reset($resultObj->features);
             $image->address = $feature->properties->name . ',' . $feature->properties->country;
-            $image->latitude = $feature->geometry->coordinates[0];
-            $image->longitude = $feature->geometry->coordinates[1];
+            $image->longitude = $feature->geometry->coordinates[0];
+            $image->latitude = $feature->geometry->coordinates[1];
         }
     }
 

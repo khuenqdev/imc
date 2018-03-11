@@ -27,21 +27,23 @@ class ImageController extends Controller
      * List all images
      *
      * @Rest\QueryParam(name="page", key="page", default="1", nullable=true)
-     * @Rest\QueryParam(name="limit", key="limit", default="10", nullable=true)
+     * @Rest\QueryParam(name="limit", key="limit", default="1000", nullable=true)
      * @Rest\QueryParam(name="sort", key="sort", default=null, nullable=true)
      * @Rest\QueryParam(name="direction", key="direction", default=null, nullable=true)
-     * @Rest\QueryParam(name="filter_field", key="filter_field", default=null, nullable=true)
-     * @Rest\QueryParam(name="filter_value", key="filter_value", default=null, nullable=true)
+     * @Rest\QueryParam(name="search", key="search", default=null, nullable=true)
+     * @Rest\QueryParam(name="min_lat", key="min_lat", default=null, nullable=true)
+     * @Rest\QueryParam(name="max_lat", key="max_lat", default=null, nullable=true)
+     * @Rest\QueryParam(name="min_lng", key="min_lng", default=null, nullable=true)
+     * @Rest\QueryParam(name="max_lng", key="max_lng", default=null, nullable=true)
      * @Rest\View(statusCode=200)
-     * @param $page
-     * @param $limit
+     * @param Request $request
      * @return array
      */
-    public function listAction($page, $limit)
+    public function listAction(Request $request)
     {
-        $images = $this->getManager()->listImages();
+        $images = $this->getManager()->listImages($request->query->all());
 
-        return $this->get('knp_paginator')->paginate($images, $page, $limit)->getItems();
+        return $images;
     }
 
     /**

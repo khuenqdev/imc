@@ -63,13 +63,16 @@ class ImageManager
     /**
      * List all images
      *
+     * @param array $filters
      * @return Image[]|array
      */
-    public function listImages()
+    public function listImages(array $filters = [])
     {
-        $images = $this->em->getRepository(Image::class)->findAll();
+        $images = $this->em
+            ->getRepository(Image::class)
+            ->findImages($filters);
 
-        return $images;
+        return $this->paginator->paginate($images)->getItems();
     }
 
     /**
