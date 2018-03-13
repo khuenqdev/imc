@@ -1,5 +1,6 @@
 var map;
 var markers = [];
+var imageContents = [];
 var lastInfoWindow;
 
 /**
@@ -35,8 +36,8 @@ function retrieveImages(minLat, maxLat, minLng, maxLng) {
             max_lng: maxLng
         },
         success: function (data) {
-            clearOldMarkers();
-            addMarkersFromData(data);
+            buildImageContents(data);
+            addMarkers(data);
         }
     });
 }
@@ -49,25 +50,42 @@ function clearOldMarkers() {
     markers = [];
 }
 
-function addMarkersFromData(data) {
-    for (var i = 0; i < data.length; i++) {
+function addMarkers() {
+    clearOldMarkers();
+
+    for (var coordinates in imageContents) {
+        var latlng = coordinates.split('|');
+
         addMarker({
-            lat: data[i].latitude,
-            lng: data[i].longitude
-        }, data[i]);
+            lat: parseFloat(latlng[0]),
+            lng: parseFloat(latlng[1])
+        }, imageContents[coordinates]);
     }
 }
 
-function addMarker(position, image) {
+function buildImageContents(data) {
+    for (var i = 0; i < data.length; i++) {
+        var image = data[i];
+        var index = image.latitude + '|' + image.longitude;
+
+        if (imageContents[index] !== undefined) {
+            imageContents[index] += '<div class="content">' +
+                '<img src="' + image.src + '" alt="' + image.alt + '" width="100px"/>' +
+                '</div>';
+        } else {
+            imageContents[index] = '<div class="content">' +
+                '<img src="' + image.src + '" alt="' + image.alt + '" width="100px"/>' +
+                '</div>';
+        }
+    }
+}
+
+function addMarker(position, imageContent) {
+
     var marker = new google.maps.Marker({
         position: position,
-        map: map,
-        title: image.address
+        map: map
     });
-
-    var imageContent = '<div class="content">' +
-        '<img src="' + image.src + '" alt="' + image.alt + '" width="100px"/>' +
-        '</div>';
 
     var infoWindow = new google.maps.InfoWindow({
         content: imageContent
