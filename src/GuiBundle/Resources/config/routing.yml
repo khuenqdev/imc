@@ -2,6 +2,10 @@ gui_homepage:
     path: /
     defaults: { _controller: GuiBundle:Default:index }
 
+gui_statistics:
+    path: /statistics
+    defaults: { _controller: GuiBundle:Default:stats }
+
 gui_gallery:
     prefix: /gallery
     resource: "@GuiBundle/Resources/config/routing/gallery.yml"

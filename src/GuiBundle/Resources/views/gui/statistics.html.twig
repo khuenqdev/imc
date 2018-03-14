@@ -1,0 +1,73 @@
+{% extends '@Gui/base.html.twig' %}
+
+{% block title %}Statistics{% endblock %}
+
+{% block content %}
+    <div class="row center">
+        <div class="col s12">
+            <div id="statistics">
+                <h3>Statistics</h3>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Discovered links</b>
+                    </div>
+                    <div class="col s3">{{ no_of_links }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Visited links</b>
+                    </div>
+                    <div class="col s3">{{ visited_links }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Discovered images</b>
+                    </div>
+                    <div class="col s3">{{ discovered_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Images w/ location metadata</b>
+                    </div>
+                    <div class="col s3">{{ images_with_exif_location }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Images w/o location metadata</b>
+                    </div>
+                    <div class="col s3">{{ images_without_exif_location }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Successful geoparsed images</b>
+                    </div>
+                    <div class="col s3">{{ successful_geoparsed_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Unsuccessful geoparsed images</b>
+                    </div>
+                    <div class="col s3">{{ unsuccessful_geoparsed_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Images w/ correct location</b>
+                    </div>
+                    <div class="col s3">{{ correct_location_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Images w/ incorrect location</b>
+                    </div>
+                    <div class="col s3">{{ incorrect_location_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Unverified-location images</b>
+                    </div>
+                    <div class="col s3">{{ unverified_location_images }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

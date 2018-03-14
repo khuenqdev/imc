@@ -21,8 +21,7 @@ class ImageRepository extends EntityRepository
     public function findImages(array $filters = [])
     {
         $qb = $this->createQueryBuilder('i');
-        $qb->where('i.geoparsed = 1')
-            ->andWhere('i.latitude IS NOT NULL')
+        $qb->where('i.latitude IS NOT NULL')
             ->andWhere('i.longitude IS NOT NULL');
 
         if (isset($filters['search'])) {

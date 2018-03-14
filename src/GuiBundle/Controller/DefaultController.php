@@ -17,7 +17,14 @@ class DefaultController extends Controller
     public function indexAction()
     {
         return $this->render(
-            '@Gui/gui/image_locations.html.twig',
+            '@Gui/gui/image_locations.html.twig'
+        );
+    }
+
+    public function statsAction()
+    {
+        return $this->render(
+            '@Gui/gui/statistics.html.twig',
             $this->get('gui.statistics')->getStatistics()
         );
     }
