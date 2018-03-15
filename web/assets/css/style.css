@@ -28,3 +28,17 @@
 .imc-image {
     max-height: 600px !important;
 }
+
+.gallery-image {
+    width: 25%;
+    height: 320px;
+}
+
+.scroll-loader {
+    width: 256px;
+    height: 256px;
+    background-image: url("../images/loading.gif");
+    background-size: 256px 256px;
+    background-repeat: no-repeat;
+    background-position: center;
+}

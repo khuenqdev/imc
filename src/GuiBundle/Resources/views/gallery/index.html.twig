@@ -1,0 +1,23 @@
+{% extends '@Gui/base.html.twig' %}
+
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+    <div id="search-container" class="row">
+        <input id="search-input" type="text" placeholder="Type keyword here to search for image..." value="" />
+    </div>
+
+    <div id="gallery-container" class="row" data-source="{{ path('list_images') }}">
+    </div>
+
+    <div class="row page-load-status center-align">
+        <div class="col s12 infinite-scroll-request scroll-loader center-align"></div>
+        <p class="infinite-scroll-last">End of content</p>
+        <p class="infinite-scroll-error">No more pages to load</p>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ asset('assets/js/infinite-scroll.pkgd.min.js') }}"></script>
+    <script src="{{ asset('assets/js/gallery.js') }}"></script>
+{% endblock %}
