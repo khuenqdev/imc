@@ -5,7 +5,7 @@
         $searchInput.on('keyup', _.debounce(function () {
             var search = $(this).val();
             var params = {
-                'page': 1,
+                'offset': 0,
                 'limit': 12,
                 'search': search
             };
@@ -26,10 +26,10 @@
 
         $container = $('#gallery-container').infiniteScroll({
             path: function () {
-                var page = this.loadCount + 1;
+                var offset = 12 * this.loadCount + 1;
 
                 var params = {
-                    'page': page,
+                    'offset': offset,
                     'limit': 12
                 };
 

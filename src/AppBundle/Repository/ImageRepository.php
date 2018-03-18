@@ -48,6 +48,14 @@ class ImageRepository extends EntityRepository
             $qb->andWhere("i.longitude <= {$filters['max_lng']}");
         }
 
+        if (isset($filters['offset'])) {
+            $qb->setFirstResult($filters['offset']);
+        }
+
+        if (isset($filters['limit'])) {
+            $qb->setMaxResults($filters['limit']);
+        }
+
         return $qb->getQuery()->getResult();
     }
 

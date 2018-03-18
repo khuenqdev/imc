@@ -38,7 +38,7 @@ class ImageController extends Controller
      *     }
      * )
      *
-     * @Rest\QueryParam(name="page", key="page", default="1", nullable=true, description="Result offset")
+     * @Rest\QueryParam(name="offset", key="offset", default="0", nullable=true, description="Result offset")
      * @Rest\QueryParam(name="limit", key="limit", default="1000", nullable=true, description="Amount of results returned")
      * @Rest\QueryParam(name="sort", key="sort", default=null, nullable=true, description="Name of the field used for sorting")
      * @Rest\QueryParam(name="direction", key="direction", default=null, nullable=true, description="Direction of sorting (asc or desc)")

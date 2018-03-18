@@ -72,7 +72,7 @@ class ImageManager
             ->getRepository(Image::class)
             ->findImages($filters);
 
-        return $this->paginator->paginate($images)->getItems();
+        return $images;
     }
 
     /**
