@@ -20,6 +20,11 @@
 {% endblock %}
 
 {% block scripts %}
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            Materialize.toast('Click on the map markers to reveal images', 4000, 'rounded');
+        });
+    </script>
     <script src="{{ asset('assets/js/googlemap.js') }}"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}&callback=initMap"
             async defer></script>

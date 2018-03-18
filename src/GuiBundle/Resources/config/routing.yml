@@ -1,10 +1,14 @@
 gui_homepage:
     path: /
     defaults: { _controller: GuiBundle:Default:index }
+    options:
+        expose: true
 
 gui_statistics:
     path: /statistics
     defaults: { _controller: GuiBundle:Default:stats }
+    options:
+        expose: true
 
 gui_gallery:
     prefix: /gallery
@@ -17,3 +21,5 @@ gui_verification:
 gui_clear_cache:
     path: /clear_cache
     defaults: { _controller: GuiBundle:Default:clearCache }
+    options:
+        expose: true

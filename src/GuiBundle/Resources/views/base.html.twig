@@ -20,7 +20,7 @@
     <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container">
             <a id="logo-container" href="{{ path('gui_homepage') }}" class="brand-logo">
-                <img src="{{ asset("assets/images/logo.png") }}" alt="MopsiCrawler" />
+                <img src="{{ asset("assets/images/logo.png") }}" alt="MopsiCrawler"/>
             </a>
             <ul class="right hide-on-med-and-down">
                 <li><a href="{{ path('gui_statistics') }}">Statistics</a></li>
@@ -52,21 +52,20 @@
 </div>
 
 <!-- Footer -->
-{#<footer class="page-footer orange fixed-footer">#}
-    {#{% block footer %}#}
-        {#<div class="footer-copyright">#}
-            {#<div class="container">#}
-                {#Made by <a class="orange-text text-lighten-3" href="">Khue Quang Nguyen</a>#}
-            {#</div>#}
-        {#</div>#}
-    {#{% endblock %}#}
-{#</footer>#}
+{% block footer %}
+    <footer class="page-footer orange fixed-footer footer-copyright">
+        <div class="row">Made by <a class="orange-text text-lighten-3">Khue Quang Nguyen</a></div>
+    </footer>
+{% endblock %}
 
 <div id="scripts-block">
     <!--  Scripts-->
     <script src="{{ asset('assets/js/jquery-3.2.1.min.js') }}"></script>
     <script src="{{ asset('assets/js/materialize.min.js') }}"></script>
     <script src="{{ asset('assets/js/init.js') }}"></script>
+    <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+    <script src="{{ asset('assets/js/underscore-min.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
     {% block scripts %}{% endblock %}
 </div>
 

@@ -4,7 +4,28 @@ var imageContents = [];
 var lastInfoWindow;
 
 /**
- * Initialize map data
+ * Initialize map for image edit page
+ */
+function initEditMap() {
+    var $map = jQuery("#map");
+    var position = {
+        lat: parseFloat($map.data('lat')),
+        lng: parseFloat($map.data('lng'))
+    };
+
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: position,
+        zoom: 14
+    });
+
+    var marker = new google.maps.Marker({
+        position: position,
+        map: map
+    });
+}
+
+/**
+ * Initialize map data (for image location/homepage)
  */
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -69,19 +90,18 @@ function buildImageContents(data) {
         var index = image.latitude + '|' + image.longitude;
 
         if (imageContents[index] !== undefined) {
-            imageContents[index] += '<div class="content">' +
-                '<img src="' + image.src + '" alt="' + image.alt + '" width="100px"/>' +
+            imageContents[index] += '<div class="content col s3">' +
+                '<img src="' + image.src + '" alt="' + image.alt + '" class="map-image"/>' +
                 '</div>';
         } else {
-            imageContents[index] = '<div class="content">' +
-                '<img src="' + image.src + '" alt="' + image.alt + '" width="100px"/>' +
+            imageContents[index] = '<div class="content col s3">' +
+                '<img src="' + image.src + '" alt="' + image.alt + '" class="map-image"/>' +
                 '</div>';
         }
     }
 }
 
 function addMarker(position, imageContent) {
-
     var marker = new google.maps.Marker({
         position: position,
         map: map

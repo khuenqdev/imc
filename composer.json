@@ -31,6 +31,7 @@
         "doctrine/migrations": "^1.5",
         "doctrine/orm": "^2.4.8",
         "egeloen/google-map": "^2.0",
+        "friendsofsymfony/jsrouting-bundle": "^2.2",
         "friendsofsymfony/rest-bundle": "^2.3",
         "guzzlehttp/guzzle": "^6.3",
         "incenteev/composer-parameter-handler": "~2.0",

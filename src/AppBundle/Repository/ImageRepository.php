@@ -25,7 +25,8 @@ class ImageRepository extends EntityRepository
             ->andWhere('i.longitude IS NOT NULL');
 
         if (isset($filters['search'])) {
-            $qb->andWhere("i.description LIKE \"%{$filters['search']}%\"");
+            $qb->andWhere('i.description LIKE :description')
+                ->setParameter('description', "%{$filters['search']}%");
         }
 
         if (isset($filters['min_lat'])) {

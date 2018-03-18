@@ -2,15 +2,26 @@ list_images:
     path: /
     defaults: { _controller: AppBundle:Api\Image:list, _format: json }
     methods: GET
+    options:
+        expose: true
+
 read_image:
     path: /{id}
     defaults: { _controller: AppBundle:Api\Image:read, _format: json }
     methods: GET
+    options:
+        expose: true
+
 update_image:
     path: /{id}
     defaults: { _controller: AppBundle:Api\Image:update, _format: json }
     methods: PUT
+    options:
+        expose: true
+
 delete_image:
     path: /{id}
     defaults: { _controller: AppBundle:Api\Image:delete, _format: json }
     methods: DELETE
+    options:
+        expose: true

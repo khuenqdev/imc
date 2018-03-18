@@ -50,6 +50,7 @@ class Image
 
     /**
      * @var string
+     * @Serializer\Expose
      */
     public $type;
 
@@ -61,6 +62,7 @@ class Image
 
     /**
      * @var bool
+     * @Serializer\Expose
      */
     public $isExifLocation;
 

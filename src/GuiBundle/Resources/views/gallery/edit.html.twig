@@ -1,0 +1,94 @@
+{% extends '@Gui/base.html.twig' %}
+
+{% block stylesheets %}
+    <link href="{{ asset('assets/css/googlemap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div id="google-map-container" class="col s8">
+            <div class="card-panel large">
+                <div class="googlemap-edit row">
+                    <div id="map" data-lat="{{ image.latitude }}" data-lng="{{ image.longitude }}"></div>
+                </div>
+                <div class="row">
+                    <div class="col s3"><b>Src</b></div>
+                    <div class="col s9">{{ image.src }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s3"><b>Alt</b></div>
+                    <div class="col s9">{{ image.alt }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s3"><b>Filename</b></div>
+                    <div class="col s9">{{ image.filename }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s3"><b>Type</b></div>
+                    <div class="col s9">{{ image.type }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s3"><b>Path</b></div>
+                    <div class="col s9">{{ image.path }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s3"><b>Size</b></div>
+                    <div class="col s9">{{ image.width }} x {{ image.height }} px</div>
+                </div>
+                <div class="row">
+                    <div class="col s3"><b>Location from metadata?</b></div>
+                    <div class="col s9">{{ image.isExifLocation ? 'Yes' : 'No' }}</div>
+                </div>
+            </div>
+        </div>
+        <div id="image-info-container" class="col s4">
+            <div class="card">
+                <div class="card-content">
+                    {{ form_start(form) }}
+                    <div class="row">
+                        <div id="embedded-image"></div>
+                    </div>
+                    <div class="row input-field">
+                        {{ form_widget(form.latitude) }}
+                        {{ form_label(form.latitude) }}
+                    </div>
+                    <div class="row input-field">
+                        {{ form_widget(form.longitude) }}
+                        {{ form_label(form.longitude) }}
+                    </div>
+                    <div class="row input-field">
+                        {{ form_widget(form.address) }}
+                        {{ form_label(form.address) }}
+                    </div>
+                    <div class="row input-field">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                    </div>
+                    <div class="row">
+                        <div class="col s6">{{ form_widget(form.back) }}</div>
+                        <div class="col s6 right-align">{{ form_widget(form.save) }}</div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('#appbundle_image_back').click(function() {
+                window.location.href = Routing.generate('gallery_index')
+            });
+
+            jQuery("#embedded-image").css({
+                'background-image': "url('{{ image.src }}')",
+                'background-position': 'center'
+            })
+        });
+    </script>
+    <script src="{{ asset('assets/js/googlemap.js') }}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}&callback=initEditMap"
+            async defer></script>
+{% endblock %}

@@ -42,3 +42,17 @@
     background-repeat: no-repeat;
     background-position: center;
 }
+
+.btn-edit {
+    bottom: 25px !important;
+    right: 80px !important;
+}
+
+.btn-delete {
+    bottom: 25px !important;
+}
+
+.map-image {
+    width: 128px;
+    height: 128px;
+}
