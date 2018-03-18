@@ -1,6 +1,5 @@
 var map;
 var markers = [];
-var imageContents = [];
 var lastInfoWindow;
 
 /**
@@ -34,6 +33,12 @@ function initMap() {
     });
 
     google.maps.event.addListener(map, 'tilesloaded', function () {
+        clearOldMarkers();
+        setMarkers(map);
+    });
+    
+    google.maps.event.addListener(map, 'dragend', function () {
+        clearOldMarkers();
         setMarkers(map);
     });
 }
@@ -58,8 +63,8 @@ function retrieveImages(minLat, maxLat, minLng, maxLng) {
             only_with_location: 1
         },
         success: function (data) {
-            buildImageContents(data);
-            addMarkers(data);
+            var imageContents = buildImageContents(data);
+            addMarkers(imageContents);
         }
     });
 }
@@ -72,9 +77,7 @@ function clearOldMarkers() {
     markers = [];
 }
 
-function addMarkers() {
-    clearOldMarkers();
-
+function addMarkers(imageContents) {
     for (var coordinates in imageContents) {
         var latlng = coordinates.split('|');
 
@@ -86,20 +89,24 @@ function addMarkers() {
 }
 
 function buildImageContents(data) {
+    var imageContents = [];
+
     for (var i = 0; i < data.length; i++) {
         var image = data[i];
         var index = image.latitude + '|' + image.longitude;
 
         if (imageContents[index] !== undefined) {
-            imageContents[index] += '<div class="content col s3">' +
+            imageContents[index] += '<div class="content col s4">' +
                 '<img src="' + image.src + '" alt="' + image.alt + '" class="map-image"/>' +
                 '</div>';
         } else {
-            imageContents[index] = '<div class="content col s3">' +
+            imageContents[index] = '<div class="content col s4">' +
                 '<img src="' + image.src + '" alt="' + image.alt + '" class="map-image"/>' +
                 '</div>';
         }
     }
+
+    return imageContents;
 }
 
 function addMarker(position, imageContent) {
