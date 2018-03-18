@@ -38,6 +38,7 @@
         "jms/serializer-bundle": "^2.3",
         "knplabs/knp-paginator-bundle": "^2.7",
         "miljar/php-exif": "^0.6.3",
+        "nelmio/api-doc-bundle": "^2.13",
         "sensio/distribution-bundle": "~4.0",
         "sensio/framework-extra-bundle": "^3.0.2",
         "symfony/apache-pack": "^1.0",

@@ -80,7 +80,7 @@
             '<div class="card hoverable sticky-action medium">' +
             '<div class="card-image waves-effect waves-block waves-light">' +
             '<img src="' + image.src + '" alt="' + image.alt + '" class="gallery-image activator" />\n' +
-            '<span class="card-title activator">' + image.address + '</span>' +
+            '<span class="card-title activator">' + (image.address ? image.address : '') + '</span>' +
             '<a class="btn-floating halfway-fab waves-effect waves-light light-blue btn-edit" href="' + editRoute + '">' +
             '<i class="material-icons">edit</i>' +
             '</a>' +
@@ -96,9 +96,9 @@
             '<span class="row card-title activator">Image details<i class="material-icons right">close</i></span>' +
             '<div class="row"><div class="col s6"><b>Type</b></div><div class="col s6">' + image.type + '</div></div>' +
             '<div class="row"><div class="col s6"><b>Size</b></div><div class="col s6">' + image.width + 'x' + image.height + ' px</div></div>' +
-            '<div class="row"><div class="col s6"><b>Address</b></div><div class="col s6">' + image.address + '</div></div>' +
-            '<div class="row"><div class="col s6"><b>Latitude</b></div><div class="col s6">' + parseFloat(image.latitude).toFixed(6) + '</div></div>' +
-            '<div class="row"><div class="col s6"><b>Longitude</b></div><div class="col s6">' + parseFloat(image.longitude).toFixed(6) + '</div></div>' +
+            '<div class="row"><div class="col s6"><b>Address</b></div><div class="col s6">' + (image.address ? image.address : 'N/A') + '</div></div>' +
+            '<div class="row"><div class="col s6"><b>Latitude</b></div><div class="col s6">' + (image.latitude ? parseFloat(image.latitude).toFixed(6) : 'N/A') + '</div></div>' +
+            '<div class="row"><div class="col s6"><b>Longitude</b></div><div class="col s6">' + (image.latitude ? parseFloat(image.longitude).toFixed(6) : 'N/A') + '</div></div>' +
             '<div class="row"><div class="col s6"><b>Location from metadata?</b></div><div class="col s6">' + (image.is_exif_location ? 'Yes' : 'No') + '</div></div>' +
             '<div class="row"><div class="col s6"><b>Description</b></div><div class="col s6">' + image.description + '</div></div>' +
             '</div>' +

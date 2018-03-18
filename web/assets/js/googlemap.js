@@ -54,7 +54,8 @@ function retrieveImages(minLat, maxLat, minLng, maxLng) {
             min_lat: minLat,
             max_lat: maxLat,
             min_lng: minLng,
-            max_lng: maxLng
+            max_lng: maxLng,
+            only_with_location: 1
         },
         success: function (data) {
             buildImageContents(data);
