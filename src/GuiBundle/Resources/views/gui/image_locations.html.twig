@@ -12,6 +12,10 @@
             <div id="map"></div>
         </div>
     </div>
+    <div id="modal" class="modal">
+        <div id="image-container" class="modal-content">
+        </div>
+    </div>
     <div>
         <form>
             <input type="hidden" id="list-api-url" name="list_api_url" value="{{ url('list_images') }}"/>
@@ -22,6 +26,7 @@
 {% block scripts %}
     <script type="text/javascript">
         jQuery(document).ready(function() {
+            jQuery('.modal').modal();
             Materialize.toast('Click on the map markers to reveal images', 4000, 'rounded');
         });
     </script>

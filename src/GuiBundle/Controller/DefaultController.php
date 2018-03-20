@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class DefaultController extends Controller
 {
     /**
-     Dashboard
+     * Dashboard
      *
      * @return Response
      */
@@ -21,11 +21,26 @@ class DefaultController extends Controller
         );
     }
 
+    /**
+     * Statistics
+     *
+     * @return Response
+     */
     public function statsAction()
     {
         return $this->render(
             '@Gui/gui/statistics.html.twig',
             $this->get('gui.statistics')->getStatistics()
+        );
+    }
+
+    /**
+     * For testing various UI functionality
+     */
+    public function testAction()
+    {
+        return $this->render(
+            '@Gui/gui/test.html.twig'
         );
     }
 

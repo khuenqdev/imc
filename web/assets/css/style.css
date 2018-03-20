@@ -52,7 +52,11 @@
     bottom: 25px !important;
 }
 
+#image-container {
+    min-height: 600px;
+}
+
 .map-image {
-    width: 128px;
-    height: 128px;
+    width: 640px !important;
+    height: 480px;
 }

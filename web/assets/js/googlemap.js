@@ -36,7 +36,7 @@ function initMap() {
         clearOldMarkers();
         setMarkers(map);
     });
-    
+
     google.maps.event.addListener(map, 'dragend', function () {
         clearOldMarkers();
         setMarkers(map);
@@ -94,15 +94,41 @@ function buildImageContents(data) {
     for (var i = 0; i < data.length; i++) {
         var image = data[i];
         var index = image.latitude + '|' + image.longitude;
+        var itemHtml = '<div>' +
+            '<div class="row">' +
+            '<div class="col s12 center-align">' +
+            '<img src="' + image.src + '" alt="' + image.alt + '" class="map-image"/></div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col s6"><b>Filename</b></div>' +
+            '<div class="col s6">' + image.filename + '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col s6"><b>Type</b></div>' +
+            '<div class="col s6">' + image.type + '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col s6"><b>Size</b></div>' +
+            '<div class="col s6">' + image.width + 'x' + image.height + '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col s6"><b>Location Coordinates</b></div>' +
+            '<div class="col s6">' + image.latitude + ', ' + image.longitude + '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col s6"><b>Location Address</b></div>' +
+            '<div class="col s6">' + image.address + '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col s6"><b>Description</b></div>' +
+            '<div class="col s6">' + image.description + '</div>' +
+            '</div>' +
+            '</div>';
 
         if (imageContents[index] !== undefined) {
-            imageContents[index] += '<div class="content col s4">' +
-                '<img src="' + image.src + '" alt="' + image.alt + '" class="map-image"/>' +
-                '</div>';
+            imageContents[index] += itemHtml;
         } else {
-            imageContents[index] = '<div class="content col s4">' +
-                '<img src="' + image.src + '" alt="' + image.alt + '" class="map-image"/>' +
-                '</div>';
+            imageContents[index] = itemHtml;
         }
     }
 
@@ -115,20 +141,26 @@ function addMarker(position, imageContent) {
         map: map
     });
 
-    var infoWindow = new google.maps.InfoWindow({
-        content: imageContent
-    });
+    // var infoWindow = new google.maps.InfoWindow({
+    //     content: imageContent
+    // });
 
-    marker.addListener('click', function() {
-        if(lastInfoWindow !== undefined) {
-            lastInfoWindow.close();
-        }
-
-        infoWindow.open(map, marker);
-        lastInfoWindow = infoWindow;
+    marker.addListener('click', function () {
+        openImageWindow(imageContent);
+        // if (lastInfoWindow !== undefined) {
+        //     lastInfoWindow.close();
+        // }
+        //
+        // infoWindow.open(map, marker);
+        // lastInfoWindow = infoWindow;
     });
 
     markers.push(marker);
+}
+
+function openImageWindow(imageContent) {
+    jQuery('#image-container').html(imageContent);
+    jQuery('#modal').modal("open");
 }
 
 /**

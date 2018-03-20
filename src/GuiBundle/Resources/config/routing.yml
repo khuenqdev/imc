@@ -18,6 +18,12 @@ gui_verification:
     prefix: /verification
     resource: "@GuiBundle/Resources/config/routing/verification.yml"
 
+gui_test:
+    path: /test
+    defaults: { _controller: GuiBundle:Default:test }
+    options:
+        expose: true
+
 gui_clear_cache:
     path: /clear_cache
     defaults: { _controller: GuiBundle:Default:clearCache }
