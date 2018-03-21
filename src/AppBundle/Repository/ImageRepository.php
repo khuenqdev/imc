@@ -60,6 +60,51 @@ class ImageRepository extends EntityRepository
     }
 
     /**
+     * Get unique location coordinates (markers for map)
+     *
+     * @param array $filters
+     * @return array
+     */
+    public function getLocationCoordinates(array $filters = [])
+    {
+        $qb = $this->createQueryBuilder('i');
+
+        $qb->select('i.latitude')
+            ->addSelect('i.longitude')
+            ->where('i.latitude IS NOT NULL')
+            ->andWhere('i.longitude IS NOT NULL');
+
+        if (isset($filters['min_lat'])) {
+            $qb->andWhere("i.latitude >= {$filters['min_lat']}");
+        }
+
+        if (isset($filters['max_lat'])) {
+            $qb->andWhere("i.latitude <= {$filters['max_lat']}");
+        }
+
+        if (isset($filters['min_lng'])) {
+            $qb->andWhere("i.longitude >= {$filters['min_lng']}");
+        }
+
+        if (isset($filters['max_lng'])) {
+            $qb->andWhere("i.longitude <= {$filters['max_lng']}");
+        }
+
+        if (isset($filters['offset'])) {
+            $qb->setFirstResult($filters['offset']);
+        }
+
+        if (isset($filters['limit'])) {
+            $qb->setMaxResults($filters['limit']);
+        }
+
+        $qb->groupBy('i.latitude')
+            ->addGroupBy('i.longitude');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * Get total number of images
      *
      * @return mixed|null

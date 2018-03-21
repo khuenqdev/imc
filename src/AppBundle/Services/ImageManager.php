@@ -164,6 +164,18 @@ class ImageManager
     }
 
     /**
+     * Get all available marker locations
+     *
+     * @param array $filters
+     * @return array
+     */
+    public function getMarkerLocations(array $filters = [])
+    {
+        return $this->em->getRepository(Image::class)
+            ->getLocationCoordinates($filters);
+    }
+
+    /**
      * Get kernel parameter
      *
      * @param $name

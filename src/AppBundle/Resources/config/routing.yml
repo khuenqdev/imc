@@ -1,3 +1,7 @@
 api_images:
     resource: "@AppBundle/Resources/config/routing/api/image.yml"
     prefix:   /api/images
+
+api_map:
+    resource: "@AppBundle/Resources/config/routing/api/map.yml"
+    prefix:   /api/map

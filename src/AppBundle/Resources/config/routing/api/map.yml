@@ -1,0 +1,6 @@
+get_markers:
+    path: /get_markers
+    defaults: { _controller: AppBundle:Api\Map:getMarkerLocations, _format: json }
+    methods: GET
+    options:
+        expose: true

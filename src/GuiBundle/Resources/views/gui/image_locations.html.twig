@@ -13,20 +13,27 @@
         </div>
     </div>
     <div id="modal" class="modal">
-        <div id="image-container" class="modal-content">
+        <div class="row modal-content">
+            <div class="col s7" id="image-info"></div>
+            <div class="col s5">
+                <div class="row"><h4>Images in this location</h4></div>
+                <div class="row" id="image-container"></div>
+            </div>
         </div>
-    </div>
-    <div>
-        <form>
-            <input type="hidden" id="list-api-url" name="list_api_url" value="{{ url('list_images') }}"/>
-        </form>
     </div>
 {% endblock %}
 
 {% block scripts %}
     <script type="text/javascript">
-        jQuery(document).ready(function() {
-            jQuery('.modal').modal();
+        jQuery(document).ready(function () {
+            jQuery('.modal').modal({
+                dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                inDuration: 300, // Transition in duration
+                outDuration: 200, // Transition out duration
+                startingTop: '4%', // Starting top style attribute
+                endingTop: '10%' // Ending top style attribute
+            });
+
             Materialize.toast('Click on the map markers to reveal images', 4000, 'rounded');
         });
     </script>
