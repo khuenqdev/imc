@@ -151,6 +151,16 @@ class Image
      */
     public function getMetadata()
     {
-        return unserialize($this->metadata);
+        $metadata = unserialize($this->metadata);
+
+        return array_map(function($val) {
+            if (is_array($val)) {
+                return implode('|', $val);
+            } elseif(is_object($val)) {
+                return serialize($val);
+            }
+
+            return $val;
+        }, $metadata);
     }
 }
