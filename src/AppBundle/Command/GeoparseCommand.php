@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class GeoparseCommand extends ContainerAwareCommand
@@ -27,7 +28,7 @@ class GeoparseCommand extends ContainerAwareCommand
         $this->setName('crawler:geoparse')
             ->setDescription('Perform geoparsing for images')
             ->setHelp('Perform a geoparsing task')
-            ->addArgument('geocode', InputArgument::OPTIONAL, 'Perform only geocoding');
+            ->addOption('geocode_only', null, InputOption::VALUE_OPTIONAL, 'Perform only geocoding');
     }
 
     /**
@@ -53,7 +54,7 @@ class GeoparseCommand extends ContainerAwareCommand
         foreach ($images as $image) {
             try {
 
-                if ($input->getArgument('geocode')) {
+                if ($input->getOption('geocode_only')) {
                     $output->writeln("Geocoding {$image->path}/{$image->filename}");
 
                     if ($image->latitude && $image->longitude) {
