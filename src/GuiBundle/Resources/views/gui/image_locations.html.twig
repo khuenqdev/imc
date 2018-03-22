@@ -13,12 +13,14 @@
         </div>
     </div>
     <div id="modal" class="modal">
-        <div class="row modal-content">
-            <div class="col s7" id="image-info"></div>
-            <div class="col s5">
-                <div class="row"><h4>Images in this location</h4></div>
-                <div class="row" id="image-container"></div>
+        <div class="modal-content">
+            <div class="right-align">
+                <a href="#!" class="modal-action modal-close waves-effect waves-green">
+                    <i class="material-icons">close</i>
+                </a>
             </div>
+            <div id="image-container"></div>
+            <div class="row" id="image-info"></div>
         </div>
     </div>
 {% endblock %}
@@ -30,8 +32,8 @@
                 dismissible: true, // Modal can be dismissed by clicking outside of the modal
                 inDuration: 300, // Transition in duration
                 outDuration: 200, // Transition out duration
-                startingTop: '4%', // Starting top style attribute
-                endingTop: '10%' // Ending top style attribute
+                startingTop: '2%', // Starting top style attribute
+                endingTop: '2%' // Ending top style attribute
             });
 
             Materialize.toast('Click on the map markers to reveal images', 4000, 'rounded');

@@ -32,6 +32,18 @@ class GalleryController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param Image $image
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction(Request $request, Image $image)
+    {
+        return $this->render('GuiBundle:gallery:view.html.twig', array(
+            'image' => $image
+        ));
+    }
+
+    /**
      * Show and edit an image
      *
      * @param Request $request

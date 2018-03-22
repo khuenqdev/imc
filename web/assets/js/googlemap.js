@@ -54,7 +54,7 @@ function setMarkers(map) {
 
 function retrieveMarkers(minLat, maxLat, minLng, maxLng) {
     jQuery.ajax({
-        url: Routing.generate('get_markers'),
+        url: Routing.generate('get_markers', {}, false),
         dataType: 'json',
         data: {
             min_lat: minLat,
@@ -103,10 +103,10 @@ function buildImageContent(data) {
 
     for (var i = 0; i < data.length; i++) {
         var image = data[i];
-        
-        itemHtml += '<div class="col s3">' +
-            '<img src="' + image.src + '" alt="' + image.alt + '" class="hoverable map-image"/>' +
-            '</div>';
+
+        itemHtml += '<a class="carousel-item" href="#image' + i + '!">' +
+            '<img src="/downloaded/' + (image.path + '/' + image.filename) + '" alt="' + image.alt + '" class="map-image" data-id="' + image.id + '"/>' +
+            '</a>';
     }
 
     return itemHtml;
@@ -114,7 +114,7 @@ function buildImageContent(data) {
 
 function openImageWindow(position) {
     jQuery.ajax({
-        url: Routing.generate('list_images'),
+        url: Routing.generate('list_images', {}, false),
         dataType: 'json',
         data: {
             min_lat: position.lat,
@@ -125,17 +125,31 @@ function openImageWindow(position) {
         },
         success: function (data) {
             var imageContent = buildImageContent(data);
-            console.log(imageContent);
 
-            jQuery('#image-container').html('<div class="row">'
+            jQuery('#image-container').html('<div class="carousel">'
                 + imageContent
                 + '</div>'
             );
 
             jQuery('#modal').modal("open");
-            $('.carousel.carousel-slider').carousel({fullWidth: true});
+
+            jQuery('.carousel').carousel({
+                onCycleTo: function(el, dragged) {
+                    getImageInfoHtml(el.find('img').data('id'));
+                }
+            });
+
+            getImageInfoHtml(data[0].id);
         }
     });
+}
 
-
+function getImageInfoHtml(imageId) {
+    jQuery.ajax({
+        url: Routing.generate('gallery_view', {id: imageId}, false),
+        dataType: 'html',
+        success: function (data) {
+            jQuery('#image-info').html(data);
+        }
+    });
 }

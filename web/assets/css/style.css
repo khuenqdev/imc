@@ -26,12 +26,20 @@
 }
 
 .imc-image {
-    max-height: 600px !important;
+    max-height: 256px !important;
 }
 
-.gallery-image {
-    width: 25%;
-    height: 320px;
+.modal {
+    width: 70% !important;
+    max-height: 96% !important;
+}
+
+#image-info {
+    padding: 50px;
+}
+
+.carousel {
+    height: 256px !important;
 }
 
 .scroll-loader {
@@ -52,12 +60,7 @@
     bottom: 25px !important;
 }
 
-#image-container {
-    min-height: 600px;
-}
-
 .map-image {
-    width: 100px !important;
-    height: 100px;
+    height: 100% !important;
     cursor: pointer;
 }

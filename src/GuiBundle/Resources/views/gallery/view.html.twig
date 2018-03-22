@@ -1,0 +1,38 @@
+<div class="row">
+    <div class="col s12 center-align"><h5>Basic Information</h5></div>
+</div>
+<div class="row">
+    <div class="col s2"><b>Filename</b></div>
+    <div class="col s10">{{ image.filename }}</div>
+</div>
+<div class="row">
+    <div class="col s2"><b>Original Link</b></div>
+    <div class="col s10"><a href="{{ image.src }}">{{ image.src }}</a></div>
+</div>
+<div class="row">
+    <div class="col s2"><b>Alt Attribute</b></div>
+    <div class="col s10">{{ image.alt }}</div>
+</div>
+<div class="row">
+    <div class="col s2"><b>Type</b></div>
+    <div class="col s10">{{ image.type }}</div>
+</div>
+<div class="row">
+    <div class="col s2"><b>Size</b></div>
+    <div class="col s10">{{ image.width }} x {{ image.height }} px</div>
+</div>
+<div class="row">
+    <div class="col s12 center-align"><h5>Metadata</h5></div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <table class="striped responsive-table highlight">
+            {% for key, data in image.metadata %}
+                <tr>
+                    <th>{{ key }}</th>
+                    <td>{{ data }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>

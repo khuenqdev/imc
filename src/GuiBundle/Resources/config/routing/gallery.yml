@@ -5,6 +5,13 @@ gallery_index:
     options:
         expose: true
 
+gallery_view:
+    path:     /{id}/view
+    defaults: { _controller: "GuiBundle:Gallery:view" }
+    methods:  GET
+    options:
+        expose: true
+
 gallery_edit:
     path:     /{id}/edit
     defaults: { _controller: "GuiBundle:Gallery:edit" }

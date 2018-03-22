@@ -79,7 +79,7 @@
         return '<div class="col s4">' +
             '<div class="card hoverable sticky-action medium">' +
             '<div class="card-image waves-effect waves-block waves-light">' +
-            '<img src="' + image.src + '" alt="' + image.alt + '" class="gallery-image activator" />\n' +
+            '<img src="/downloaded/' + (image.path + '/' + image.filename) + '" alt="' + image.alt + '" class="gallery-image activator" />\n' +
             '<span class="card-title activator">' + (image.address ? image.address : '') + '</span>' +
             '<a class="btn-floating halfway-fab waves-effect waves-light light-blue btn-edit" href="' + editRoute + '">' +
             '<i class="material-icons">edit</i>' +

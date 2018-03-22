@@ -13,6 +13,7 @@ use AppBundle\Entity\Image;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -24,8 +25,9 @@ class GeoparseCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('crawler:geoparse')
-            ->setDescription('Perform a geoparsing for images')
-            ->setHelp('Perform a crawling task');
+            ->setDescription('Perform geoparsing for images')
+            ->setHelp('Perform a geoparsing task')
+            ->addArgument('geocode', InputArgument::OPTIONAL, 'Perform only geocoding');
     }
 
     /**
@@ -50,13 +52,22 @@ class GeoparseCommand extends ContainerAwareCommand
         /** @var Image $image */
         foreach ($images as $image) {
             try {
-                $output->writeln("Geoparsing {$image->path}/{$image->filename}");
 
-                if ($image->latitude && $image->longitude) {
-                    $this->geocode($image);
+                if ($input->getArgument('geocode')) {
+                    $output->writeln("Geocoding {$image->path}/{$image->filename}");
+
+                    if ($image->latitude && $image->longitude) {
+                        $this->geocode($image);
+                    }
                 } else {
-                    $this->geoparse($image);
-                    $image->isExifLocation = false;
+                    $output->writeln("Geoparsing {$image->path}/{$image->filename}");
+
+                    if ($image->latitude && $image->longitude) {
+                        $this->geocode($image);
+                    } else {
+                        $this->geoparse($image);
+                        $image->isExifLocation = false;
+                    }
                 }
 
                 $image->geoparsed = true;
