@@ -30,7 +30,11 @@
             {% for key, data in image.metadata %}
                 <tr>
                     <th>{{ key }}</th>
-                    <td>{{ data }}</td>
+                    {% if data is iterable %}
+                        <td>{{ data|join('|') }}</td>
+                    {% else %}
+                        <td>{{ data }}</td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </table>
