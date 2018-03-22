@@ -5,7 +5,7 @@
         <h3 class="header">Is this image's location information correct?</h3>
         <div class="card horizontal">
             <div class="card-image">
-                <img class="imc-image" src="{{ asset('/downloaded/' ~ image.path ~ '/' ~ image.filename ) }}" />
+                <img class="imc-image" src="{{ url('gui_homepage') ~ '/downloaded/' ~ image.path ~ '/' ~ image.filename }}" />
             </div>
             <div class="card-stacked">
                 <div class="card-content">

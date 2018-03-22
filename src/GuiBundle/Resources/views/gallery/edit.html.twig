@@ -83,7 +83,7 @@
             });
 
             jQuery("#embedded-image").css({
-                'background-image': "url('{{ asset('/downloaded/' ~ image.path ~ '/' ~ image.filename ) }}')",
+                'background-image': "url('{{ image.src }}')",
                 'background-position': 'center'
             })
         });
