@@ -4,9 +4,9 @@
 
 {% block content %}
     <div class="row center">
-        <div class="col s12">
-            <div id="statistics">
-                <h3>Statistics</h3>
+        <div class="col s6">
+            <div class="statistics">
+                <h3>General Statistics</h3>
                 <div class="row">
                     <div class="col s9">
                         <b>Discovered links</b>
@@ -66,6 +66,53 @@
                         <b>Unverified-location images</b>
                     </div>
                     <div class="col s3">{{ unverified_location_images }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="statistics">
+                <h3>Regional Statistics</h3>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Africa</b>
+                    </div>
+                    <div class="col s3">{{ africa_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Antarctic</b>
+                    </div>
+                    <div class="col s3">{{ antarctic_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Asia</b>
+                    </div>
+                    <div class="col s3">{{ asia_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Australia</b>
+                    </div>
+                    <div class="col s3">{{ australia_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Europe</b>
+                    </div>
+                    <div class="col s3">{{ europe_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>North America</b>
+                    </div>
+                    <div class="col s3">{{ na_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>South America</b>
+                    </div>
+                    <div class="col s3">{{ sa_images }}</div>
                 </div>
             </div>
         </div>

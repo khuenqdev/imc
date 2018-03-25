@@ -3,6 +3,7 @@
 namespace AppBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * ImageRepository
@@ -32,21 +33,7 @@ class ImageRepository extends EntityRepository
                 ->setParameter('description', "%{$filters['search']}%");
         }
 
-        if (isset($filters['min_lat'])) {
-            $qb->andWhere("i.latitude >= {$filters['min_lat']}");
-        }
-
-        if (isset($filters['max_lat'])) {
-            $qb->andWhere("i.latitude <= {$filters['max_lat']}");
-        }
-
-        if (isset($filters['min_lng'])) {
-            $qb->andWhere("i.longitude >= {$filters['min_lng']}");
-        }
-
-        if (isset($filters['max_lng'])) {
-            $qb->andWhere("i.longitude <= {$filters['max_lng']}");
-        }
+        $this->filterResultsByBoundingBox($qb, $filters);
 
         if (isset($filters['offset'])) {
             $qb->setFirstResult($filters['offset']);
@@ -74,21 +61,7 @@ class ImageRepository extends EntityRepository
             ->where('i.latitude IS NOT NULL')
             ->andWhere('i.longitude IS NOT NULL');
 
-        if (isset($filters['min_lat'])) {
-            $qb->andWhere("i.latitude >= {$filters['min_lat']}");
-        }
-
-        if (isset($filters['max_lat'])) {
-            $qb->andWhere("i.latitude <= {$filters['max_lat']}");
-        }
-
-        if (isset($filters['min_lng'])) {
-            $qb->andWhere("i.longitude >= {$filters['min_lng']}");
-        }
-
-        if (isset($filters['max_lng'])) {
-            $qb->andWhere("i.longitude <= {$filters['max_lng']}");
-        }
+        $this->filterResultsByBoundingBox($qb, $filters);
 
         if (isset($filters['offset'])) {
             $qb->setFirstResult($filters['offset']);
@@ -118,6 +91,48 @@ class ImageRepository extends EntityRepository
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
             return null;
+        }
+    }
+
+    /**
+     * Count number of images within a region based on map bounding box
+     *
+     * @param array $filters
+     * @return mixed|null
+     */
+    public function getNoOfImageInRegion(array $filters = [])
+    {
+        $qb = $this->getCountQuery();
+
+        $qb->where('i.latitude IS NOT NULL')
+            ->andWhere('i.longitude IS NOT NULL');
+
+        $this->filterResultsByBoundingBox($qb, $filters);
+
+        try {
+            return $qb->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function filterResultsByBoundingBox(QueryBuilder &$qb, array $filters = [])
+    {
+        if (isset($filters['min_lat'])) {
+            $qb->andWhere("i.latitude >= {$filters['min_lat']}");
+        }
+
+        if (isset($filters['max_lat'])) {
+            $qb->andWhere("i.latitude <= {$filters['max_lat']}");
+        }
+
+        if (isset($filters['min_lng'])) {
+            $qb->andWhere("i.longitude >= {$filters['min_lng']}");
+        }
+
+        if (isset($filters['max_lng'])) {
+            $qb->andWhere("i.longitude <= {$filters['max_lng']}");
         }
     }
 
