@@ -228,6 +228,7 @@ class ImageRepository extends EntityRepository
             ->where('i.geoparsed = true')
             ->andWhere('i.latitude IS NOT NULL')
             ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.isExifLocation = false')
             ->andWhere('i.isLocationCorrect = true');
 
         try {
@@ -249,6 +250,7 @@ class ImageRepository extends EntityRepository
             ->where('i.geoparsed = true')
             ->andWhere('i.latitude IS NOT NULL')
             ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.isExifLocation = false')
             ->andWhere('i.isLocationCorrect = false');
 
         try {
