@@ -55,10 +55,11 @@ class GeoparseCommand extends ContainerAwareCommand
             try {
 
                 if ($input->getOption('geocode_only') == "1") {
-                    $output->writeln("Geocoding {$image->path}/{$image->filename}");
-
                     if ($image->latitude && $image->longitude) {
+                        $output->writeln("Geocoding {$image->path}/{$image->filename}");
                         $this->geocode($image);
+                    } else {
+                        continue;
                     }
                 } else {
                     $output->writeln("Geoparsing {$image->path}/{$image->filename}");
