@@ -54,7 +54,7 @@ class GeoparseCommand extends ContainerAwareCommand
         foreach ($images as $image) {
             try {
 
-                if ($input->getOption('geocode_only')) {
+                if ($input->getOption('geocode_only') == "1") {
                     $output->writeln("Geocoding {$image->path}/{$image->filename}");
 
                     if ($image->latitude && $image->longitude) {
