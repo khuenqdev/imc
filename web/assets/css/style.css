@@ -39,7 +39,12 @@
 }
 
 .carousel {
-    height: 256px !important;
+    height: 500px !important;
+}
+
+#image-container {
+    margin-top: -150px;
+    margin-left: -170px;
 }
 
 .scroll-loader {
@@ -61,6 +66,7 @@
 }
 
 .map-image {
-    height: 100% !important;
+    width: 400px !important;
+    height: 400px !important;
     cursor: pointer;
 }
