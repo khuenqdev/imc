@@ -182,7 +182,8 @@ class ImageRepository extends EntityRepository
         $query = $this->getCountQuery()
             ->where('i.geoparsed = true')
             ->andWhere('i.latitude IS NOT NULL')
-            ->andWhere('i.longitude IS NOT NULL');
+            ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.isExifLocation = false');
 
         try {
             return $query->getQuery()
@@ -200,7 +201,9 @@ class ImageRepository extends EntityRepository
     public function getNoOfUnsuccessfulGeoparsedImages()
     {
         $query = $this->getCountQuery()
-            ->where('i.geoparsed = true');
+            ->where('i.geoparsed = true')
+            ->andWhere('i.isExifLocation = false');
+
         $query->andWhere($query->expr()->orX(
             $query->expr()->isNull('i.latitude'),
             $query->expr()->isNull('i.longitude')
@@ -267,6 +270,7 @@ class ImageRepository extends EntityRepository
             ->where('i.geoparsed = true')
             ->andWhere('i.latitude IS NOT NULL')
             ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.isExifLocation = false')
             ->andWhere('i.isLocationCorrect IS NULL');
 
         try {
@@ -289,6 +293,7 @@ class ImageRepository extends EntityRepository
             ->where('i.latitude IS NOT NULL')
             ->andWhere('i.longitude IS NOT NULL')
             ->andWhere('i.geoparsed = true')
+            ->andWhere('i.isExifLocation = false')
             ->andWhere('i.isLocationCorrect IS NULL');
 
         if (!empty($ignoredImageIds)) {
