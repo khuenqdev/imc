@@ -27,8 +27,8 @@ function initEditMap() {
  */
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 65.397, lng: -20.644},
-        zoom: 6
+        center: {lat: 0.000000, lng: 0.000000},
+        zoom: 1
     });
 
     google.maps.event.addListener(map, 'idle', _.debounce(function () {
