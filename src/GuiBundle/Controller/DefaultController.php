@@ -39,8 +39,12 @@ class DefaultController extends Controller
      */
     public function testAction()
     {
+        $image = $this->getManager()->getRepository(Image::class)->find(3);
         return $this->render(
-            '@Gui/gui/test.html.twig'
+            '@Gui/gui/test.html.twig',
+            [
+                'image' => $image
+            ]
         );
     }
 

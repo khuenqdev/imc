@@ -72,6 +72,14 @@
     <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
     <script src="{{ asset('assets/js/underscore-min.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+
+    <script type="text/javascript">
+        var base_path = '{{ app.request.basePath }}';
+        function getImcImage(image) {
+            return base_path + '/downloaded/' + image.path + '/' + image.filename;
+        }
+    </script>
+
     {% block scripts %}{% endblock %}
 </div>
 

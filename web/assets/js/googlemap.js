@@ -105,7 +105,7 @@ function buildImageContent(data) {
         var image = data[i];
 
         itemHtml += '<a class="carousel-item" href="#image' + i + '!">' +
-            '<img src="' + image.src + '" alt="' + image.alt + '" class="map-image" data-id="' + image.id + '"/>' +
+            '<img src="' + getImcImage(image) + '" alt="' + image.alt + '" class="map-image" data-id="' + image.id + '"/>' +
             '</a>';
     }
 

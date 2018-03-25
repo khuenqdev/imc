@@ -5,10 +5,11 @@
 {% block content %}
     <div class="materialboxed">
         <div class="row">
-            <img src="http://materializecss.com/images/sample-1.jpg" data-caption="A picture of a way with a group of trees in a park" />
+            <img src="{{ imc_image(image) }}" data-caption="A picture of a way with a group of trees in a park" />
         </div>
         <div class="row">
             <p>This is a test material box</p>
+            <p>{{ imc_image(image) }}</p>
         </div>
     </div>
 {% endblock %}

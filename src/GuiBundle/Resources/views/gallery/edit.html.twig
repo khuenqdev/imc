@@ -83,7 +83,7 @@
             });
 
             jQuery("#embedded-image").css({
-                'background-image': "url('{{ image.src }}')",
+                'background-image': "url('{{ imc_image(image) }}')",
                 'background-position': 'center'
             })
         });
