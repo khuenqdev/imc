@@ -1,18 +1,62 @@
 (function ($) {
     $(document).ready(function () {
-        $searchInput = $('#search-input');
+        initGalleryIndex();
+        initGalleryEdit();
+    });
 
-        $searchInput.on('keyup', _.debounce(function () {
-            var search = $(this).val();
-            var params = {
-                'offset': 0,
-                'limit': 12,
-                'search': search
-            };
+    function initGalleryIndex()
+    {
+        var $galleryContainer = $('#gallery-container');
+        if ($galleryContainer.length > 0) {
+            $searchInput = $('#search-input');
 
-            var url = Routing.generate('list_images') + '?' + $.param(params);
+            $searchInput.on('keyup', _.debounce(function () {
+                var search = $(this).val();
+                var params = {
+                    'offset': 0,
+                    'limit': 12,
+                    'search': search
+                };
 
-            $.getJSON(url, function (data) {
+                var url = Routing.generate('list_images') + '?' + $.param(params);
+
+                $.getJSON(url, function (data) {
+                    var html = '';
+
+                    for (var i = 0; i < data.length; i++) {
+                        var image = data[i];
+                        html += getImageItemHtml(image);
+                    }
+
+                    $galleryContainer.html(html);
+                });
+            }, 300));
+
+            $container = $galleryContainer.infiniteScroll({
+                path: function () {
+                    var offset = 12 * this.loadCount + 1;
+
+                    var params = {
+                        'offset': offset,
+                        'limit': 12
+                    };
+
+                    var searchInput = $('#search-input');
+
+                    if (searchInput.val() !== "") {
+                        params.search = searchInput.val();
+                    }
+
+                    return Routing.generate('list_images') + '?' + $.param(params);
+                },
+                responseType: 'text',
+                history: false,
+                status: '.page-load-status'
+            });
+
+            $container.on('load.infiniteScroll', function (event, response) {
+                // parse response into JSON data
+                var data = JSON.parse(response);
                 var html = '';
 
                 for (var i = 0; i < data.length; i++) {
@@ -20,51 +64,32 @@
                     html += getImageItemHtml(image);
                 }
 
-                $('#gallery-container').html(html);
+                // convert HTML string into elements
+                var $items = $(html);
+
+                // append item elements
+                $container.infiniteScroll('appendItems', $items);
             });
-        }, 300));
 
-        $container = $('#gallery-container').infiniteScroll({
-            path: function () {
-                var offset = 12 * this.loadCount + 1;
+            $container.infiniteScroll('loadNextPage');
+        }
+    }
 
-                var params = {
-                    'offset': offset,
-                    'limit': 12
-                };
+    function initGalleryEdit()
+    {
+        if ($('#gallery_edit_image_form').length > 0) {
+            var $embeddedImage = $("#embedded-image");
 
-                var searchInput = $('#search-input');
+            $('#appbundle_image_back').click(function() {
+                window.location.href = Routing.generate('gallery_index')
+            });
 
-                if (searchInput.val() !== "") {
-                    params.search = searchInput.val();
-                }
-
-                return Routing.generate('list_images') + '?' + $.param(params);
-            },
-            responseType: 'text',
-            history: false,
-            status: '.page-load-status'
-        });
-
-        $container.on('load.infiniteScroll', function (event, response) {
-            // parse response into JSON data
-            var data = JSON.parse(response);
-            var html = '';
-
-            for (var i = 0; i < data.length; i++) {
-                var image = data[i];
-                html += getImageItemHtml(image);
-            }
-
-            // convert HTML string into elements
-            var $items = $(html);
-
-            // append item elements
-            $container.infiniteScroll('appendItems', $items);
-        });
-
-        $container.infiniteScroll('loadNextPage');
-    });
+            $embeddedImage.css({
+                'background-image': "url('" + $embeddedImage.data('src') + "')",
+                'background-position': 'center'
+            });
+        }
+    }
 
     /**
      * Build the image
@@ -106,3 +131,24 @@
             '</div>';
     }
 })(jQuery);
+
+/**
+ * Initialize map for image edit page
+ */
+function initGalleryEditMap() {
+    var $map = jQuery("#map");
+    var position = {
+        lat: parseFloat($map.data('lat')),
+        lng: parseFloat($map.data('lng'))
+    };
+
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: position,
+        zoom: 14
+    });
+
+    var marker = new google.maps.Marker({
+        position: position,
+        map: map
+    });
+}

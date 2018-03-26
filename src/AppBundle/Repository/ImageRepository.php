@@ -25,12 +25,15 @@ class ImageRepository extends EntityRepository
 
         if (isset($filters['only_with_location']) && $filters['only_with_location']) {
             $qb->andWhere('i.latitude IS NOT NULL')
-                ->andWhere('i.longitude IS NOT NULL');
+                ->andWhere('i.longitude IS NOT NULL')
+                ->andWhere('i.isLocationCorrect = true');
         }
 
         if (isset($filters['search'])) {
-            $qb->andWhere('i.description LIKE :description')
-                ->setParameter('description', "%{$filters['search']}%");
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->like('i.description', $qb->expr()->literal("%{$filters['search']}%")),
+                $qb->expr()->like('i.address', $qb->expr()->literal("%{$filters['search']}%"))
+            ));
         }
 
         $this->filterResultsByBoundingBox($qb, $filters);
@@ -59,7 +62,8 @@ class ImageRepository extends EntityRepository
         $qb->select('i.latitude')
             ->addSelect('i.longitude')
             ->where('i.latitude IS NOT NULL')
-            ->andWhere('i.longitude IS NOT NULL');
+            ->andWhere('i.longitude IS NOT NULL')
+            ->andWhere('i.isLocationCorrect = true');
 
         $this->filterResultsByBoundingBox($qb, $filters);
 

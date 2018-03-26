@@ -44,9 +44,9 @@
         <div id="image-info-container" class="col s4">
             <div class="card">
                 <div class="card-content">
-                    {{ form_start(form) }}
+                    {{ form_start(form, {'attr': {'id': 'gallery_edit_image_form'}}) }}
                     <div class="row">
-                        <div id="embedded-image"></div>
+                        <div id="embedded-image" data-src="{{ imc_image(image) }}"></div>
                     </div>
                     <div class="row input-field">
                         {{ form_widget(form.latitude) }}
@@ -76,19 +76,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript">
-        jQuery(document).ready(function() {
-            jQuery('#appbundle_image_back').click(function() {
-                window.location.href = Routing.generate('gallery_index')
-            });
-
-            jQuery("#embedded-image").css({
-                'background-image': "url('{{ imc_image(image) }}')",
-                'background-position': 'center'
-            })
-        });
-    </script>
-    <script src="{{ asset('assets/js/googlemap.js') }}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}&callback=initEditMap"
+    <script src="{{ asset('assets/js/gallery.js') }}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}&callback=initGalleryEditMap"
             async defer></script>
 {% endblock %}

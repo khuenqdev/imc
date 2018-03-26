@@ -1,41 +1,48 @@
+(function ($) {
+    $(document).ready(function () {
+        $searchInput = $('#search-input');
+
+        $searchInput.on('keyup', _.debounce(function () {
+            var search = $(this).val();
+            var params = {
+                'offset': 0,
+                'limit': 1,
+                'search': search,
+                'only_with_location': 1
+            };
+
+            var url = Routing.generate('list_images') + '?' + $.param(params);
+
+            $.getJSON(url, function (data) {
+                var image = data[0];
+
+                if (typeof image !== 'undefined') {
+                    map.setCenter({
+                        lat: image.latitude,
+                        lng: image.longitude
+                    });
+
+                    map.setZoom(4);
+                }
+            });
+        }, 300));
+
+        $('.modal').modal({
+            dismissible: true, // Modal can be dismissed by clicking outside of the modal
+            inDuration: 300, // Transition in duration
+            outDuration: 200, // Transition out duration
+            startingTop: '2%', // Starting top style attribute
+            endingTop: '2%' // Ending top style attribute
+        });
+
+        Materialize.toast('Click on the map markers to reveal images', 4000, 'rounded');
+    });
+
+    
+})(jQuery);
+
 var map;
 var markers = [];
-
-/**
- * Initialize map for image edit page
- */
-function initEditMap() {
-    var $map = jQuery("#map");
-    var position = {
-        lat: parseFloat($map.data('lat')),
-        lng: parseFloat($map.data('lng'))
-    };
-
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: position,
-        zoom: 14
-    });
-
-    var marker = new google.maps.Marker({
-        position: position,
-        map: map
-    });
-}
-
-/**
- * Initialize map data (for image location/homepage)
- */
-function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 0.000000, lng: 0.000000},
-        zoom: 3
-    });
-
-    google.maps.event.addListener(map, 'idle', _.debounce(function () {
-        clearOldMarkers();
-        setMarkers(map);
-    }, 100));
-}
 
 /**
  * Set map markers
@@ -53,7 +60,7 @@ function setMarkers(map) {
 }
 
 function retrieveMarkers(minLat, maxLat, minLng, maxLng) {
-    jQuery.ajax({
+    $.ajax({
         url: Routing.generate('get_markers', {}, false),
         dataType: 'json',
         data: {
@@ -113,7 +120,7 @@ function buildImageContent(data) {
 }
 
 function openImageWindow(position) {
-    jQuery.ajax({
+    $.ajax({
         url: Routing.generate('list_images', {}, false),
         dataType: 'json',
         data: {
@@ -126,14 +133,14 @@ function openImageWindow(position) {
         success: function (data) {
             var imageContent = buildImageContent(data);
 
-            jQuery('#image-container').html('<div class="carousel">'
+            $('#image-container').html('<div class="carousel">'
                 + imageContent
                 + '</div>'
             );
 
-            jQuery('#modal').modal("open");
+            $('#modal').modal("open");
 
-            jQuery('.carousel').carousel({
+            $('.carousel').carousel({
                 onCycleTo: function(el, dragged) {
                     getImageInfoHtml(el.find('img').data('id'));
                 }
@@ -145,11 +152,26 @@ function openImageWindow(position) {
 }
 
 function getImageInfoHtml(imageId) {
-    jQuery.ajax({
+    $.ajax({
         url: Routing.generate('gallery_view', {id: imageId}, false),
         dataType: 'html',
         success: function (data) {
-            jQuery('#image-info').html(data);
+            $('#image-info').html(data);
         }
     });
+}
+
+/**
+ * Initialize map data (for image location/homepage)
+ */
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 0.000000, lng: 0.000000},
+        zoom: 3
+    });
+
+    google.maps.event.addListener(map, 'idle', _.debounce(function () {
+        clearOldMarkers();
+        setMarkers(map);
+    }, 100));
 }

@@ -7,6 +7,11 @@
 {% endblock %}
 
 {% block content %}
+    <div class="row center input-field">
+        <i class="material-icons prefix">search</i>
+        <input id="search-input" type="text" value="" />
+        <label for="search-input">Search for image</label>
+    </div>
     <div class="row center">
         <div class="col s12 googlemap">
             <div id="map"></div>
@@ -26,19 +31,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            jQuery('.modal').modal({
-                dismissible: true, // Modal can be dismissed by clicking outside of the modal
-                inDuration: 300, // Transition in duration
-                outDuration: 200, // Transition out duration
-                startingTop: '2%', // Starting top style attribute
-                endingTop: '2%' // Ending top style attribute
-            });
-
-            Materialize.toast('Click on the map markers to reveal images', 4000, 'rounded');
-        });
-    </script>
     <script src="{{ asset('assets/js/googlemap.js') }}"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}&callback=initMap"
             async defer></script>

@@ -3,8 +3,10 @@
 {% block title %}Gallery{% endblock %}
 
 {% block content %}
-    <div id="search-container" class="row">
-        <input id="search-input" type="text" placeholder="Type keyword here to search for image..." value="" />
+    <div id="search-container" class="row input-field">
+        <i class="material-icons prefix">search</i>
+        <input id="search-input" type="text" value="" />
+        <label for="search-input">Search for image</label>
     </div>
 
     <div id="gallery-container" class="row"></div>

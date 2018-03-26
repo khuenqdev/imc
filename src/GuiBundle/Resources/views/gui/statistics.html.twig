@@ -27,13 +27,13 @@
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Images w/ location metadata</b>
+                        <b>Images w/ GPS in metadata</b>
                     </div>
                     <div class="col s3">{{ images_with_exif_location }}</div>
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Images w/o location metadata</b>
+                        <b>Images w/o GPS in metadata</b>
                     </div>
                     <div class="col s3">{{ images_without_exif_location }}</div>
                 </div>
@@ -41,34 +41,34 @@
         </div>
         <div class="col s6">
             <div class="statistics">
-                <h5>Geoparsing statistics</h5>
+                <h5>Geoparsing Statistics</h5>
                 <div class="row">
                     <div class="col s9">
-                        <b>Successful geoparsed images</b>
+                        <b>Successful geoparsed</b>
                     </div>
                     <div class="col s3">{{ successful_geoparsed_images }}</div>
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Unsuccessful geoparsed images</b>
+                        <b>Unsuccessful geoparsed</b>
                     </div>
                     <div class="col s3">{{ unsuccessful_geoparsed_images }}</div>
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Images w/ correct location</b>
+                        <b>Correct</b>
                     </div>
                     <div class="col s3">{{ correct_location_images }}</div>
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Images w/ incorrect location</b>
+                        <b>Incorrect</b>
                     </div>
                     <div class="col s3">{{ incorrect_location_images }}</div>
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Unverified-location images</b>
+                        <b>Unverified</b>
                     </div>
                     <div class="col s3">{{ unverified_location_images }}</div>
                 </div>
@@ -123,6 +123,9 @@
                     <div class="col s3">{{ sa_images }}</div>
                 </div>
             </div>
+        </div>
+        <div class="col s6">
+
         </div>
     </div>
 {% endblock %}
