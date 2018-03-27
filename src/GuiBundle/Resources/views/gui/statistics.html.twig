@@ -191,14 +191,15 @@
             data.addColumn('string', 'Title');
             data.addColumn('number', 'Statistic');
             data.addRows([
-                ['Location from metadata', {{ images_with_exif_location }}],
-                ['Location from geoparsing', {{ successful_geoparsed_images }}],
-                ['Unknown location', {{ unsuccessful_geoparsed_images }}]
+                ['Geocoded', {{ images_with_exif_location }}],
+                ['Successful geoparsed', {{ successful_geoparsed_images }}],
+                ['Unsuccessful geoparsed', {{ unsuccessful_geoparsed_images }}],
+                ['Unhandled', {{ images_without_exif_location - (successful_geoparsed_images + unsuccessful_geoparsed_images) }}]
             ]);
 
             // Set chart options
             var options = {
-                'title':'Distribution of crawling result images',
+                'title':'Handling of crawling results',
                 'width':600,
                 'height':400
             };
