@@ -38,7 +38,7 @@
         Materialize.toast('Click on the map markers to reveal images', 4000, 'rounded');
     });
 
-    
+
 })(jQuery);
 
 var map;
@@ -62,9 +62,7 @@ function setMarkers(map) {
     var maxLng = ne.lng();
 
     if (minLng > maxLng) {
-        var tmp = minLng;
-        minLng = maxLng;
-        maxLng = tmp;
+        maxLng = Math.abs(maxLng);
     }
 
     retrieveMarkers(minLat, maxLat, minLng, maxLng);
