@@ -82,6 +82,24 @@ class ImageRepository extends EntityRepository
     }
 
     /**
+     * Get number of images by addresses
+     *
+     * @return array
+     */
+    public function getNumberOfImagesByAddresses()
+    {
+        $query = $this->createQueryBuilder('i');
+
+        $query->select('i.address')
+            ->addSelect('i.isExifLocation AS is_exif_location')
+            ->addSelect('COUNT(i.id) AS no_of_images')
+            ->where('i.address IS NOT NULL')
+            ->groupBy('i.address');
+
+        return $query->getQuery()->getResult();
+    }
+
+    /**
      * Get total number of images
      *
      * @return mixed|null
@@ -94,7 +112,7 @@ class ImageRepository extends EntityRepository
             return $query->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -117,7 +135,7 @@ class ImageRepository extends EntityRepository
             return $qb->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -154,7 +172,7 @@ class ImageRepository extends EntityRepository
             return $query->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -172,7 +190,7 @@ class ImageRepository extends EntityRepository
             return $query->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -193,7 +211,7 @@ class ImageRepository extends EntityRepository
             return $query->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -217,7 +235,7 @@ class ImageRepository extends EntityRepository
             return $query->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -239,7 +257,7 @@ class ImageRepository extends EntityRepository
             return $query->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -261,7 +279,7 @@ class ImageRepository extends EntityRepository
             return $query->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -283,7 +301,7 @@ class ImageRepository extends EntityRepository
             return $query->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 
@@ -312,7 +330,7 @@ class ImageRepository extends EntityRepository
                 ->getQuery()
                 ->getSingleResult();
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
     }
 

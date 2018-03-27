@@ -27,13 +27,13 @@
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Images w/ GPS in metadata</b>
+                        <b>Images w/ Location in metadata</b>
                     </div>
                     <div class="col s3">{{ images_with_exif_location }}</div>
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Images w/o GPS in metadata</b>
+                        <b>Images w/o Location in metadata</b>
                     </div>
                     <div class="col s3">{{ images_without_exif_location }}</div>
                 </div>
@@ -100,9 +100,9 @@
                 </div>
                 <div class="row">
                     <div class="col s9">
-                        <b>Australia</b>
+                        <b>Oceania</b>
                     </div>
-                    <div class="col s3">{{ australia_images }}</div>
+                    <div class="col s3">{{ oceania_images }}</div>
                 </div>
                 <div class="row">
                     <div class="col s9">
@@ -122,10 +122,93 @@
                     </div>
                     <div class="col s3">{{ sa_images }}</div>
                 </div>
+                <div class="row">
+                    <small>
+                        <i>
+                            * Regional statistics are not 100% accurate due to rectangle
+                            bounding box coordinates used for querying images for calculation
+                        </i>
+                    </small>
+                </div>
             </div>
         </div>
         <div class="col s6">
-
+            <div class="statistics">
+                <div id="chart"></div>
+            </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col s12">
+            <h5>Address Statistics</h5>
+            <div>
+                <b>Total number of address: </b> {{ no_of_address_images }}
+            </div>
+            <div>
+                <b>Number of address from metadata: </b> {{ no_of_address_images_in_metadata }}
+            </div>
+            <div>
+                <b>Number of address from geoparsing: </b> {{ no_of_address_images_nin_metadata }}
+            </div>
+            <table class="table responsive-table highlight striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Address</th>
+                    <th>No. of images</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for data in address_images %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ data.address }}</td>
+                        <td>{{ data.no_of_images }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages':['corechart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawChart);
+
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        function drawChart() {
+
+            // Create the data table.
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Title');
+            data.addColumn('number', 'Statistic');
+            data.addRows([
+                ['Location from metadata', {{ images_with_exif_location }}],
+                ['Location from geoparsing', {{ successful_geoparsed_images }}],
+                ['Unknown location', {{ unsuccessful_geoparsed_images }}]
+            ]);
+
+            // Set chart options
+            var options = {
+                'title':'Distribution of crawling result images',
+                'width':600,
+                'height':400
+            };
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.PieChart(document.getElementById('chart'));
+            chart.draw(data, options);
+        }
+    </script>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

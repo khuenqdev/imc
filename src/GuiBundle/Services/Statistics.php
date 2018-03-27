@@ -31,11 +31,11 @@ class Statistics
         'max_lng' => 180.0000
     ];
 
-    const BOUNDING_BOX_AUSTRALIA = [
-        'min_lat' => -53.0587,
-        'max_lat' => -6.0694,
-        'min_lng' => 105.3770,
-        'max_lng' => -175.2925
+    const BOUNDING_BOX_OCEANIA = [
+        'min_lat' => -53.215743,
+        'max_lat' => -7.607290,
+        'min_lng' => -145.298644,
+        'max_lng' => 180.686459
     ];
 
     const BOUNDING_BOX_EUROPE = [
@@ -84,6 +84,14 @@ class Statistics
         $linkRepo = $this->em->getRepository(Link::class);
         $imageRepo = $this->em->getRepository(Image::class);
 
+        $addressImages = $imageRepo->getNumberOfImagesByAddresses();
+        $noOfAddressImages = count($addressImages);
+
+        $addressImagesInMetadata = array_filter($addressImages, function($var) {
+            return ($var['is_exif_location'] === true);
+        });
+        $noOfAddressImagesInMetadata = count($addressImagesInMetadata);
+
         return [
             'no_of_links' => $linkRepo->getNumberOfLinks(),
             'visited_links' => $linkRepo->getNumberOfVisitedLinks(),
@@ -98,10 +106,14 @@ class Statistics
             'africa_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_AFRICA),
             'antarctic_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_ANTARCTIC),
             'asia_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_ASIA),
-            'australia_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_AUSTRALIA),
+            'oceania_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_OCEANIA),
             'europe_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_EUROPE),
             'na_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_NA),
             'sa_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_SA),
+            'address_images' => $addressImages,
+            'no_of_address_images' => $noOfAddressImages,
+            'no_of_address_images_in_metadata' => $noOfAddressImagesInMetadata,
+            'no_of_address_images_nin_metadata' => $noOfAddressImages - $noOfAddressImagesInMetadata
         ];
     }
 }

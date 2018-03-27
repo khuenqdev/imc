@@ -56,7 +56,18 @@ function setMarkers(map) {
     var nw = new google.maps.LatLng(ne.lat(), sw.lng());
     // var se = new google.maps.LatLng(sw.lat(), ne.lng());
 
-    retrieveMarkers(sw.lat(), nw.lat(), nw.lng(), ne.lng());
+    var minLat = sw.lat();
+    var maxLat = nw.lat();
+    var minLng = nw.lng();
+    var maxLng = ne.lng();
+
+    if (minLng > maxLng) {
+        var tmp = minLng;
+        minLng = maxLng;
+        maxLng = tmp;
+    }
+
+    retrieveMarkers(minLat, maxLat, minLng, maxLng);
 }
 
 function retrieveMarkers(minLat, maxLat, minLng, maxLng) {
@@ -174,4 +185,18 @@ function initMap() {
         clearOldMarkers();
         setMarkers(map);
     }, 100));
+
+    // google.maps.event.addListener(map, "bounds_changed", function() {
+    //     var bounds = map.getBounds();
+    //     var ne = bounds.getNorthEast();
+    //     var sw = bounds.getSouthWest();
+    //     var nw = new google.maps.LatLng(ne.lat(), sw.lng());
+    //
+    //     var minLat = sw.lat();
+    //     var maxLat = nw.lat();
+    //     var minLng = nw.lng();
+    //     var maxLng = ne.lng();
+    //
+    //     console.log("Bounding box: {", minLat, maxLat, minLng, maxLng, '}');
+    // });
 }
