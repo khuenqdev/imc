@@ -157,6 +157,7 @@
                 <tr>
                     <th>#</th>
                     <th>Address</th>
+                    <th>Geocoded from metadata?</th>
                     <th>No. of images</th>
                 </tr>
                 </thead>
@@ -165,6 +166,13 @@
                     <tr>
                         <td>{{ loop.index }}</td>
                         <td>{{ data.address }}</td>
+                        <td>
+                            {% if data.is_exif_location %}
+                                YES
+                            {% else %}
+                                NO
+                            {% endif %}
+                        </td>
                         <td>{{ data.no_of_images }}</td>
                     </tr>
                 {% endfor %}
