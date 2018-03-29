@@ -24,7 +24,10 @@ class GalleryController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $images = $em->getRepository('AppBundle:Image')->findAll();
+        $images = $em->getRepository('AppBundle:Image')->findImages([
+            'offset' => 0,
+            'limit' => 12
+        ]);
 
         return $this->render('GuiBundle:gallery:index.html.twig', array(
             'images' => $images,
