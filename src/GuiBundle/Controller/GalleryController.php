@@ -22,16 +22,7 @@ class GalleryController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $images = $em->getRepository('AppBundle:Image')->findImages([
-            'offset' => 0,
-            'limit' => 12
-        ]);
-
-        return $this->render('GuiBundle:gallery:index.html.twig', array(
-            'images' => $images,
-        ));
+        return $this->render('GuiBundle:gallery:index.html.twig');
     }
 
     /**

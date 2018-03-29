@@ -138,6 +138,34 @@ class ImageController extends Controller
     }
 
     /**
+     * Get system statistics
+     *
+     * @Rest\QueryParam(name="general", key="general", nullable=true, default=0, description="Include general statistics")
+     * @Rest\QueryParam(name="geoparsing", key="geoparsing", nullable=true, default=0, description="Include geoparsing statistics")
+     * @Rest\QueryParam(name="regional", key="regional", nullable=true, default=0, description="Include regional statistics (number of images per world regions)")
+     * @Rest\QueryParam(name="address", key="address", nullable=true, default=0, description="Include address statistics (number of images per discovered address)")
+     *
+     * @ApiDoc(
+     *     resource=true,
+     *     description="Get system statistics. Specify filter parameters to filter out statistic results. If no filter parameters specified, all statistics are included.",
+     *     tags={"stable"},
+     *     statusCodes={
+     *         204="Returned when successful",
+     *         500="Returned when there is a server error"
+     *     }
+     * )
+     *
+     * @Rest\View(statusCode=200)
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function statisticsAction(Request $request)
+    {
+        return $this->getManager()->getStatistics($request->query->all());
+    }
+
+    /**
      * Get image manager
      *
      * @return \AppBundle\Services\ImageManager|object

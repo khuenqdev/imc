@@ -2,11 +2,11 @@
  * element that contains the map. */
 
 .googlemap {
-    height: 680px;
+    height: 480px;
 }
 
 .googlemap-edit {
-    height: 460px;
+    height: 480px;
 }
 
 #embedded-image {

@@ -87,7 +87,6 @@ class GeoparseCommand extends ContainerAwareCommand
 
                 $em->persist($image);
                 $em->flush($image);
-                break; // Break as soon as there is error
             }
         }
     }

@@ -4,8 +4,7 @@
         initGalleryEdit();
     });
 
-    function initGalleryIndex()
-    {
+    function initGalleryIndex() {
         var $galleryContainer = $('#gallery-container');
         if ($galleryContainer.length > 0) {
             $searchInput = $('#search-input');
@@ -75,12 +74,11 @@
         }
     }
 
-    function initGalleryEdit()
-    {
+    function initGalleryEdit() {
         if ($('#gallery_edit_image_form').length > 0) {
             var $embeddedImage = $("#embedded-image");
 
-            $('#appbundle_image_back').click(function() {
+            $('#appbundle_image_back').click(function () {
                 window.location.href = Routing.generate('gallery_index')
             });
 
@@ -137,18 +135,29 @@
  */
 function initGalleryEditMap() {
     var $map = jQuery("#map");
-    var position = {
-        lat: parseFloat($map.data('lat')),
-        lng: parseFloat($map.data('lng'))
-    };
 
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: position,
-        zoom: 14
-    });
+    var lat = $map.data('lat');
+    var lng = $map.data('lng');
 
-    var marker = new google.maps.Marker({
-        position: position,
-        map: map
-    });
+    if (
+        lat !== "" && lat !== null && typeof lat !== 'undefined'
+        && lng !== "" && lng !== null && typeof lng !== 'undefined'
+    ) {
+        var position = {
+            lat: parseFloat(lat),
+            lng: parseFloat(lng)
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: position,
+            zoom: 14
+        });
+
+        var marker = new google.maps.Marker({
+            position: position,
+            map: map
+        });
+    } else {
+        $map.html('<div class="center-align col s12"><h5>Location information not available for this image!</h5></div>')
+    }
 }

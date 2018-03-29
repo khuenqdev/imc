@@ -79,41 +79,65 @@ class Statistics
      *
      * @return array
      */
-    public function getStatistics()
+    public function getStatistics(array $filters = [])
     {
         $linkRepo = $this->em->getRepository(Link::class);
         $imageRepo = $this->em->getRepository(Image::class);
 
-        $addressImages = $imageRepo->getNumberOfImagesByAddresses();
-        $noOfAddressImages = count($addressImages);
+        // If no filter specified, get all statistics
+        if (empty($filters)) {
+            $filters = [
+                'general' => 1,
+                'geoparsing' => 1,
+                'regional' => 1,
+                'address' => 1
+            ];
+        }
 
-        $addressImagesInMetadata = array_filter($addressImages, function($var) {
-            return ($var['is_exif_location'] === true);
-        });
-        $noOfAddressImagesInMetadata = count($addressImagesInMetadata);
+        $statistics = [];
 
-        return [
-            'no_of_links' => $linkRepo->getNumberOfLinks(),
-            'visited_links' => $linkRepo->getNumberOfVisitedLinks(),
-            'discovered_images' => $imageRepo->getNumberOfImages(),
-            'images_with_exif_location' => $imageRepo->getNoOfImagesWithExifLocation(),
-            'images_without_exif_location' => $imageRepo->getNoOfImagesWithoutExifLocation(),
-            'successful_geoparsed_images' => $imageRepo->getNoOfSuccessfulGeoparsedImages(),
-            'unsuccessful_geoparsed_images' => $imageRepo->getNoOfUnsuccessfulGeoparsedImages(),
-            'correct_location_images' => $imageRepo->getNoOfCorrectLocationImages(),
-            'incorrect_location_images' => $imageRepo->getNoOfIncorrectLocationImages(),
-            'unverified_location_images' => $imageRepo->getNoOfUnverifiedLocationImages(),
-            'africa_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_AFRICA),
-            'antarctic_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_ANTARCTIC),
-            'asia_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_ASIA),
-            'oceania_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_OCEANIA),
-            'europe_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_EUROPE),
-            'na_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_NA),
-            'sa_images' => $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_SA),
-            'address_images' => $addressImages,
-            'no_of_address_images' => $noOfAddressImages,
-            'no_of_address_images_in_metadata' => $noOfAddressImagesInMetadata,
-            'no_of_address_images_nin_metadata' => $noOfAddressImages - $noOfAddressImagesInMetadata
-        ];
+        if (isset($filters['general']) && $filters['general']) {
+            $statistics['no_of_links'] = $linkRepo->getNumberOfLinks();
+            $statistics['visited_links'] = $linkRepo->getNumberOfVisitedLinks();
+            $statistics['discovered_images'] = $imageRepo->getNumberOfImages();
+            $statistics['images_with_exif_location'] = $imageRepo->getNoOfImagesWithExifLocation();
+            $statistics['images_without_exif_location'] = $imageRepo->getNoOfImagesWithoutExifLocation();
+            $statistics['average_image_size'] = $imageRepo->getAverageImageSize();
+        }
+
+        if (isset($filters['geoparsing']) && $filters['geoparsing']) {
+            $statistics['successful_geoparsed_images'] = $imageRepo->getNoOfSuccessfulGeoparsedImages();
+            $statistics['unsuccessful_geoparsed_images'] = $imageRepo->getNoOfUnsuccessfulGeoparsedImages();
+            $statistics['correct_location_images'] = $imageRepo->getNoOfCorrectLocationImages();
+            $statistics['incorrect_location_images'] = $imageRepo->getNoOfIncorrectLocationImages();
+            $statistics['unverified_location_images'] = $imageRepo->getNoOfUnverifiedLocationImages();
+        }
+
+        if (isset($filters['regional']) && $filters['regional']) {
+            $statistics['africa_images'] = $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_AFRICA);
+            $statistics['antarctic_images'] = $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_ANTARCTIC);
+            $statistics['asia_images'] = $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_ASIA);
+            $statistics['oceania_images'] = $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_OCEANIA);
+            $statistics['europe_images'] = $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_EUROPE);
+            $statistics['na_images'] = $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_NA);
+            $statistics['sa_images'] = $imageRepo->getNoOfImageInRegion(self::BOUNDING_BOX_SA);
+        }
+
+        if (isset($filters['address']) && $filters['address']) {
+            $addressImages = $imageRepo->getNumberOfImagesByAddresses();
+            $noOfAddressImages = count($addressImages);
+
+            $addressImagesInMetadata = array_filter($addressImages, function($var) {
+                return ($var['is_exif_location'] === true);
+            });
+            $noOfAddressImagesInMetadata = count($addressImagesInMetadata);
+
+            $statistics['address_images'] = $addressImages;
+            $statistics['no_of_address_images'] = $noOfAddressImages;
+            $statistics['no_of_address_images_in_metadata'] = $noOfAddressImagesInMetadata;
+            $statistics['no_of_address_images_nin_metadata'] = $noOfAddressImages - $noOfAddressImagesInMetadata;
+        }
+
+        return $statistics;
     }
 }

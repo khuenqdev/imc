@@ -30,7 +30,24 @@ class DefaultController extends Controller
     {
         return $this->render(
             '@Gui/gui/statistics.html.twig',
-            $this->get('gui.statistics')->getStatistics()
+            $this->get('gui.statistics')->getStatistics([
+                'general' => 1,
+                'geoparsing' => 1,
+                'regional' => 1
+            ])
+        );
+    }
+
+    /**
+     * Statistics
+     *
+     * @return Response
+     */
+    public function addressStatsAction()
+    {
+        return $this->render(
+            '@Gui/gui/statistics_addresses.html.twig',
+            $this->get('gui.statistics')->getStatistics(['address' => 1])
         );
     }
 

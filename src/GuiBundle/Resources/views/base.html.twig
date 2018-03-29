@@ -19,25 +19,34 @@
 <body>
 <!-- Navigation -->
 {% block navigation %}
-    <nav class="light-blue lighten-1" role="navigation">
+    <ul id="stats-dropdown-desktop" class="dropdown-content">
+        <li><a href="{{ path('gui_statistics') }}">General Statistics</a></li>
+        <li><a href="{{ path('gui_address_statistics') }}">Address Statistics</a></li>
+    </ul>
+    <ul id="stats-dropdown-mobile" class="dropdown-content">
+        <li><a href="{{ path('gui_statistics') }}">General Statistics</a></li>
+        <li><a href="{{ path('gui_address_statistics') }}">Address Statistics</a></li>
+    </ul>
+    <nav class="orange lighten-1" role="navigation">
         <div class="nav-wrapper container">
             <a id="logo-container" href="{{ path('gui_homepage') }}" class="brand-logo">
                 <img src="{{ asset("assets/images/logo.gif") }}" alt="MopsiCrawler"/>
             </a>
+
             <ul class="right hide-on-med-and-down">
-                <li><a href="{{ path('gui_homepage') }}">Home</a></li>
-                <li><a href="{{ path('gui_statistics') }}">Statistics</a></li>
-                <li><a href="{{ path('gallery_index') }}">Image Gallery</a></li>
-                <li><a href="{{ path('nelmio_api_doc_index') }}">API Documentations</a></li>
-                <li><a href="{{ path('verifification_show_image') }}">Verify Image Location</a></li>
+                <li id="home"><a href="{{ path('gui_homepage') }}">Home</a></li>
+                <li id="stats"><a href="#!" class="dropdown-button-desktop"  data-activates="stats-dropdown-desktop">Statistics<i class="material-icons right">arrow_drop_down</i></a></li>
+                <li id="gallery"><a href="{{ path('gallery_index') }}">Image Gallery</a></li>
+                <li id="docs"><a href="{{ path('nelmio_api_doc_index') }}">API Documentations</a></li>
+                <li id="verify"><a href="{{ path('verifification_show_image') }}">Verify Image Location</a></li>
             </ul>
 
             <ul id="nav-mobile" class="side-nav">
-                <li><a href="{{ path('gui_homepage') }}">Home</a></li>
-                <li><a href="{{ path('gui_statistics') }}">Statistics</a></li>
-                <li><a href="{{ path('gallery_index') }}">Image Gallery</a></li>
-                <li><a href="{{ path('nelmio_api_doc_index') }}">API Documentations</a></li>
-                <li><a href="{{ path('verifification_show_image') }}">Verify Image Location</a></li>
+                <li id="home"><a href="{{ path('gui_homepage') }}">Home</a></li>
+                <li id="stats"><a href="#!" class="dropdown-button-mobile"  data-activates="stats-dropdown-mobile">Statistics<i class="material-icons right">arrow_drop_down</i></a></li>
+                <li id="gallery"><a href="{{ path('gallery_index') }}">Image Gallery</a></li>
+                <li id="docs"><a href="{{ path('nelmio_api_doc_index') }}">API Documentations</a></li>
+                <li id="verify"><a href="{{ path('verifification_show_image') }}">Verify Image Location</a></li>
             </ul>
             <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
         </div>
@@ -59,9 +68,9 @@
 
 <!-- Footer -->
 {% block footer %}
-    <footer class="page-footer orange fixed-footer footer-copyright">
-        <div class="row">Made by <a class="orange-text text-lighten-3">Khue Quang Nguyen</a></div>
-    </footer>
+    {#<footer class="page-footer orange fixed-footer footer-copyright">#}
+        {#<div class="row">Made by <a class="orange-text text-lighten-3">Khue Quang Nguyen</a></div>#}
+    {#</footer>#}
 {% endblock %}
 
 <div id="scripts-block">
@@ -78,9 +87,26 @@
 
     <script type="text/javascript">
         var base_path = '{{ app.request.basePath }}';
+
         function getImcImage(image) {
             return base_path + '/downloaded/' + image.path + '/' + image.filename;
         }
+
+        jQuery(document).ready(function() {
+            jQuery('.dropdown-button-desktop').dropdown({
+                'belowOrigin': true,
+                'constrainWidth': false,
+                'hover': true
+            });
+
+            jQuery('.dropdown-button-mobile').dropdown({
+                'belowOrigin': true,
+                'constrainWidth': false,
+                'hover': true
+            });
+
+            jQuery('#{{ active_menu }}').addClass('active');
+        });
     </script>
 
     {% block scripts %}{% endblock %}

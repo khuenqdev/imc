@@ -80,6 +80,23 @@ class ImageRepository extends EntityRepository
     }
 
     /**
+     * Get average image size
+     *
+     * @return array
+     */
+    public function getAverageImageSize()
+    {
+        $query = $this->createQueryBuilder('i');
+
+        $query->select('AVG(i.width) AS average_width')
+            ->addSelect('AVG(i.height) AS average_height');
+
+        $result = $query->getQuery()->getResult();
+
+        return reset($result);
+    }
+
+    /**
      * Get number of images by addresses
      *
      * @return array

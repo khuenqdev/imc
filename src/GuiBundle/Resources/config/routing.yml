@@ -10,6 +10,12 @@ gui_statistics:
     options:
         expose: true
 
+gui_address_statistics:
+    path: /statistics_addresses
+    defaults: { _controller: GuiBundle:Default:addressStats }
+    options:
+        expose: true
+
 gui_gallery:
     prefix: /gallery
     resource: "@GuiBundle/Resources/config/routing/gallery.yml"

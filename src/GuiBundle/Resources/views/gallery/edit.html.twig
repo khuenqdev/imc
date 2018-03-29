@@ -1,5 +1,5 @@
 {% extends '@Gui/base.html.twig' %}
-
+{% set active_menu = 'gallery' %}
 {% block stylesheets %}
     <link href="{{ asset('assets/css/googlemap.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
 {% endblock %}
@@ -9,35 +9,31 @@
         <div id="google-map-container" class="col s8">
             <div class="card-panel large">
                 <div class="googlemap-edit row">
-                    <div id="map" data-lat="{{ image.latitude }}" data-lng="{{ image.longitude }}"></div>
-                </div>
-                <div class="row">
-                    <div class="col s3"><b>Src</b></div>
-                    <div class="col s9">{{ image.src }}</div>
-                </div>
-                <div class="row">
-                    <div class="col s3"><b>Alt</b></div>
-                    <div class="col s9">{{ image.alt }}</div>
+                    <div id="map" class="valign-wrapper" data-lat="{{ image.latitude }}" data-lng="{{ image.longitude }}"></div>
                 </div>
                 <div class="row">
                     <div class="col s3"><b>Filename</b></div>
                     <div class="col s9">{{ image.filename }}</div>
                 </div>
                 <div class="row">
-                    <div class="col s3"><b>Type</b></div>
-                    <div class="col s9">{{ image.type }}</div>
+                    <div class="col s3"><b>Original Link</b></div>
+                    <div class="col s9">{{ image.src }}</div>
                 </div>
                 <div class="row">
-                    <div class="col s3"><b>Path</b></div>
-                    <div class="col s9">{{ image.path }}</div>
+                    <div class="col s3"><b>Alt Attribute</b></div>
+                    <div class="col s9">{{ image.alt }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s3"><b>Type</b></div>
+                    <div class="col s9">{{ image.type }}</div>
                 </div>
                 <div class="row">
                     <div class="col s3"><b>Size</b></div>
                     <div class="col s9">{{ image.width }} x {{ image.height }} px</div>
                 </div>
                 <div class="row">
-                    <div class="col s3"><b>Location from metadata?</b></div>
-                    <div class="col s9">{{ image.isExifLocation ? 'Yes' : 'No' }}</div>
+                    <div class="col s3"><b>GPS coordinates from metadata?</b></div>
+                    <div class="col s9">{{ image.isExifLocation ? 'YES' : 'NO' }}</div>
                 </div>
             </div>
         </div>

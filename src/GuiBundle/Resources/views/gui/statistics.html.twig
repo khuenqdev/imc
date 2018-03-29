@@ -1,6 +1,6 @@
 {% extends '@Gui/base.html.twig' %}
-
-{% block title %}Statistics{% endblock %}
+{% set active_menu = 'stats' %}
+{% block title %}General Statistics{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -36,6 +36,12 @@
                         <b>Images w/o Location in metadata</b>
                     </div>
                     <div class="col s3">{{ images_without_exif_location }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Average image size</b>
+                    </div>
+                    <div class="col s3">{{ average_image_size.average_width|round ~ ' x ' ~ average_image_size.average_height|round }} px</div>
                 </div>
             </div>
         </div>
@@ -140,46 +146,6 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col s12">
-            <h5>Address Statistics</h5>
-            <div>
-                <b>Total number of address: </b> {{ no_of_address_images }}
-            </div>
-            <div>
-                <b>Number of address from metadata: </b> {{ no_of_address_images_in_metadata }}
-            </div>
-            <div>
-                <b>Number of address from geoparsing: </b> {{ no_of_address_images_nin_metadata }}
-            </div>
-            <table class="table responsive-table highlight striped">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Address</th>
-                    <th>Geocoded from metadata?</th>
-                    <th>No. of images</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for data in address_images %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ data.address }}</td>
-                        <td>
-                            {% if data.is_exif_location %}
-                                YES
-                            {% else %}
-                                NO
-                            {% endif %}
-                        </td>
-                        <td>{{ data.no_of_images }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -209,7 +175,7 @@
             // Set chart options
             var options = {
                 'width':600,
-                'height':400
+                'height':350
             };
 
             // Instantiate and draw our chart, passing in some options.

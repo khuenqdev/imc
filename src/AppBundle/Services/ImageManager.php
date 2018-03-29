@@ -176,6 +176,19 @@ class ImageManager
     }
 
     /**
+     * Get link and image statistics
+     *
+     * @param array $filters
+     * @return array
+     */
+    public function getStatistics(array $filters = [])
+    {
+        $service = $this->kernel->getContainer()->get('gui.statistics');
+
+        return $service->getStatistics($filters);
+    }
+
+    /**
      * Get kernel parameter
      *
      * @param $name
