@@ -5,7 +5,7 @@
 {% block content %}
     <div id="search-container" class="row input-field">
         <i class="material-icons prefix">search</i>
-        <input id="search-input" type="text" value="" />
+        <input id="search-input" type="text" value=""/>
         <label for="search-input">Search for image</label>
     </div>
 
@@ -16,6 +16,9 @@
         <p class="infinite-scroll-last">End of content</p>
         <p class="infinite-scroll-error">No more pages to load</p>
     </div>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}
 
 {% block scripts %}
