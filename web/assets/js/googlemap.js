@@ -94,7 +94,8 @@ function addMarkers(data) {
 
     var markerCluster = new MarkerClusterer(map, markers, {
         imagePath: markerClusterImagePath,
-        gridSize: 80
+        gridSize: 80,
+        imageExtension: 'gif'
     });
 }
 
