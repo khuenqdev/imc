@@ -91,6 +91,11 @@ function addMarkers(data) {
             lng: parseFloat(data[i].longitude)
         });
     }
+
+    var markerCluster = new MarkerClusterer(map, markers, {
+        imagePath: markerClusterImagePath,
+        gridSize: 80
+    });
 }
 
 function addMarker(position) {

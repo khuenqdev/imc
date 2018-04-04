@@ -4,3 +4,9 @@ services:
         arguments: ["@doctrine.orm.entity_manager","@kernel", "@logger", "@knp_paginator", '@session']
         tags:
             - { name: monolog.logger, channel: managers }
+
+    image_serialization_subscriber:
+        class: AppBundle\EventSubscribers\ImageSerializationSubscriber
+        arguments: ['@request_stack']
+        tags:
+            - { name: jms_serializer.event_subscriber }

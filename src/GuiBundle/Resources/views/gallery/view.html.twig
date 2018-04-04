@@ -1,5 +1,17 @@
 <div class="row">
-    <div class="col s12 center-align"><h5>Basic Information</h5></div>
+    <div class="col s12">
+        <h5 class="valign-wrapper">
+            Basic Information
+            &nbsp;
+            <a href="{{ path('gallery_edit', { 'id': image.id }) }}">
+                <i class="material-icons small">edit</i>
+            </a>
+            &nbsp;
+            <a href="{{ path('gallery_delete', { 'id': image.id }) }}">
+                <i class="material-icons small">delete</i>
+            </a>
+        </h5>
+    </div>
 </div>
 <div class="row">
     <div class="col s2"><b>Filename</b></div>
@@ -12,6 +24,10 @@
 <div class="row">
     <div class="col s2"><b>Alt Attribute</b></div>
     <div class="col s10">{{ image.alt }}</div>
+</div>
+<div class="row">
+    <div class="col s2"><b>Extracted Description</b></div>
+    <div class="col s10">{{ image.description }}</div>
 </div>
 <div class="row">
     <div class="col s2"><b>Type</b></div>
@@ -30,7 +46,7 @@
     <div class="col s10">{{ image.address }}</div>
 </div>
 <div class="row">
-    <div class="col s12 center-align"><h5>Metadata</h5></div>
+    <div class="col s12"><h5>Metadata</h5></div>
 </div>
 <div class="row">
     <div class="col s12">

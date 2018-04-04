@@ -163,4 +163,13 @@ class Image
             return $val;
         }, $metadata);
     }
+
+    /**
+     * @Serializer\VirtualProperty(name="image_metadata")
+     * @return mixed
+     */
+    public function getImageMetadata()
+    {
+        return $this->getMetadata();
+    }
 }

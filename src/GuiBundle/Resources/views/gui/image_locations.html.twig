@@ -31,6 +31,10 @@
 {% endblock %}
 
 {% block scripts %}
+    <script type="text/javascript">
+        var markerClusterImagePath = '{{ asset('assets/images/', null, true) ~ 'm' }}';
+    </script>
+    <script src="{{ asset('assets/js/markerclusterer.js') }}"></script>
     <script src="{{ asset('assets/js/googlemap.js') }}"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}&callback=initMap"
             async defer></script>
