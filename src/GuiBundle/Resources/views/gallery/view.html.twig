@@ -13,6 +13,19 @@
         </h5>
     </div>
 </div>
+{% if image.metadata.author is defined %}
+    <div class="row">
+        <div class="col s12 purple darken-4 white-text">
+            Image taken by {{ image.metadata.author }}
+        </div>
+    </div>
+{% elseif image.metadata.copyright is defined %}
+    <div class="row">
+        <div class="col s12 purple darken-4 white-text">
+            Copyright © {{ image.metadata.copyright }}
+        </div>
+    </div>
+{% endif %}
 <div class="row">
     <div class="col s2"><b>Filename</b></div>
     <div class="col s10">{{ image.filename }}</div>
@@ -44,6 +57,10 @@
 <div class="row">
     <div class="col s2"><b>Geographic Address</b></div>
     <div class="col s10">{{ image.address }}</div>
+</div>
+<div class="row">
+    <div class="col s2"><b>Metadata GPS?</b></div>
+    <div class="col s10">{{ image.isExifLocation ? 'YES' : 'NO' }}</div>
 </div>
 <div class="row">
     <div class="col s12"><h5>Metadata</h5></div>
