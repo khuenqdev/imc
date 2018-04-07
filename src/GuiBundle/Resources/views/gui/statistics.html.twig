@@ -85,7 +85,23 @@
     <div class="row">
         <div class="col s6">
             <div class="statistics">
-
+                <h5>Domain Statistics</h5>
+                <table class="highlight striped">
+                    <thead>
+                    <tr>
+                        <th>Domain</th>
+                        <th>Images</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for data in domain_images %}
+                        <tr>
+                            <td><b>.{{ data.domain }}</b></td>
+                            <td>{{ data.no_of_images }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="col s6">

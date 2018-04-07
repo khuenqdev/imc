@@ -137,6 +137,7 @@ class ImageRepository extends EntityRepository
             ->addSelect('i.isExifLocation AS is_exif_location')
             ->addSelect('COUNT(i.id) AS no_of_images')
             ->where('i.address IS NOT NULL')
+            ->andWhere('i.isExifLocation = true')
             ->groupBy('i.address');
 
         return $query->getQuery()->getResult();

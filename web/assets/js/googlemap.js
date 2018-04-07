@@ -41,63 +41,18 @@
     });
 })(jQuery);
 
-var map;
-var markers = [];
-
-/**
- * Set map markers
- *
- * @param map
- */
-function setMarkers(map) {
-    var bounds = map.getBounds();
-    var ne = bounds.getNorthEast();
-    var sw = bounds.getSouthWest();
-    var nw = new google.maps.LatLng(ne.lat(), sw.lng());
-    // var se = new google.maps.LatLng(sw.lat(), ne.lng());
-
-    var minLat = sw.lat();
-    var maxLat = nw.lat();
-    var minLng = nw.lng();
-    var maxLng = ne.lng();
-
-    if (minLng > maxLng) {
-        maxLng = Math.abs(maxLng);
-    }
-
-    retrieveMarkers(minLat, maxLat, minLng, maxLng);
-}
-
-function retrieveMarkers(minLat, maxLat, minLng, maxLng) {
+function retrieveMarkers(params, map) {
     $.ajax({
         url: Routing.generate('get_markers', {}, false),
         dataType: 'json',
-        data: {
-            min_lat: minLat,
-            max_lat: maxLat,
-            min_lng: minLng,
-            max_lng: maxLng
-        },
+        data: (params ? params : {}),
         success: function (data) {
-            addMarkers(data);
+            addMarkers(data, map);
         }
     });
 }
 
-function addMarkers(data) {
-    // for (var i = 0; i < data.length; i++) {
-    //     addMarker({
-    //         lat: parseFloat(data[i].latitude),
-    //         lng: parseFloat(data[i].longitude)
-    //     });
-    // }
-
-    // var markerCluster = new MarkerClusterer(map, markers, {
-    //     imagePath: markerClusterImagePath,
-    //     gridSize: 80,
-    //     imageExtension: 'gif'
-    // });
-
+function addMarkers(data, map) {
     var options = {};
     options.clusteringMethod = "gridBased";
     options.serverClient = "client"; // “client”, “server”
@@ -116,7 +71,7 @@ function addMarkers(data) {
         // supposing your data is in the array data
         for (var j = 0; j < data.length; j++) {
             // creating objects one by one and adding to clusteringObj using the function: addObject
-            obj = {};
+            var obj = {};
             obj.lat = parseFloat(data[j].latitude);
             obj.lon = parseFloat(data[j].longitude);
 
@@ -130,6 +85,17 @@ function addMarkers(data) {
         }
 
         clusteringObj.apply(); // performing clustering algorithm and displaying markers
+
+        for(var i = 0; i < clusteringObj.markers.length; i++) {
+            var marker = clusteringObj.markers[i].marker;
+
+            marker.addListener('click', function () {
+                openImageWindow({
+                    lat: this.lat,
+                    lon: this.lon
+                });
+            });
+        }
     }
 }
 
@@ -214,27 +180,42 @@ function getImageInfoHtml(imageId) {
  * Initialize map data (for image location/homepage)
  */
 function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 0.000000, lng: 0.000000},
-        zoom: 4
-    });
+    var map = createMap(62.60, 29.76, "map", 12);
 
-    google.maps.event.addListener(map, 'idle', _.debounce(function () {
-        clearOldMarkers();
-        setMarkers(map);
+    var mapReadyListener = google.maps.event.addListenerOnce(map, 'idle', _.debounce(function () {
+        retrieveMarkers({}, map);
+        google.maps.event.removeListener(mapReadyListener);
     }, 100));
 
-    // google.maps.event.addListener(map, "bounds_changed", function() {
-    //     var bounds = map.getBounds();
-    //     var ne = bounds.getNorthEast();
-    //     var sw = bounds.getSouthWest();
-    //     var nw = new google.maps.LatLng(ne.lat(), sw.lng());
-    //
-    //     var minLat = sw.lat();
-    //     var maxLat = nw.lat();
-    //     var minLng = nw.lng();
-    //     var maxLng = ne.lng();
-    //
-    //     console.log("Bounding box: {", minLat, maxLat, minLng, maxLng, '}');
-    // });
+    var mapHeight =  Math.round(jQuery(window).innerHeight() * 0.75);
+    jQuery('.googlemap').css({ height: mapHeight });
+
+    jQuery(window).resize(function(){
+        jQuery('.googlemap').css({ height: mapHeight });
+    });
+}
+
+function createMap(lat, lon, canvasId, zoomLevel) {
+    var map, defaultOptions, mapTypeIds, type;
+    mapTypeIds = [];
+
+    for (type in google.maps.MapTypeId) {
+        mapTypeIds.push(google.maps.MapTypeId[type]);
+    }
+
+    defaultOptions = {
+        zoom: zoomLevel,
+        center: new google.maps.LatLng(lat, lon),
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapTypeControlOptions: {
+            mapTypeIds: mapTypeIds
+        },
+        rotateControl: false,
+        streetViewControl: false,
+        panControl: false
+    };
+
+    map = new google.maps.Map(document.getElementById(canvasId), defaultOptions);
+
+    return map;
 }

@@ -25,6 +25,7 @@ class AppExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('imc_image', array($this, 'getImcImage')),
+            new \Twig_SimpleFunction('base_path', array($this, 'getBasePath')),
         );
     }
 
@@ -33,5 +34,12 @@ class AppExtension extends \Twig_Extension
         $basePath = $this->requestStack->getCurrentRequest()->getBasePath();
 
         return $basePath . '/downloaded/' . $image->path . '/' . $image->filename;
+    }
+
+    public function getBasePath()
+    {
+        $basePath = $this->requestStack->getCurrentRequest()->getBasePath();
+
+        return $basePath;
     }
 }

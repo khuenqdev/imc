@@ -32,29 +32,15 @@
 
 {% block scripts %}
     <script type="text/javascript">
-        var markerClusterImagePath = '{{ asset('assets/images/', null, true) ~ 'm' }}';
-        var clusteringAPIPath = '{{ asset('assets/js/') }}';
+        var clusteringAssetPath = '{{ asset('assets/images/icons/', null, true) }}';
     </script>
 
     <script src="{{ asset('assets/js/googlemap.js') }}"></script>
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}"
-            async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}"></script>
 
     <script src="{{ asset('assets/js/clusteringInterface.js') }}"></script>
     <script src="{{ asset('assets/js/clusteringLogic.js') }}"></script>
     <script src="{{ asset('assets/js/mapFunctions.js') }}"></script>
     <script src="{{ asset('assets/js/markerFunctions.js') }}"></script>
-    {#<script src="{{ asset('assets/js/markerclusterer.js') }}"></script>#}
-
-    <script type="text/javascript">
-        jQuery(document).ready(function() {
-            var mapHeight =  Math.round(jQuery(window).innerHeight() * 0.75);
-            jQuery('.googlemap').css({ height: mapHeight });
-
-            jQuery(window).resize(function(){
-                jQuery('.googlemap').css({ height: mapHeight });
-            });
-        });
-    </script>
 {% endblock %}
