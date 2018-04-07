@@ -33,11 +33,19 @@
 {% block scripts %}
     <script type="text/javascript">
         var markerClusterImagePath = '{{ asset('assets/images/', null, true) ~ 'm' }}';
+        var clusteringAPIPath = '{{ asset('assets/js/') }}';
     </script>
-    <script src="{{ asset('assets/js/markerclusterer.js') }}"></script>
+
     <script src="{{ asset('assets/js/googlemap.js') }}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}&callback=initMap"
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map_api_key }}"
             async defer></script>
+
+    <script src="{{ asset('assets/js/clusteringInterface.js') }}"></script>
+    <script src="{{ asset('assets/js/clusteringLogic.js') }}"></script>
+    <script src="{{ asset('assets/js/mapFunctions.js') }}"></script>
+    <script src="{{ asset('assets/js/markerFunctions.js') }}"></script>
+    {#<script src="{{ asset('assets/js/markerclusterer.js') }}"></script>#}
 
     <script type="text/javascript">
         jQuery(document).ready(function() {

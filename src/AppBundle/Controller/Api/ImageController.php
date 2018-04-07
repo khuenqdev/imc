@@ -46,6 +46,7 @@ class ImageController extends Controller
      * @Rest\QueryParam(name="min_lng", key="min_lng", default=null, nullable=true, description="Minimum longitude")
      * @Rest\QueryParam(name="max_lng", key="max_lng", default=null, nullable=true, description="Maximum longitude")
      * @Rest\QueryParam(name="only_with_location", key="only_with_location", default=1, nullable=true, description="Whether there should only be images with locations, either set to 1 or unset")
+     * @Rest\QueryParam(name="only_location_from_exif", key="only_location_from_exif", default=1, nullable=true, description="Whether there should only be images with location info from metadata")
      * @Rest\View(statusCode=200)
      * @param Request $request
      * @return array
@@ -144,6 +145,7 @@ class ImageController extends Controller
      * @Rest\QueryParam(name="geoparsing", key="geoparsing", nullable=true, default=0, description="Include geoparsing statistics")
      * @Rest\QueryParam(name="regional", key="regional", nullable=true, default=0, description="Include regional statistics (number of images per world regions)")
      * @Rest\QueryParam(name="address", key="address", nullable=true, default=0, description="Include address statistics (number of images per discovered address)")
+     * @Rest\QueryParam(name="domain", key="domain", nullable=true, default=0, description="Include domain statistics (number of images per URL domain)")
      *
      * @ApiDoc(
      *     resource=true,

@@ -33,7 +33,7 @@ class DefaultController extends Controller
             $this->get('gui.statistics')->getStatistics([
                 'general' => 1,
                 'geoparsing' => 1,
-                'regional' => 1
+                'domain' => 1
             ])
         );
     }

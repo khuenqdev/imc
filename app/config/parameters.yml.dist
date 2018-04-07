@@ -25,6 +25,7 @@ parameters:
     image_min_width: 400
     image_min_height: 400
     image_directory: '%kernel.root_dir%/../web/downloaded/images/'
+    image_thumbnail_directory: '%kernel.root_dir%/../web/downloaded/thumbnails/'
 
     # Google Geocode API credentials
     google_geocode_url: 'https://maps.googleapis.com/maps/api/geocode/json'

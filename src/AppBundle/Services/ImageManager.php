@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\Paginator;
 use Monolog\Logger;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\KernelInterface as Kernel;
 
@@ -46,18 +47,30 @@ class ImageManager
     private $session;
 
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
      * ImageManager constructor.
      *
      * @param EntityManager $em
      * @param Kernel $kernel
      */
-    public function __construct(EntityManager $em, Kernel $kernel, Logger $logger, Paginator $paginator, Session $session)
-    {
+    public function __construct(
+        EntityManager $em,
+        Kernel $kernel,
+        Logger $logger,
+        Paginator $paginator,
+        Session $session,
+        RequestStack $requestStack
+    ) {
         $this->em = $em;
         $this->kernel = $kernel;
         $this->logger = $logger;
         $this->paginator = $paginator;
         $this->session = $session;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -158,7 +171,7 @@ class ImageManager
      */
     public function verifyImageLocation(Image $image, $isCorrect)
     {
-        $image->isLocationCorrect = (bool) $isCorrect;
+        $image->isLocationCorrect = (bool)$isCorrect;
         $this->em->persist($image);
         $this->em->flush($image);
     }
@@ -171,8 +184,21 @@ class ImageManager
      */
     public function getMarkerLocations(array $filters = [])
     {
-        return $this->em->getRepository(Image::class)
+        $markers = $this->em->getRepository(Image::class)
             ->getLocationCoordinates($filters);
+
+        $markers = array_map(function ($image) {
+            $host = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
+            $basePath = $this->requestStack->getCurrentRequest()->getBasePath();
+            $image['thumbnail'] = $basePath . '/downloaded/thumbnails/' . $image['thumbnail'];
+            $image['photourl'] = $host . $basePath . '/downloaded/' . $image['path'] . '/' . $image['filename'];
+            unset($image['path']);
+            unset($image['filename']);
+
+            return $image;
+        }, $markers);
+
+        return $markers;
     }
 
     /**

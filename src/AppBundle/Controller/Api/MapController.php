@@ -39,6 +39,7 @@ class MapController extends Controller
      * @Rest\QueryParam(name="max_lat", key="max_lat", default=null, nullable=true, description="Maximum latitude")
      * @Rest\QueryParam(name="min_lng", key="min_lng", default=null, nullable=true, description="Minimum longitude")
      * @Rest\QueryParam(name="max_lng", key="max_lng", default=null, nullable=true, description="Maximum longitude")
+     * @Rest\QueryParam(name="only_location_from_exif", key="only_location_from_exif", default=1, nullable=true, description="Whether the marker should be from images whose location in metadata")
      * @Rest\View(statusCode=200)
      */
     public function getMarkerLocationsAction(Request $request)

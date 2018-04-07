@@ -43,17 +43,33 @@ class ImageSerializationSubscriber implements EventSubscriberInterface
     public function onPostSerialize(ObjectEvent $event)
     {
         $event->getVisitor()->addData('local_src', $this->getLocalSrc($event->getObject()));
+        $event->getVisitor()->setData('thumbnail', $this->getThumbnailPath($event->getObject()));
     }
 
     /**
+     * Get link to server image
+     *
      * @param $image
      * @return string
      */
-    public function getLocalSrc($image)
+    private function getLocalSrc($image)
     {
         $host = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
         $basePath = $this->requestStack->getCurrentRequest()->getBasePath();
 
         return $host . $basePath . '/downloaded/' . $image->path . '/' . $image->filename;
+    }
+
+    /**
+     * Get thumbnail path
+     *
+     * @param $image
+     * @return string
+     */
+    private function getThumbnailPath($image)
+    {
+        $basePath = $this->requestStack->getCurrentRequest()->getBasePath();
+
+        return $basePath . '/downloaded/thumbnails/' . $image->thumbnail;
     }
 }

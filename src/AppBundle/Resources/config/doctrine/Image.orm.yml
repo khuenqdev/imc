@@ -60,4 +60,12 @@ AppBundle\Entity\Image:
         geoparserRetries:
             type: integer
             column: geoparser_retries
+        domain:
+            type: string
+            length: 5
+            nullable: true
+        thumbnail:
+            type: string
+            length: 255
+            nullable: true
     lifecycleCallbacks: {  }

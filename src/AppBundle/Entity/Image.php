@@ -111,6 +111,17 @@ class Image
     /**
      * @var string
      */
+    public $domain;
+
+    /**
+     * @var string
+     * @Serializer\Expose
+     */
+    public $thumbnail;
+
+    /**
+     * @var string
+     */
     private $metadata;
 
     /**
@@ -129,6 +140,7 @@ class Image
         $this->height = $height;
         $this->geoparsed = false;
         $this->geoparserRetries = 0;
+        $this->extractDomain($src);
     }
 
     /**
@@ -171,5 +183,20 @@ class Image
     public function getImageMetadata()
     {
         return $this->getMetadata();
+    }
+
+    /**
+     * Extract image domain
+     *
+     * @param $src
+     */
+    private function extractDomain($src)
+    {
+        $host = parse_url($src, PHP_URL_HOST);
+
+        if ($host && !empty($host)) {
+            $domain = substr($host, strrpos($host, '.') + 1);
+            $this->domain = $domain;
+        }
     }
 }

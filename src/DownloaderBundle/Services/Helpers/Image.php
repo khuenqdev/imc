@@ -9,6 +9,7 @@
 namespace DownloaderBundle\Services\Helpers;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Client;
 use Monolog\Logger;
 use PHPExif\Adapter\Exiftool;
@@ -94,6 +95,50 @@ class Image
     }
 
     /**
+     * Generate image thumbnail
+     *
+     * @param \AppBundle\Entity\Image $image
+     */
+    public function generateThumbnail(\AppBundle\Entity\Image &$image)
+    {
+        $metadata = $image->getMetadata();
+
+        if (isset($metadata['SourceFile'])) {
+            $filename = $metadata['SourceFile'];
+            $thumb = imagecreatetruecolor(100, 75);
+
+            switch ($image->type) {
+                case 'JPEG':
+                    $source = imagecreatefromjpeg($filename);
+                    break;
+                case 'JPG':
+                case 'PNG':
+                    $source = imagecreatefrompng($filename);
+                    break;
+                case 'SVG':
+                    $source = null;
+                    break;
+                default:
+                    $source = null;
+            }
+
+            if ($source) {
+                imagecopyresized(
+                    $thumb, $source,
+                    0, 0, 0, 0, 100, 75,
+                    $image->width, $image->height
+                );
+
+                $thumbnailPath = 'thumb_' . $image->filename;
+
+                imagejpeg($thumb, $this->getParameter('image_thumbnail_directory') . $thumbnailPath, 100);
+
+                $image->thumbnail = $thumbnailPath;
+            }
+        }
+    }
+
+    /**
      * Save image entity
      *
      * @param \DOMElement $element
@@ -129,6 +174,9 @@ class Image
             $image->isLocationCorrect = true;
         }
 
+        // Generate thumbnail
+        $this->generateThumbnail($image);
+
         // Save to database
         $this->em->persist($image);
         $this->em->flush($image);
@@ -148,7 +196,7 @@ class Image
     {
         $alt = trim($element->getAttribute('alt'));
         $title = trim($element->getAttribute('title'));
-        $description =  "{$alt} {$title} {$this->sanitize($filename)}";
+        $description = "{$alt} {$title} {$this->sanitize($filename)}";
         $prev = $element->previousSibling;
         $next = $element->nextSibling;
 
@@ -202,11 +250,11 @@ class Image
         $metadata = array_merge($exif->getRawData(), $exif->getData());
         list($width, $height) = @getimagesize($filename);
 
-        if(!isset($metadata['File:ImageWidth']) || empty($metadata['File:ImageWidth'])) {
+        if (!isset($metadata['File:ImageWidth']) || empty($metadata['File:ImageWidth'])) {
             $metadata['File:ImageWidth'] = $width;
         }
 
-        if(!isset($metadata['File:ImageHeight']) || empty($metadata['File:ImageHeight'])) {
+        if (!isset($metadata['File:ImageHeight']) || empty($metadata['File:ImageHeight'])) {
             $metadata['File:ImageHeight'] = $height;
         }
 
@@ -254,7 +302,7 @@ class Image
     {
         $ratio = $width / $height;
 
-        return (float) number_format($ratio, 2, '.', '');
+        return (float)number_format($ratio, 2, '.', '');
     }
 
     /**

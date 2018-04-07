@@ -58,3 +58,4 @@ puphpet/config-custom.yaml
 web/downloaded/*
 !web/downloaded/.gitkeep
 !web/downloaded/images/.gitkeep
+!web/downloaded/thumbnails/.gitkeep

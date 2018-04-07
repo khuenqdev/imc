@@ -90,7 +90,8 @@ class Statistics
                 'general' => 1,
                 'geoparsing' => 1,
                 'regional' => 1,
-                'address' => 1
+                'address' => 1,
+                'domain' => 1
             ];
         }
 
@@ -136,6 +137,10 @@ class Statistics
             $statistics['no_of_address_images'] = $noOfAddressImages;
             $statistics['no_of_address_images_in_metadata'] = $noOfAddressImagesInMetadata;
             $statistics['no_of_address_images_nin_metadata'] = $noOfAddressImages - $noOfAddressImagesInMetadata;
+        }
+
+        if (isset($filters['domain']) && $filters['domain']) {
+            $statistics['domain_images'] = $imageRepo->getNumberOfImagesByDomain();
         }
 
         return $statistics;

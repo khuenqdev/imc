@@ -35,10 +35,10 @@
             endingTop: '2%' // Ending top style attribute
         });
 
+        initMap();
+
         Materialize.toast('Click on the map markers to reveal images', 4000, 'rounded');
     });
-
-
 })(jQuery);
 
 var map;
@@ -85,18 +85,52 @@ function retrieveMarkers(minLat, maxLat, minLng, maxLng) {
 }
 
 function addMarkers(data) {
-    for (var i = 0; i < data.length; i++) {
-        addMarker({
-            lat: parseFloat(data[i].latitude),
-            lng: parseFloat(data[i].longitude)
-        });
-    }
+    // for (var i = 0; i < data.length; i++) {
+    //     addMarker({
+    //         lat: parseFloat(data[i].latitude),
+    //         lng: parseFloat(data[i].longitude)
+    //     });
+    // }
 
-    var markerCluster = new MarkerClusterer(map, markers, {
-        imagePath: markerClusterImagePath,
-        gridSize: 80,
-        imageExtension: 'gif'
-    });
+    // var markerCluster = new MarkerClusterer(map, markers, {
+    //     imagePath: markerClusterImagePath,
+    //     gridSize: 80,
+    //     imageExtension: 'gif'
+    // });
+
+    var options = {};
+    options.clusteringMethod = "gridBased";
+    options.serverClient = "client"; // “client”, “server”
+    options.markerStyle = "thumbnail"; // “thumbnail”, “marker1”
+    options.markerColor = "yellow"; // “yellow”, “green”, “red”, “blue”
+    options.representativeType = "mean"; // “mean”, “first”, “middleCell”
+    options.markerSingleWidth = 48; // width of single marker on map
+    options.markerClusterWidth = 48; // width of cluster marker on map
+    options.markerSingleHeight = 39; // height of single marker on map
+    options.markerClusterHeight = 39; // height of cluster marker on map
+
+    var clusteringObj = new mopsiMarkerClustering(map, options);
+
+    if (clusteringObj.validParams === "YES") { // validParams: “YES” or “NO”
+        // add data objects
+        // supposing your data is in the array data
+        for (var j = 0; j < data.length; j++) {
+            // creating objects one by one and adding to clusteringObj using the function: addObject
+            obj = {};
+            obj.lat = parseFloat(data[j].latitude);
+            obj.lon = parseFloat(data[j].longitude);
+
+            // optional
+            obj.name = 'marker_' + j;
+            obj.thumburl = data[j].thumbnail;
+            obj.photourl = data[j].photourl;
+            obj.color = "yellow";
+
+            clusteringObj.addObject(obj); // adds object to the array markersData of clusteringObj
+        }
+
+        clusteringObj.apply(); // performing clustering algorithm and displaying markers
+    }
 }
 
 function addMarker(position) {
@@ -156,7 +190,7 @@ function openImageWindow(position) {
             $('#modal').modal("open");
 
             $('.carousel').carousel({
-                onCycleTo: function(el, dragged) {
+                onCycleTo: function (el, dragged) {
                     getImageInfoHtml(el.find('img').data('id'));
                 }
             });
@@ -182,7 +216,7 @@ function getImageInfoHtml(imageId) {
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 0.000000, lng: 0.000000},
-        zoom: 3
+        zoom: 4
     });
 
     google.maps.event.addListener(map, 'idle', _.debounce(function () {

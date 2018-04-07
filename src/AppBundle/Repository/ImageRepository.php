@@ -28,6 +28,10 @@ class ImageRepository extends EntityRepository
                 ->andWhere('i.longitude IS NOT NULL');
         }
 
+        if (isset($filters['only_location_from_exif']) && $filters['only_location_from_exif']) {
+            $qb->andWhere('i.isExifLocation = true');
+        }
+
         if (isset($filters['search'])) {
             $qb->andWhere($qb->expr()->orX(
                 $qb->expr()->like('i.description', $qb->expr()->literal("%{$filters['search']}%")),
@@ -60,8 +64,15 @@ class ImageRepository extends EntityRepository
 
         $qb->select('i.latitude')
             ->addSelect('i.longitude')
+            ->addSelect('i.path')
+            ->addSelect('i.filename')
+            ->addSelect('i.thumbnail')
             ->where('i.latitude IS NOT NULL')
             ->andWhere('i.longitude IS NOT NULL');
+
+        if (isset($filters['only_location_from_exif']) && $filters['only_location_from_exif']) {
+            $qb->andWhere('i.isExifLocation = true');
+        }
 
         $this->filterResultsByBoundingBox($qb, $filters);
 
@@ -94,6 +105,23 @@ class ImageRepository extends EntityRepository
         $result = $query->getQuery()->getResult();
 
         return reset($result);
+    }
+
+    /**
+     * Get number of images by domain
+     *
+     * @return array
+     */
+    public function getNumberOfImagesByDomain()
+    {
+        $query = $this->createQueryBuilder('i');
+
+        $query->select('i.domain')
+            ->addSelect('COUNT(i.id) AS no_of_images')
+            ->where('i.domain IS NOT NULL')
+            ->groupBy('i.domain');
+
+        return $query->getQuery()->getResult();
     }
 
     /**

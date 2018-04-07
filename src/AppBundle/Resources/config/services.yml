@@ -1,7 +1,13 @@
 services:
     image_manager:
         class: AppBundle\Services\ImageManager
-        arguments: ["@doctrine.orm.entity_manager","@kernel", "@logger", "@knp_paginator", '@session']
+        arguments:
+            - "@doctrine.orm.entity_manager"
+            - "@kernel"
+            - "@logger"
+            - "@knp_paginator"
+            - '@session'
+            - '@request_stack'
         tags:
             - { name: monolog.logger, channel: managers }
 
