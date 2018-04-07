@@ -18,7 +18,7 @@ class Version20180406171652 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE image ADD domain VARCHAR(5) DEFAULT NULL, ADD thumbnail VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Image ADD domain VARCHAR(5) DEFAULT NULL, ADD thumbnail VARCHAR(255) DEFAULT NULL');
     }
 
     /**

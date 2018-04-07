@@ -78,24 +78,13 @@ function addMarkers(data, map) {
             // optional
             obj.name = 'marker_' + j;
             obj.thumburl = data[j].thumbnail;
-            obj.photourl = data[j].photourl;
+            //obj.photourl = data[j].photourl;
             obj.color = "yellow";
 
             clusteringObj.addObject(obj); // adds object to the array markersData of clusteringObj
         }
 
         clusteringObj.apply(); // performing clustering algorithm and displaying markers
-
-        for(var i = 0; i < clusteringObj.markers.length; i++) {
-            var marker = clusteringObj.markers[i].marker;
-
-            marker.addListener('click', function () {
-                openImageWindow({
-                    lat: this.lat,
-                    lon: this.lon
-                });
-            });
-        }
     }
 }
 

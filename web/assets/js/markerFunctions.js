@@ -49,6 +49,13 @@ function markerX(mapEx, jsonObject) {
         destination: jsonObject.destination
     });
 
+    this.marker.addListener('click', function () {
+        openImageWindow({
+            lat: this.lat,
+            lon: this.lon
+        });
+    });
+
     this.mapEx = mapEx;
 
     this.clusterSize = jsonObject.clusterSize;
