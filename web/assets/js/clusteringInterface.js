@@ -481,7 +481,6 @@ mopsiMarkerClustering.prototype.representativesToLatLng = function (objClusters)
             x = x / 100000000;
 
             if (objClusters.clusters[i].coordinates !== undefined) {
-                console.log(objClusters.clusters[i].coordinates);
                 y = objClusters.clusters[i].coordinates[0];
                 x = objClusters.clusters[i].coordinates[1];
             }
@@ -490,7 +489,7 @@ mopsiMarkerClustering.prototype.representativesToLatLng = function (objClusters)
             objClusters.clusters[i].represent[1] = x;
         }
     }
-console.log(objClusters);
+
     objClusters.nValidClusters = cntValid;
     return objClusters;
 }

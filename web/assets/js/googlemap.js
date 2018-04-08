@@ -135,7 +135,7 @@ function openImageWindow(position) {
             only_with_location: 1
         },
         success: function (data) {
-            if (data.length > 1) {
+            if (data.length > 0) {
                 var imageContent = buildImageContent(data);
 
                 $('#image-container').html('<div class="carousel">'
