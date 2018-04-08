@@ -144,6 +144,24 @@ class ImageRepository extends EntityRepository
     }
 
     /**
+     * @return int|mixed
+     */
+    public function getNoOfImagesWithWrongGPSCoordinates()
+    {
+        $query = $this->getCountQuery();
+
+        $query->where('i.isExifLocation = true')
+            ->andWhere('i.geoparserRetries > 0');
+
+        try {
+            return $query->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    /**
      * Get total number of images
      *
      * @return mixed|null

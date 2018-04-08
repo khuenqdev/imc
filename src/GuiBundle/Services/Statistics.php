@@ -103,6 +103,7 @@ class Statistics
             $statistics['discovered_images'] = $imageRepo->getNumberOfImages();
             $statistics['images_with_exif_location'] = $imageRepo->getNoOfImagesWithExifLocation();
             $statistics['images_without_exif_location'] = $imageRepo->getNoOfImagesWithoutExifLocation();
+            $statistics['images_with_gps_sensor_errors'] = $imageRepo->getNoOfImagesWithWrongGPSCoordinates();
             $statistics['average_image_size'] = $imageRepo->getAverageImageSize();
         }
 

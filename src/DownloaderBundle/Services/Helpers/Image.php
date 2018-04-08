@@ -177,11 +177,66 @@ class Image
         // Generate thumbnail
         $this->generateThumbnail($image);
 
+        // Extract URL domain
+        $this->extractDomain($image);
+
+        // Run geocoding
+
         // Save to database
         $this->em->persist($image);
         $this->em->flush($image);
 
         return $this;
+    }
+
+    /**
+     * @param \AppBundle\Entity\Image $image
+     */
+    protected function geocode(\AppBundle\Entity\Image &$image)
+    {
+        if ($image->latitude && $image->longitude) {
+            $client = new Client([
+                'timeout' => 60,
+                'allow_redirects' => false,
+                'verify' => $this->getContainer()->getParameter('http_verify_ssl')
+            ]);
+
+            $response = $client->get($this->getContainer()->getParameter('google_geocode_url'), [
+                'query' => [
+                    'latlng' => "{$image->latitude},{$image->longitude}",
+                    'key' => $this->getContainer()->getParameter('google_map_api_key'),
+                    'result_type' => "street_address|postal_code|country"
+                ]
+            ]);
+
+            $results = $response->getBody()->getContents();
+            $resultObj = @json_decode($results);
+
+            if ($resultObj->status === "OK" && is_array($resultObj->results) && !empty($resultObj->results)) {
+                $image->address = $resultObj->results[0]->formatted_address;
+                $image->geoparsed = true;
+            } elseif ($resultObj->status === 'INVALID_REQUEST') {
+                if (!$image->geoparserRetries) {
+                    $image->geoparserRetries = 0;
+                } else {
+                    $image->geoparserRetries += 1;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param \AppBundle\Entity\Image $image
+     */
+    protected function extractDomain(\AppBundle\Entity\Image &$image)
+    {
+        $src = $image->src;
+        $host = parse_url($src, PHP_URL_HOST);
+
+        if ($host && !empty($host)) {
+            $domain = substr($host, strrpos($host, '.') + 1);
+            $image->domain = $domain;
+        }
     }
 
     /**

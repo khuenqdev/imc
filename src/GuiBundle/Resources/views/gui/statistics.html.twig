@@ -17,7 +17,9 @@
                     <div class="col s9">
                         <b>Visited links</b>
                     </div>
-                    <div class="col s3">{{ visited_links }}</div>
+                    <div class="col s3">
+                        {{ visited_links }} ({{ ((visited_links / no_of_links) * 100)|number_format(2, '.', ',') }}%)
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col s9">
@@ -25,17 +27,29 @@
                     </div>
                     <div class="col s3">{{ discovered_images }}</div>
                 </div>
-                <div class="row">
+                <div class="row yellow">
                     <div class="col s9">
                         <b>Images w/ Location in metadata</b>
                     </div>
-                    <div class="col s3">{{ images_with_exif_location }}</div>
+                    <div class="col s3">
+                        {{ images_with_exif_location }} ({{ ((images_with_exif_location / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col s9">
                         <b>Images w/o Location in metadata</b>
                     </div>
-                    <div class="col s3">{{ images_without_exif_location }}</div>
+                    <div class="col s3">
+                        {{ images_without_exif_location }} ({{ ((images_without_exif_location / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                    </div>
+                </div>
+                <div class="row red lighten-3">
+                    <div class="col s9">
+                        <b>Images w/ Wrong Location Coordinates by GPS Sensor</b>
+                    </div>
+                    <div class="col s3">
+                        {{ images_with_gps_sensor_errors }} ({{ ((images_with_gps_sensor_errors / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col s9">
