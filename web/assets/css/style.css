@@ -42,11 +42,6 @@
     height: 500px !important;
 }
 
-#image-container {
-    margin-top: -150px;
-    margin-left: -170px;
-}
-
 .scroll-loader {
     width: 256px;
     height: 256px;
