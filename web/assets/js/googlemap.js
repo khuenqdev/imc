@@ -135,22 +135,24 @@ function openImageWindow(position) {
             only_with_location: 1
         },
         success: function (data) {
-            var imageContent = buildImageContent(data);
+            if (data.length > 1) {
+                var imageContent = buildImageContent(data);
 
-            $('#image-container').html('<div class="carousel">'
-                + imageContent
-                + '</div>'
-            );
+                $('#image-container').html('<div class="carousel">'
+                    + imageContent
+                    + '</div>'
+                );
 
-            $('#modal').modal("open");
+                $('#modal').modal("open");
 
-            $('.carousel').carousel({
-                onCycleTo: function (el, dragged) {
-                    getImageInfoHtml(el.find('img').data('id'));
-                }
-            });
+                $('.carousel').carousel({
+                    onCycleTo: function (el, dragged) {
+                        getImageInfoHtml(el.find('img').data('id'));
+                    }
+                });
 
-            getImageInfoHtml(data[0].id);
+                getImageInfoHtml(data[0].id);
+            }
         }
     });
 }

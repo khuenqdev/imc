@@ -51,8 +51,8 @@ function markerX(mapEx, jsonObject) {
 
     this.marker.addListener('click', function () {
         openImageWindow({
-            lat: this.lat,
-            lon: this.lon
+            lat: jsonObject.latitude,
+            lng: jsonObject.longitude
         });
     });
 
@@ -102,14 +102,14 @@ function getIconForMarkerParamType(jsonObject) {
 
     if (jsonObject.style == "marker1") {
         if (jsonObject.clusterSize > 1) {
-            iconUrl = clusteringAssetPath + "marker1_cluster_" + jsonObject.color + ".png";
+            iconUrl = clusteringAssetPath + "marker1_cluster_" + jsonObject.color + ".gif";
             size = new google.maps.Size(jsonObject.width, jsonObject.height);
             origin = new google.maps.Point(0, 0);
             anchor = new google.maps.Point(jsonObject.width / 2, jsonObject.height / 2);
             scaledSize = new google.maps.Size(jsonObject.width, jsonObject.height);
         }
         else {
-            iconUrl = clusteringAssetPath + "marker1_single_" + jsonObject.color + ".png";
+            iconUrl = clusteringAssetPath + "marker1_single_" + jsonObject.color + ".gif";
             size = new google.maps.Size(jsonObject.width, jsonObject.height);
             origin = new google.maps.Point(0, 0);
             anchor = new google.maps.Point(jsonObject.width / 2, jsonObject.height);
@@ -133,9 +133,9 @@ function getShadowForMarkerParamType(markerStyle, type, clusterSize) {
 
     if (markerStyle == "thumbnail") {
         if (clusterSize > 1)
-            shadow = new google.maps.MarkerImage(clusteringAssetPath + 'photoCollectionShadow.png', null, new google.maps.Point(0, 0), new google.maps.Point(35, 57));
+            shadow = new google.maps.MarkerImage(clusteringAssetPath + 'photoCollectionShadow.gif', null, new google.maps.Point(0, 0), new google.maps.Point(35, 57));
         else
-            shadow = new google.maps.MarkerImage(clusteringAssetPath + 'photoShadow.png', null, new google.maps.Point(0, 0), new google.maps.Point(35, 49));
+            shadow = new google.maps.MarkerImage(clusteringAssetPath + 'photoShadow.gif', null, new google.maps.Point(0, 0), new google.maps.Point(35, 49));
     }
 
     if (markerStyle == "marker1") {
@@ -728,7 +728,7 @@ Label.prototype.draw = function () {
     switch (this.markerStyle) {
         case "thumbnail":
             if (this.thumb != undefined && this.clusterSize > 1) {
-                var icon_filename = 'circle_' + this.color + '.png';
+                var icon_filename = 'circle_' + this.color + '.gif';
                 var nr = this.clusterSize > 99 ? "99+" : this.clusterSize;
                 var id = Math.round(position.x) + "" + Math.round(position.y);
 
