@@ -18,7 +18,7 @@ class GenerateThumbnailCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
-        $this->setName('crawler:generate_thumbnail')
+        $this->setName('crawler:generate:thumbnail')
             ->setDescription('Generate image thumbnail')
             ->setHelp('Generate image thumbnail');
     }

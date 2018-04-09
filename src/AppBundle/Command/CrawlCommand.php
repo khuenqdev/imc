@@ -144,6 +144,7 @@ class CrawlCommand extends ContainerAwareCommand
      * Initialize the crawler
      *
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      */
     private function initializeCrawler()
     {

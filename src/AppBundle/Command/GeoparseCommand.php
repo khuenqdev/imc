@@ -8,14 +8,10 @@
 
 namespace AppBundle\Command;
 
-
 use AppBundle\Entity\Image;
-use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class GeoparseCommand extends ContainerAwareCommand
@@ -27,8 +23,7 @@ class GeoparseCommand extends ContainerAwareCommand
     {
         $this->setName('crawler:geoparse')
             ->setDescription('Perform geoparsing for images')
-            ->setHelp('Perform a geoparsing task')
-            ->addOption('geocode_only', null, InputOption::VALUE_OPTIONAL, 'Perform only geocoding');
+            ->setHelp('Perform a geoparsing task');
     }
 
     /**
@@ -45,33 +40,21 @@ class GeoparseCommand extends ContainerAwareCommand
         // Get entity manager
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-        // Get all images that have not been geoparsed
-        $images = $em->getRepository(Image::class)->findBy(['geoparsed' => false]);
+        // Get all images that have not been geoparsed and location not from EXIF
+        $images = $em->getRepository(Image::class)->findBy([
+            'isExifLocation' => false,
+            'geoparsed' => false
+        ]);
 
         $maxRetries = $this->getContainer()->getParameter('maximum_geoparser_retry');
 
         /** @var Image $image */
         foreach ($images as $image) {
             try {
+                $output->writeln("Geoparsing {$image->path}/{$image->filename}");
 
-                if ($input->getOption('geocode_only') == "1") {
-                    if ($image->latitude && $image->longitude) {
-                        $output->writeln("Geocoding {$image->path}/{$image->filename}");
-                        $this->geocode($image);
-                    } else {
-                        continue;
-                    }
-                } else {
-                    $output->writeln("Geoparsing {$image->path}/{$image->filename}");
-
-                    if ($image->latitude && $image->longitude) {
-                        $this->geocode($image);
-                    } else {
-                        $this->geoparse($image);
-                        $image->isExifLocation = false;
-                    }
-                }
-
+                $this->geoparse($image);
+                $image->isExifLocation = false;
                 $image->geoparsed = true;
                 $em->persist($image);
                 $em->flush($image);
@@ -80,9 +63,9 @@ class GeoparseCommand extends ContainerAwareCommand
 
                 if ($image->geoparserRetries < $maxRetries) {
                     $image->geoparserRetries += 1;
+                    $image->geoparsed = false;
                 } else {
                     $image->geoparsed = true;
-                    $image->isLocationCorrect = false;
                 }
 
                 $em->persist($image);
@@ -173,35 +156,6 @@ class GeoparseCommand extends ContainerAwareCommand
             $image->address = $match->location;
             $image->latitude = $resultObj->latt;
             $image->longitude = $resultObj->longt;
-        }
-    }
-
-    /**
-     * Perform geocoding process
-     *
-     * @param Image $image
-     */
-    protected function geocode(Image &$image)
-    {
-        $client = new Client([
-            'timeout' => 60,
-            'allow_redirects' => false,
-            'verify' => $this->getContainer()->getParameter('http_verify_ssl')
-        ]);
-
-        $response = $client->get($this->getContainer()->getParameter('google_geocode_url'), [
-            'query' => [
-                'latlng' => "{$image->latitude},{$image->longitude}",
-                'key' => $this->getContainer()->getParameter('google_map_api_key'),
-                'result_type' => "street_address|postal_code|country"
-            ]
-        ]);
-
-        $results = $response->getBody()->getContents();
-        $resultObj = @json_decode($results);
-
-        if ($resultObj->status === "OK" && is_array($resultObj->results) && !empty($resultObj->results)) {
-            $image->address = $resultObj->results[0]->formatted_address;
         }
     }
 }

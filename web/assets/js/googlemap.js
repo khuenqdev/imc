@@ -8,7 +8,8 @@
                 'offset': 0,
                 'limit': 1,
                 'search': search,
-                'only_with_location': 1
+                'only_with_location': 1,
+                'only_location_from_exif': 1
             };
 
             var url = Routing.generate('list_images') + '?' + $.param(params);
@@ -159,7 +160,8 @@ function openImageWindow(position) {
             max_lat: position.lat,
             min_lng: position.lng,
             max_lng: position.lng,
-            only_with_location: 1
+            only_with_location: 1,
+            only_location_from_exif: 1
         },
         success: function (data) {
             if (data.length > 0) {

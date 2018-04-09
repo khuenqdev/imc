@@ -210,13 +210,12 @@ class Downloader
                 $this->em->persist($link);
                 $this->em->flush($link);
                 $this->em->refresh($link);
+                $this->queue->addLink($link);
             } catch (\Exception $e) {
                 $this->saveLog("[Downloader] saveLinkToDatabase() at line {$e->getLine()}: {$e->getMessage()}");
                 $this->outputMessages .= "<info>[Downloader] saveLinkToDatabase() at line {$e->getLine()}: {$e->getMessage()}</info>\n";
             }
         }
-
-        $this->queue->addLink($link);
     }
 
     /**

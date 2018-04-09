@@ -18,7 +18,7 @@ class ExtractImageDomainCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
-        $this->setName('crawler:extract_domain')
+        $this->setName('crawler:extract:domain')
             ->setDescription('Extract domain of image original src')
             ->setHelp('Extract domain of image original src');
     }

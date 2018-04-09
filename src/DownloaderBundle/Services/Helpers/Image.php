@@ -54,11 +54,17 @@ class Image
      *
      * @param $pageUrl
      * @param DomCrawlerImage $element
+     * @return Image
      * @throws \Exception
      */
     public function download($pageUrl, DomCrawlerImage $element)
     {
         $src = strtok($element->getUri(), '?');
+
+        // Avoid duplication of image
+        if ($this->em->getRepository(\AppBundle\Entity\Image::class)->findOneBy(['src' => $src])) {
+            return $this;
+        }
 
         if ($saveDir = $this->getDirectory($pageUrl)) {
             $extension = pathinfo($src, PATHINFO_EXTENSION);
@@ -92,6 +98,8 @@ class Image
                 throw $e;
             }
         }
+
+        return $this;
     }
 
     /**
@@ -149,11 +157,6 @@ class Image
      */
     protected function saveImage(\DOMElement $element, $src, array $metadata = [])
     {
-        // Avoid duplication of image
-        if ($this->em->getRepository(\AppBundle\Entity\Image::class)->findOneBy(['src' => $src])) {
-            return $this;
-        }
-
         $image = new \AppBundle\Entity\Image($src);
         $image->alt = $element->getAttribute('alt');
         $image->filename = isset($metadata['System:FileName']) ? $metadata['System:FileName'] : (pathinfo($src,
@@ -181,6 +184,7 @@ class Image
         $this->extractDomain($image);
 
         // Run geocoding
+        $this->geocode($image);
 
         // Save to database
         $this->em->persist($image);
