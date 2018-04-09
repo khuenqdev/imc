@@ -191,7 +191,9 @@ function initMap() {
     var map = createMap(62.60, 29.76, "map", 12);
 
     var mapReadyListener = google.maps.event.addListenerOnce(map, 'idle', _.debounce(function () {
-        retrieveMarkers({}, map);
+        retrieveMarkers({
+            only_location_from_exif: 1
+        }, map);
         google.maps.event.removeListener(mapReadyListener);
     }, 100));
 
