@@ -166,6 +166,8 @@ class Image
         $image->width = isset($metadata['File:ImageWidth']) ? $metadata['File:ImageWidth'] : 0;
         $image->height = isset($metadata['File:ImageHeight']) ? $metadata['File:ImageHeight'] : 0;
         $image->latitude = isset($metadata['GPS:GPSLatitude']) ? (float)$metadata['GPS:GPSLatitude'] : null;
+        $image->latitudeRef = isset($metadata['GPS:GPSLatitudeRef']) ? (float)$metadata['GPS:GPSLatitudeRef'] : null;
+        $image->longitudeRef = isset($metadata['GPS:GPSLongitudeRef']) ? (float)$metadata['GPS:GPSLongitudeRef'] : null;
         $image->longitude = isset($metadata['GPS:GPSLongitude']) ? (float)$metadata['GPS:GPSLongitude'] : null;
         $image->type = isset($metadata['File:FileType']) ? $metadata['File:FileType'] : pathinfo($src,
             PATHINFO_EXTENSION);

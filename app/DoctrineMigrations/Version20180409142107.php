@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20180126071940 extends AbstractMigration
+class Version20180409142107 extends AbstractMigration
 {
     /**
      * @param Schema $schema
@@ -18,7 +18,7 @@ class Version20180126071940 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE Link CHANGE title title LONGTEXT NOT NULL');
+        $this->addSql('ALTER TABLE Image ADD latitudeRef VARCHAR(1) DEFAULT NULL, ADD longitudeRef VARCHAR(1) DEFAULT NULL');
     }
 
     /**
@@ -29,6 +29,6 @@ class Version20180126071940 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE Link CHANGE title title VARCHAR(255) NOT NULL COLLATE utf8mb4_unicode_ci');
+        $this->addSql('ALTER TABLE Image DROP latitudeRef, DROP longitudeRef');
     }
 }
