@@ -42,8 +42,7 @@ class GeocodeCommand extends ContainerAwareCommand
 
         // Get all images that have not been geoparsed and location from EXIF
         $images = $em->getRepository(Image::class)->findBy([
-            'isExifLocation' => true,
-            'geoparsed' => false
+            'isExifLocation' => true
         ]);
 
         $maxRetries = $this->getContainer()->getParameter('maximum_geoparser_retry');

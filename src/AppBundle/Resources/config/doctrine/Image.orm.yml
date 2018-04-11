@@ -42,14 +42,6 @@ AppBundle\Entity\Image:
             precision: 10
             scale: '6'
             nullable: true
-        latitudeRef:
-            type: string
-            length: 1
-            nullable: true
-        longitudeRef:
-            type: string
-            length: 1
-            nullable: true
         address:
             type: string
             length: 255

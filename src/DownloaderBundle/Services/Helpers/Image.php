@@ -165,19 +165,17 @@ class Image
             strpos($metadata['System:Directory'], 'images')) : null;
         $image->width = isset($metadata['File:ImageWidth']) ? $metadata['File:ImageWidth'] : 0;
         $image->height = isset($metadata['File:ImageHeight']) ? $metadata['File:ImageHeight'] : 0;
-        $image->latitude = isset($metadata['GPS:GPSLatitude']) ? (float)$metadata['GPS:GPSLatitude'] : null;
-        $image->latitudeRef = isset($metadata['GPS:GPSLatitudeRef']) ? (float)$metadata['GPS:GPSLatitudeRef'] : null;
-        $image->longitudeRef = isset($metadata['GPS:GPSLongitudeRef']) ? (float)$metadata['GPS:GPSLongitudeRef'] : null;
-        $image->longitude = isset($metadata['GPS:GPSLongitude']) ? (float)$metadata['GPS:GPSLongitude'] : null;
         $image->type = isset($metadata['File:FileType']) ? $metadata['File:FileType'] : pathinfo($src,
             PATHINFO_EXTENSION);
         $image->isExifLocation = !empty($image->latitude) && !empty($image->longitude);
         $image->description = $this->extractImageDescription($element, $image->filename);
-        $image->setMetadata($metadata);
 
         if ($image->isExifLocation) {
             $image->isLocationCorrect = true;
         }
+
+        // Extract location coordinates
+        $this->extractMetadataCoordinates($image, $metadata);
 
         // Generate thumbnail
         $this->generateThumbnail($image);
@@ -188,11 +186,38 @@ class Image
         // Run geocoding
         $this->geocode($image);
 
+        // Set metadata
+        $image->setMetadata($metadata);
+
         // Save to database
         $this->em->persist($image);
         $this->em->flush($image);
 
         return $this;
+    }
+
+    public function extractMetadataCoordinates(\AppBundle\Entity\Image &$image, array $metadata)
+    {
+        $latitude = isset($metadata['GPS:GPSLatitude']) ? (float)$metadata['GPS:GPSLatitude'] : null;
+        $latRef = isset($metadata['GPS:GPSLatitudeRef']) ? strtolower($metadata['GPS:GPSLatitudeRef']) : null;
+        $longitude = isset($metadata['GPS:GPSLongitude']) ? (float)$metadata['GPS:GPSLongitude'] : null;
+        $lngRef = isset($metadata['GPS:GPSLongitudeRef']) ? strtolower($metadata['GPS:GPSLongitudeRef']) : null;
+
+        if ($latitude) {
+            if ($latRef == 's' || $latRef == 'south') {
+                $image->latitude = 0 - $latitude;
+            } else {
+                $image->latitude = $latitude;
+            }
+        }
+
+        if ($longitude) {
+            if ($lngRef == 'w' || $lngRef == 'west') {
+                $image->longitude = 0 - $longitude;
+            } else {
+                $image->longitude = $longitude;
+            }
+        }
     }
 
     /**

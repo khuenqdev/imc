@@ -76,19 +76,7 @@ class Image
      * @var float
      * @Serializer\Expose
      */
-    public $latitudeRef;
-
-    /**
-     * @var float
-     * @Serializer\Expose
-     */
     public $longitude;
-
-    /**
-     * @var float
-     * @Serializer\Expose
-     */
-    public $longitudeRef;
 
     /**
      * @var string
