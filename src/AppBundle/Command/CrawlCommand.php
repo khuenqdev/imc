@@ -76,9 +76,10 @@ class CrawlCommand extends ContainerAwareCommand
 
         // Number of crawl pages
         $noOfPages = 0;
+        $limit = $this->getContainer()->getParameter('crawling_task_limit');
 
         // Main crawler loop
-        while (!$this->queue->isEmpty() && $noOfPages < $this->getContainer()->getParameter('crawling_task_limit')) {
+        while (!$this->queue->isEmpty() && $noOfPages < $limit) {
 
             $link = $this->queue->getNextLink();
             $output->write('Fetch: ' . $link->url);
@@ -106,6 +107,11 @@ class CrawlCommand extends ContainerAwareCommand
             $output->writeln($this->downloader->outputMessages);
 
             $noOfPages++;
+
+            // If the queue is empty but we have not reach the current crawling task's limit, reinitialize it
+            if ($this->queue->isEmpty() && $noOfPages < $limit) {
+                $this->initializeQueue();
+            }
 
             if ($noOfPages % 100 === 0) {
                 $output->writeln("<fg=magenta;options=bold>[Memory Usage] " . $this->memoryUsage(true) . "</>");
@@ -153,6 +159,16 @@ class CrawlCommand extends ContainerAwareCommand
         $this->downloader = $this->getContainer()->get('downloader');
         $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
+        $this->initializeQueue();
+    }
+
+    /**
+     * Initialize the queue
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function initializeQueue()
+    {
         // Get an undone seed
         $this->seed = $this->em->getRepository(Seed::class)->findOneBy(['isDone' => false]);
 
