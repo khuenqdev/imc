@@ -166,18 +166,13 @@ class Image
         $image->height = isset($metadata['File:ImageHeight']) ? $metadata['File:ImageHeight'] : 0;
         $image->type = isset($metadata['File:FileType']) ? $metadata['File:FileType'] : pathinfo($src,
             PATHINFO_EXTENSION);
-        $image->isExifLocation = !empty($image->latitude) && !empty($image->longitude);
         $image->description = $this->extractImageDescription($element, $image->filename);
-
-        if ($image->isExifLocation) {
-            $image->isLocationCorrect = true;
-        }
-
-        // Set metadata
-        $image->setMetadata($metadata);
 
         // Extract location coordinates
         $this->extractMetadataCoordinates($image, $metadata);
+
+        // Set metadata
+        $image->setMetadata($metadata);
 
         // Generate thumbnail
         $this->generateThumbnail($image, $metadata);
@@ -201,6 +196,11 @@ class Image
         $latRef = isset($metadata['GPS:GPSLatitudeRef']) ? strtolower($metadata['GPS:GPSLatitudeRef']) : null;
         $longitude = isset($metadata['GPS:GPSLongitude']) ? (float)$metadata['GPS:GPSLongitude'] : null;
         $lngRef = isset($metadata['GPS:GPSLongitudeRef']) ? strtolower($metadata['GPS:GPSLongitudeRef']) : null;
+
+        if (!is_null($latitude) && !is_null($longitude)) {
+            $image->isExifLocation = true;
+            $image->isLocationCorrect = true;
+        }
 
         if ($latitude) {
             if ($latRef == 's' || $latRef == 'south') {

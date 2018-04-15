@@ -40,9 +40,7 @@ class CorrectLocationCommand extends ContainerAwareCommand
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         // Get all images that have not been geoparsed and location from EXIF
-        $images = $em->getRepository(Image::class)->findBy([
-            'isExifLocation' => true
-        ]);
+        $images = $em->getRepository(Image::class)->findAll();
 
         /** @var Image $image */
         foreach ($images as $image) {
