@@ -200,6 +200,8 @@ class Image
         if (!is_null($latitude) && !is_null($longitude)) {
             $image->isExifLocation = true;
             $image->isLocationCorrect = true;
+        } else {
+            $image->isExifLocation = false;
         }
 
         if ($latitude) {
