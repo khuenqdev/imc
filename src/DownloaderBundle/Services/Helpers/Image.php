@@ -106,11 +106,10 @@ class Image
      * Generate image thumbnail
      *
      * @param \AppBundle\Entity\Image $image
+     * @param $metadata
      */
-    public function generateThumbnail(\AppBundle\Entity\Image &$image)
+    public function generateThumbnail(\AppBundle\Entity\Image &$image, $metadata)
     {
-        $metadata = $image->getMetadata();
-
         if (isset($metadata['SourceFile'])) {
             $filename = $metadata['SourceFile'];
             $thumb = imagecreatetruecolor(100, 75);
@@ -174,20 +173,20 @@ class Image
             $image->isLocationCorrect = true;
         }
 
+        // Set metadata
+        $image->setMetadata($metadata);
+
         // Extract location coordinates
         $this->extractMetadataCoordinates($image, $metadata);
 
         // Generate thumbnail
-        $this->generateThumbnail($image);
+        $this->generateThumbnail($image, $metadata);
 
         // Extract URL domain
         $this->extractDomain($image);
 
         // Run geocoding
         $this->geocode($image);
-
-        // Set metadata
-        $image->setMetadata($metadata);
 
         // Save to database
         $this->em->persist($image);

@@ -153,6 +153,7 @@ class Downloader
             } catch (\Exception $e) {
                 $this->saveLog("[Downloader] downloadImages() at line {$e->getLine()}: {$e->getMessage()}");
                 $this->outputMessages .= "<info>[Downloader] downloadImages() at line {$e->getLine()}: {$e->getMessage()}</info> \n";
+                $this->outputMessages .= $e->getTraceAsString() . "\n";
             }
         }
 
