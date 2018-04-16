@@ -9,6 +9,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Entity\Link;
+use AppBundle\Entity\Report;
 use AppBundle\Entity\Seed;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Downloader;
@@ -17,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CrawlCommand extends ContainerAwareCommand
 {
@@ -128,10 +130,44 @@ class CrawlCommand extends ContainerAwareCommand
             $output->writeln("<info>All children pages of seed link {$this->seed->url} have been crawled!</info>");
         }
 
-        $output->writeln('<comment>Crawling task finished!</comment>');
+        // Add the number of visited links to report entity
+        $this->downloader->getReport()->noOfVisitedLinks = $noOfPages;
+
+        // Add execution time to the report
         $executionEndTime = microtime(true);
         $seconds = $executionEndTime - $executionStartTime;
-        $output->writeln("<comment>Total execution time: $seconds seconds</comment>");
+        $this->downloader->getReport()->executionTime = $seconds;
+        $this->downloader->getReport()->endAt = new \DateTime();
+
+        // Print out crawling task report and save report to database
+        $this->printReport($input, $output, $this->downloader->getReport());
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param Report $report
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function printReport(InputInterface $input, OutputInterface $output, Report $report)
+    {
+        $reportStyle = new SymfonyStyle($input, $output);
+
+        // Report finished crawling task statistics
+        $reportStyle->title("CRAWLING TASK REPORT");
+        $reportStyle->table([], [
+            ["Start At", "{$report->startAt->format('Y-m-d H:i:s')}"],
+            ["End At", "{$report->endAt->format('Y-m-d H:i:s')}"],
+            ["Total execution time", "{$report->executionTime} seconds"],
+            ["Discovered links", "{$report->noOfLinks}"],
+            ["Visited links", "{$report->noOfVisitedLinks}"],
+            ["Discovered images", "{$report->noOfImages}"],
+            ["Geotagged Images", "{$report->noOfExifImages}"],
+        ]);
+
+        // Save report
+        $output->writeln("<comment>Saving report...</comment>");
+        $this->saveReport($report);
     }
 
     /**
@@ -219,5 +255,16 @@ class CrawlCommand extends ContainerAwareCommand
         $this->em->refresh($link);
 
         return $link;
+    }
+
+    /**
+     * @param Report $report
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function saveReport(Report $report)
+    {
+        $this->em->persist($report);
+        $this->em->flush($report);
+        $this->em->refresh($report);
     }
 }

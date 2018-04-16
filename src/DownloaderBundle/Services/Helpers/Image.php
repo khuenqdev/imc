@@ -54,16 +54,18 @@ class Image
      *
      * @param $pageUrl
      * @param DomCrawlerImage $element
-     * @return Image
+     * @return \AppBundle\Entity\Image|null
      * @throws \Exception
      */
     public function download($pageUrl, DomCrawlerImage $element)
     {
+        $image = null;
+
         $src = strtok($element->getUri(), '?');
 
         // Avoid duplication of image
         if ($this->em->getRepository(\AppBundle\Entity\Image::class)->findOneBy(['src' => $src])) {
-            return $this;
+            return $image;
         }
 
         if ($saveDir = $this->getDirectory($pageUrl)) {
@@ -87,19 +89,20 @@ class Image
 
                 if ($this->isValid($imageFilePath)) {
                     $metadata = $this->getMetadata($imageFilePath);
-                    $this->saveImage($element->getNode(), $src, $metadata);
+                    $image = $this->saveImage($element->getNode(), $src, $metadata);
                 } else {
                     unlink($imageFilePath);
                 }
 
             } catch (\Exception $e) {
-                $this->saveLog("[ImageHelper] At line {$e->getLine()}: {$e->getMessage()}");
+                $this->saveLog("[ImageHelper] {$e->getMessage()}");
+                $this->saveLog($e->getTraceAsString());
                 unlink($imageFilePath);
                 throw $e;
             }
         }
 
-        return $this;
+        return $image;
     }
 
     /**
@@ -151,7 +154,7 @@ class Image
      * @param \DOMElement $element
      * @param $src
      * @param array $metadata
-     * @return $this
+     * @return \AppBundle\Entity\Image
      * @throws \Exception
      */
     protected function saveImage(\DOMElement $element, $src, array $metadata = [])
@@ -187,7 +190,7 @@ class Image
         $this->em->persist($image);
         $this->em->flush($image);
 
-        return $this;
+        return $image;
     }
 
     public function extractMetadataCoordinates(\AppBundle\Entity\Image &$image, array $metadata)

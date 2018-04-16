@@ -9,6 +9,7 @@
 namespace DownloaderBundle;
 
 use AppBundle\Entity\Link;
+use AppBundle\Entity\Report;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Services\Helpers;
 use GuzzleHttp\Client as HttpClient;
@@ -40,6 +41,11 @@ class Downloader
      * @var Logger
      */
     protected $logger;
+
+    /**
+     * @var Report
+     */
+    protected $report;
 
     /**
      * List of HTML elements contain texts
@@ -76,6 +82,7 @@ class Downloader
         $this->queue = $queue;
         $this->helpers = $helpers;
         $this->logger = $logger;
+        $this->report = new Report();
         $this->client = new HttpClient([
             'timeout' => 3,
             'allow_redirects' => false,
@@ -107,7 +114,8 @@ class Downloader
                 $this->fetchContent($dom);
             }
         } catch (\Exception $e) {
-            $this->saveLog("[Downloader] At line {$e->getLine()}: {$e->getMessage()}");
+            $this->saveLog("[Downloader] {$e->getMessage()}");
+            $this->saveLog($e->getTraceAsString());
             throw $e;
         }
     }
@@ -137,6 +145,16 @@ class Downloader
     }
 
     /**
+     * Get download report
+     *
+     * @return Report
+     */
+    public function getReport()
+    {
+        return $this->report;
+    }
+
+    /**
      * Download images from the DOM content
      *
      * @param DomCrawler $dom
@@ -145,17 +163,31 @@ class Downloader
     protected function downloadImages(DomCrawler $dom)
     {
         $imgElements = $dom->filter('img')->images();
+        $noOfImages = 0;
+        $noOfExifImages = 0;
 
         /** @var DomCrawlerImage $image */
         foreach ($imgElements as $image) {
             try {
-                $this->helpers->image->download($dom->getUri(), $image);
+                $downloadedImage = $this->helpers->image->download($dom->getUri(), $image);
+
+                if (!is_null($downloadedImage)) {
+                    if ($downloadedImage->isExifLocation) {
+                        $noOfExifImages++;
+                    } else {
+                        $noOfImages++;
+                    }
+                }
+
             } catch (\Exception $e) {
-                $this->saveLog("[Downloader] downloadImages() at line {$e->getLine()}: {$e->getMessage()}");
-                $this->outputMessages .= "<info>[Downloader] downloadImages() at line {$e->getLine()}: {$e->getMessage()}</info> \n";
-                $this->outputMessages .= $e->getTraceAsString() . "\n";
+                $this->saveLog("[Downloader] downloadImages(): {$e->getLine()}: {$e->getMessage()}");
+                $this->saveLog($e->getTraceAsString());
+                $this->outputMessages .= "<info>[Downloader] downloadImages(): {$e->getMessage()}</info> \n";
             }
         }
+
+        $this->report->noOfImages += $noOfImages;
+        $this->report->noOfExifImages += $noOfExifImages;
 
         return $this;
     }
@@ -171,6 +203,7 @@ class Downloader
         // Extract page text, used for relevance calculation
         $pageText = $this->extractText($dom);
         $linkElements = $dom->filter('a')->links();
+        $noOfLinks = 0;
 
         /** @var DomCrawlerLink $domLink */
         foreach ($linkElements as $domLink) {
@@ -182,13 +215,16 @@ class Downloader
 
                 // Ignore completely irrelevant links
                 if ($relevance == 0) {
-                    return $this;
+                    continue;
                 }
 
                 // Create a database link entity if not exist and add new link to the queue
                 $this->saveLinkToDatabase($linkUrl, $linkTitle, $relevance);
+                $noOfLinks++;
             }
         }
+
+        $this->report->noOfLinks += $noOfLinks;
 
         return $this;
     }
@@ -213,8 +249,9 @@ class Downloader
                 $this->em->refresh($link);
                 $this->queue->addLink($link);
             } catch (\Exception $e) {
-                $this->saveLog("[Downloader] saveLinkToDatabase() at line {$e->getLine()}: {$e->getMessage()}");
-                $this->outputMessages .= "<info>[Downloader] saveLinkToDatabase() at line {$e->getLine()}: {$e->getMessage()}</info>\n";
+                $this->saveLog("[Downloader] saveLinkToDatabase(): {$e->getLine()}: {$e->getMessage()}");
+                $this->saveLog($e->getTraceAsString());
+                $this->outputMessages .= "<info>[Downloader] saveLinkToDatabase(): {$e->getMessage()}</info>\n";
             }
         }
     }

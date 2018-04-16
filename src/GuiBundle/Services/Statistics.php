@@ -5,6 +5,7 @@ namespace GuiBundle\Services;
 
 use AppBundle\Entity\Image;
 use AppBundle\Entity\Link;
+use AppBundle\Entity\Report;
 use Doctrine\ORM\EntityManager;
 
 class Statistics
@@ -83,6 +84,7 @@ class Statistics
     {
         $linkRepo = $this->em->getRepository(Link::class);
         $imageRepo = $this->em->getRepository(Image::class);
+        $reportRepo = $this->em->getRepository(Report::class);
 
         // If no filter specified, get all statistics
         if (empty($filters)) {

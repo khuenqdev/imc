@@ -1,0 +1,35 @@
+AppBundle\Entity\Report:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\ReportRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        startAt:
+            type: datetime
+            column: start_at
+        endAt:
+            type: datetime
+            column: end_at
+        executionTime:
+            type: decimal
+            precision: 10
+            scale: '2'
+            column: execution_time
+        noOfLinks:
+            type: integer
+            column: no_of_links
+        noOfVisitedLinks:
+            type: integer
+            column: no_of_visited_links
+        noOfImages:
+            type: integer
+            column: no_of_images
+        noOfExifImages:
+            type: integer
+            column: no_of_exif_images
+    lifecycleCallbacks: {  }
