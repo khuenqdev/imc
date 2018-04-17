@@ -16,6 +16,12 @@ gui_address_statistics:
     options:
         expose: true
 
+gui_geoparsing_statistics:
+    path: /statistics_geoparsing
+    defaults: { _controller: GuiBundle:Default:geoparsingStats }
+    options:
+        expose: true
+
 gui_gallery:
     prefix: /gallery
     resource: "@GuiBundle/Resources/config/routing/gallery.yml"

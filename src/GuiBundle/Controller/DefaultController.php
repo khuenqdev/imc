@@ -22,7 +22,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * Statistics
+     * General Statistics
      *
      * @return Response
      */
@@ -33,13 +33,14 @@ class DefaultController extends Controller
             $this->get('gui.statistics')->getStatistics([
                 'general' => 1,
                 'geoparsing' => 1,
-                'domain' => 1
+                'domain' => 1,
+                'execution_times' => 1
             ])
         );
     }
 
     /**
-     * Statistics
+     * Address Statistics
      *
      * @return Response
      */
@@ -48,6 +49,19 @@ class DefaultController extends Controller
         return $this->render(
             '@Gui/gui/statistics_addresses.html.twig',
             $this->get('gui.statistics')->getStatistics(['address' => 1])
+        );
+    }
+
+    /**
+     * Geoparsing Statistics
+     *
+     * @return Response
+     */
+    public function geoparsingStatsAction()
+    {
+        return $this->render(
+            '@Gui/gui/statistics_geoparsing.html.twig',
+            $this->get('gui.statistics')->getStatistics(['geoparsing' => 1])
         );
     }
 

@@ -14,7 +14,7 @@ class ReportRepository extends \Doctrine\ORM\EntityRepository
 {
     /**
      * Get average execution time
-     *
+     * @deprecated Deprecated since building average query for a subset of data is hard with QueryBuilder
      * @return int|mixed
      */
     public function getAverageExecutionTime()
@@ -44,7 +44,8 @@ class ReportRepository extends \Doctrine\ORM\EntityRepository
     {
         $qb = $this->createQueryBuilder('r');
 
-        $qb->select('r.startAt')
+        $qb->select('r.id')
+            ->addSelect('r.startAt')
             ->addSelect('r.executionTime');
         $qb->orderBy('r.startAt', 'DESC');
 

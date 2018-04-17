@@ -1,0 +1,46 @@
+{% extends '@Gui/base.html.twig' %}
+{% set active_menu = 'stats' %}
+{% block title %}General Statistics{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col s12 m6">
+            <div class="statistics">
+                <h5>Geoparsing Statistics</h5>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Successful geoparsed</b>
+                    </div>
+                    <div class="col s3">{{ successful_geoparsed_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Unsuccessful geoparsed</b>
+                    </div>
+                    <div class="col s3">{{ unsuccessful_geoparsed_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Correct</b>
+                    </div>
+                    <div class="col s3">{{ correct_location_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Incorrect</b>
+                    </div>
+                    <div class="col s3">{{ incorrect_location_images }}</div>
+                </div>
+                <div class="row">
+                    <div class="col s9">
+                        <b>Unverified</b>
+                    </div>
+                    <div class="col s3">{{ unverified_location_images }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
