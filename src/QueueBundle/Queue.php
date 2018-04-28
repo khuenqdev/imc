@@ -10,6 +10,7 @@ namespace QueueBundle;
 
 use AppBundle\Entity\Link;
 use Doctrine\ORM\EntityManager;
+use DownloaderBundle\Downloader;
 
 class Queue
 {
@@ -41,7 +42,7 @@ class Queue
     }
 
     /**
-     * Add link to queue
+     * Add link to queue (according to priority)
      *
      * @param Link $link
      * @return $this
@@ -79,7 +80,49 @@ class Queue
     }
 
     /**
-     * Get next link out of the queue
+     * Alias of enqueue() method
+     *
+     * @param Link $link
+     * @return $this
+     */
+    public function addLinkToBottom(Link $link)
+    {
+        return $this->enqueue($link);
+    }
+
+    /**
+     * Alias of topqueue() method
+     *
+     * @param Link $link
+     * @return $this
+     */
+    public function addLinkToTop(Link $link)
+    {
+        return $this->topqueue($link);
+    }
+
+    /**
+     * Alias of dequeue() method
+     *
+     * @return mixed
+     */
+    public function getTopLink()
+    {
+        return $this->dequeue();
+    }
+
+    /**
+     * Alias of tailqueue() method
+     *
+     * @return mixed
+     */
+    public function getBottomLink()
+    {
+        return $this->tailqueue();
+    }
+
+    /**
+     * Get next link out of the queue (when use the queue as priority queue)
      *
      * @return null|Link
      */
@@ -107,7 +150,7 @@ class Queue
     }
 
     /**
-     * Get first link
+     * Get first link (no removal of link from the top of the queue)
      *
      * @return mixed
      */
@@ -117,13 +160,72 @@ class Queue
     }
 
     /**
-     * Get last link
+     * Get last link (no removal of link from the bottom of the queue)
      *
      * @return mixed
      */
     public function getLastLink()
     {
         return end($this->links);
+    }
+
+    /**
+     * Dequeue (when use the queue as non-priority queue)
+     *
+     * @return mixed
+     */
+    public function dequeue()
+    {
+        return array_shift($this->links);
+    }
+
+    /**
+     * Enqueue (when use the queue as non-priority queue)
+     *
+     * @param Link $link
+     * @return Queue
+     */
+    public function enqueue(Link $link)
+    {
+        // 0. If the link already exist in queue or it has been visited or it is irrelevant then ignore
+        if ($this->hasLink($link)) {
+            return $this;
+        }
+
+        // 1. Place the link at the end of the heap
+        $this->links[] = $link;
+        $this->hash[] = hash('sha256', $link->url);
+
+        return $this;
+    }
+
+    /**
+     * Remove and return the top of the queue (when use the queue as non-priority queue)
+     *
+     * @param Link $link
+     * @return $this
+     */
+    public function topqueue(Link $link)
+    {
+        // If the link already exist in queue or it has been visited or it is irrelevant then ignore
+        if ($this->hasLink($link)) {
+            return $this;
+        }
+
+        array_unshift($this->links, $link);
+        $this->hash[] = hash('sha256', $link->url);
+
+        return $this;
+    }
+
+    /**
+     * Remove and return the last link of the queue (when use the queue as non-priority queue)
+     *
+     * @return mixed
+     */
+    public function tailqueue()
+    {
+        return array_pop($this->links);
     }
 
     /**

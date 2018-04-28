@@ -23,6 +23,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Downloader
 {
+    const ALGO_DFS = 'dfs'; // depth-first search
+    const ALGO_BFS = 'bfs'; // breadth-first search
+    const ALGO_BEFS = 'befs'; // best-first search
+
     /**
      * @var EntityManager
      */
@@ -53,7 +57,7 @@ class Downloader
      *
      * @var array
      */
-    private $elementsContainText = [
+    protected $elementsContainText = [
         'meta[name=description]',
         'meta[name=keywords]',
         'title',
@@ -67,14 +71,21 @@ class Downloader
     ];
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * Crawling algorithm, has an impact on how a link is put on the queue
+     *
+     * @var string
+     */
+    protected $algorithm = self::ALGO_BEFS;
+
+    /**
      * @var string
      */
     public $outputMessages = "";
-
-    /**
-     * @var ContainerInterface
-     */
-    public $container;
 
     /**
      * Downloader constructor.
@@ -164,6 +175,24 @@ class Downloader
     }
 
     /**
+     * Set algorithm
+     *
+     * @param $algorithm
+     * @return $this
+     * @throws \Exception
+     */
+    public function setAlgorithm($algorithm)
+    {
+        if ($algorithm !== self::ALGO_DFS && $algorithm !== self::ALGO_BFS && $algorithm !== self::ALGO_BEFS) {
+            throw new \Exception('Invalid algorithm supplied for the crawler!');
+        }
+
+        $this->algorithm = $algorithm;
+
+        return $this;
+    }
+
+    /**
      * Download images from the DOM content
      *
      * @param DomCrawler $dom
@@ -214,13 +243,23 @@ class Downloader
         $linkElements = $dom->filter('a')->links();
         $noOfLinks = 0;
 
+        // If this is a depth-first search we sort the link elements in reverse order before processing
+        if ($this->algorithm === self::ALGO_DFS) {
+            krsort($linkElements);
+        }
+
         /** @var DomCrawlerLink $domLink */
         foreach ($linkElements as $domLink) {
             $linkUrl = $this->helpers->url->parse($domLink->getUri(), $dom->getUri());
 
             if (!empty($linkUrl)) {
                 $linkTitle = trim($domLink->getNode()->textContent);
-                $relevance = $this->calculateRelevance($dom->getUri(), $linkUrl, $pageText, $linkTitle);
+
+                if ($this->algorithm === self::ALGO_BEFS) {
+                    $relevance = $this->calculateRelevance($dom->getUri(), $linkUrl, $pageText, $linkTitle);
+                } else {
+                    $relevance = 1;
+                }
 
                 // Ignore completely irrelevant links
                 if ($relevance == 0) {
@@ -256,7 +295,18 @@ class Downloader
                 $this->em->persist($link);
                 $this->em->flush($link);
                 $this->em->refresh($link);
-                $this->queue->addLink($link);
+
+                switch ($this->algorithm) {
+                    case self::ALGO_BFS:
+                        $this->queue->addLinkToBottom($link);
+                        break;
+                    case self::ALGO_DFS:
+                        $this->queue->addLinkToTop($link);
+                        break;
+                    default:
+                        $this->queue->addLink($link); // Follow priority queue rule
+                        break;
+                }
             } catch (\Exception $e) {
                 $this->saveLog("[Downloader] saveLinkToDatabase(): {$e->getLine()}: {$e->getMessage()}");
                 $this->saveLog($e->getTraceAsString());

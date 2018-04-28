@@ -40,6 +40,7 @@ parameters:
     secondary_geoparser_api_key: ~
 
     # Other configurations
+    algorithm: befs # Crawling algorithm. Accepted values: dfs, bfs, befs
     http_verify_ssl: false
     allowed_image_extensions:
         - jpg
