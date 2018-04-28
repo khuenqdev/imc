@@ -3,10 +3,10 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
 parameters:
     database_host: 127.0.0.1
-    database_port: ~
-    database_name: symfony
-    database_user: root
-    database_password: ~
+    database_port: 3306
+    database_name: imc
+    database_user: homestead
+    database_password: secret
     # You should uncomment this if you want to use pdo_sqlite
     #database_path: "%kernel.root_dir%/data.db3"
 
@@ -48,7 +48,8 @@ parameters:
         - svg
     exif_tool_path: '%kernel.root_dir%/../exiftool/'
     server_memory_limit: '6G'
-    crawling_task_limit: 5000
+    crawling_task_limit: 1000
     maximum_geoparser_retry: 3
     allowed_aspect_ratios: [1, 1.25, 0.8, 1.33, 0.75, 1.5, 0.67, 1.67, 0.6, 1.78, 0.56, 3, 0.33]
     non_rep_image_keywords: ["logo", "banner", "header", "footer", "button", "free", "adserver", "advertisement", "ads", "now", "buy", "join", "click", "affiliate", "adv", "hits", "counter", "sprite"]
+    banned_hosts: ["www.facebook.com", "www.instagram.com", "www.pinterest.com", "twitter.com", "www.reddit.com", "ask.fm", "www.tumblr.com", "plus.google.com", "www.meetup.com", "qzone.qq.com", "weibo.com", "ok.ru", "vk.com"]

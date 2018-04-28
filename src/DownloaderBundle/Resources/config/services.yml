@@ -1,7 +1,7 @@
 services:
     downloader:
         class: DownloaderBundle\Downloader
-        arguments: ["@doctrine.orm.entity_manager", "@queue", "@helpers", "@logger"]
+        arguments: ["@doctrine.orm.entity_manager", "@queue", "@helpers", "@logger", "@service_container"]
         tags:
             - { name: monolog.logger, channel: crawler }
 

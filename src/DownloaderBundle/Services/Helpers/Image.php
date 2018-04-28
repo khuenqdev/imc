@@ -87,12 +87,8 @@ class Image
 
                 $client->get($src, ['sink' => $imageFilePath]);
 
-                if ($this->isValid($imageFilePath)) {
-                    $metadata = $this->getMetadata($imageFilePath);
-                    $image = $this->saveImage($element->getNode(), $src, $metadata);
-                } else {
-                    unlink($imageFilePath);
-                }
+                $metadata = $this->getMetadata($imageFilePath);
+                $image = $this->saveImage($element->getNode(), $imageFilePath, $src, $metadata);
 
             } catch (\Exception $e) {
                 $this->saveLog("[ImageHelper] {$e->getMessage()}");
@@ -152,12 +148,13 @@ class Image
      * Save image entity
      *
      * @param \DOMElement $element
+     * @param $imageFilePath
      * @param $src
      * @param array $metadata
      * @return \AppBundle\Entity\Image
-     * @throws \Exception
+     * @throws OptimisticLockException
      */
-    protected function saveImage(\DOMElement $element, $src, array $metadata = [])
+    protected function saveImage(\DOMElement $element, $imageFilePath, $src, array $metadata = [])
     {
         $image = new \AppBundle\Entity\Image($src);
         $image->alt = $element->getAttribute('alt');
@@ -186,9 +183,14 @@ class Image
         // Run geocoding
         $this->geocode($image);
 
-        // Save to database
-        $this->em->persist($image);
-        $this->em->flush($image);
+        if ($this->isValid($image)) {
+            // Save to database
+            $this->em->persist($image);
+            $this->em->flush($image);
+        } else {
+            // Remove physical file
+            unlink($imageFilePath);
+        }
 
         return $image;
     }
@@ -290,12 +292,12 @@ class Image
         $prev = $element->previousSibling;
         $next = $element->nextSibling;
 
-        if (get_class($prev) === \DOMElement::class && $prev->tagName !== 'script') {
+        if (!is_null($prev) && get_class($prev) === \DOMElement::class && $prev->tagName !== 'script') {
             $textContent = $prev->textContent;
             $description .= " " . trim(strip_tags($textContent));
         }
 
-        if (get_class($next) === \DOMElement::class && $next->tagName !== 'script') {
+        if (!is_null($next) && get_class($next) === \DOMElement::class && $next->tagName !== 'script') {
             $textContent = $next->textContent;
             $description .= " " . trim(strip_tags($textContent));
         }
@@ -354,15 +356,17 @@ class Image
     /**
      * Check whether the image is valid
      *
-     * @param $imageFilePath
+     * @param \AppBundle\Entity\Image $image
      * @return bool
      */
-    protected function isValid($imageFilePath)
+    protected function isValid(\AppBundle\Entity\Image $image)
     {
-        list($width, $height) = @getimagesize($imageFilePath);
+        // Check image ratio against standard aspect ratios
+        $width = $image->width;
+        $height = $image->height;
 
         if (!$width || !$height) {
-            $this->saveLog("[ImageHelper] Invalid aspect ratio for image {$imageFilePath}. The image dimension is {$width} x {$height}.");
+            $this->saveLog("[ImageHelper] Image resolutions must not be empty!");
             return false;
         }
 
@@ -374,8 +378,17 @@ class Image
             && $height < $this->getParameter('image_min_height')
             && in_array($ratio, $allowedRatios)
         ) {
-            $this->saveLog("[ImageHelper] Invalid aspect ratio for image {$imageFilePath}. The image dimension is {$width} x {$height}.");
+            $this->saveLog("[ImageHelper] Invalid aspect ratio. The image resolution is {$width} x {$height}.");
             return false;
+        }
+
+        // Check if image description contains invalid keywords
+        $nonRepImageKeywords = $this->getParameter('non_rep_image_keywords');
+
+        foreach($nonRepImageKeywords as $keyword) {
+            if (preg_match('/('. $keyword . ')/i', $image->description)) {
+                return false;
+            }
         }
 
         return true;

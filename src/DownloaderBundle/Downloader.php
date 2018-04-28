@@ -15,6 +15,7 @@ use DownloaderBundle\Services\Helpers;
 use GuzzleHttp\Client as HttpClient;
 use Monolog\Logger;
 use QueueBundle\Queue;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 use Symfony\Component\DomCrawler\Image as DomCrawlerImage;
 use Symfony\Component\DomCrawler\Link as DomCrawlerLink;
@@ -71,18 +72,26 @@ class Downloader
     public $outputMessages = "";
 
     /**
+     * @var ContainerInterface
+     */
+    public $container;
+
+    /**
      * Downloader constructor.
      * @param EntityManager $em
      * @param Queue $queue
      * @param Helpers $helpers
+     * @param Logger $logger
+     * @param ContainerInterface $container
      */
-    public function __construct(EntityManager $em, Queue $queue, Helpers $helpers, Logger $logger)
+    public function __construct(EntityManager $em, Queue $queue, Helpers $helpers, Logger $logger, ContainerInterface $container)
     {
         $this->em = $em;
         $this->queue = $queue;
         $this->helpers = $helpers;
         $this->logger = $logger;
         $this->report = new Report();
+        $this->container = $container;
         $this->client = new HttpClient([
             'timeout' => 3,
             'allow_redirects' => false,
@@ -289,14 +298,24 @@ class Downloader
      */
     protected function calculateRelevance($pageUrl, $linkUrl, $pageText, $linkTitle)
     {
-        $score = 0;
+        // Get a list of banned hosts (mostly social networks)
+        $bannedHosts = $this->container->getParameter('banned_hosts');
+        $linkHost = parse_url($linkUrl, PHP_URL_HOST);
 
-        if (parse_url($pageUrl, PHP_URL_HOST) === parse_url($linkUrl, PHP_URL_HOST)) {
+        // If the host of the link is in the list of banned host, we automatically assume it is irrelevant
+        if (in_array($linkHost, $bannedHosts)) {
+            return 0;
+        }
+
+        $score = 0;
+        $pageHost = parse_url($pageUrl, PHP_URL_HOST);
+
+        if ($pageHost === $linkHost) {
             $score++;
         }
 
         $linkTitleKeywords = $this->helpers->keyword->extract($linkTitle);
-        $criteria = count($linkTitleKeywords) + 1;
+        $criteria = count($linkTitleKeywords) + 1; // Number of keywords, plus 1 from host matching
 
         foreach ($linkTitleKeywords as $keyword) {
             $tf = $this->helpers->keyword->countWordOccurrence($keyword, $pageText);
