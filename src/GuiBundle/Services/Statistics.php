@@ -87,6 +87,7 @@ class Statistics
      *
      * @param array $filters
      * @return array
+     * @throws \Doctrine\ORM\ORMException
      */
     public function getStatistics(array $filters = [])
     {
@@ -227,6 +228,7 @@ class Statistics
      * plus the average execution times of all crawling task
      *
      * @return array
+     * @throws \Doctrine\ORM\ORMException
      */
     public function getExecutionTimeReportStatistics()
     {
@@ -249,7 +251,9 @@ class Statistics
             $executionTimes[$idx]['startAt'] = $startAt->format('d/m/Y');
         }
 
-        $averageExecutionTime /= count($executionTimes);
+        if ($noOfExecTimes = count($executionTimes)) {
+            $averageExecutionTime /= $noOfExecTimes;
+        }
 
         return [
             'average_execution_time' => $averageExecutionTime,
