@@ -103,6 +103,7 @@ class CrawlCommand extends ContainerAwareCommand
                 $output->writeln(' <info>SUCCESS</info>');
             } catch (\Exception $e) {
                 $output->writeln(' <fail>FAILED</fail>');
+                $output->writeln($e->getMessage());
             }
 
             // If there exists any output messages from the downloader, show it to the console
