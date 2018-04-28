@@ -202,6 +202,7 @@ class CrawlCommand extends ContainerAwareCommand
      * Initialize the queue
      *
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      */
     private function initializeQueue()
     {
