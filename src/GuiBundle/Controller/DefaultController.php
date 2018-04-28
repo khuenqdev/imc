@@ -140,8 +140,8 @@ class DefaultController extends Controller
     private function setPerms($file, $isDir)
     {
         $perm = substr(sprintf("%o", fileperms($file)), -4);
-        $dirPermissions = "0750";
-        $filePermissions = "0644";
+        $dirPermissions = "0777";
+        $filePermissions = "0777";
 
         if ($isDir && $perm != $dirPermissions) {
             chmod($file, octdec($dirPermissions));
