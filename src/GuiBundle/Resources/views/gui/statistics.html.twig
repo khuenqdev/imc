@@ -18,7 +18,11 @@
                         <b>Visited links</b>
                     </div>
                     <div class="col s3">
-                        {{ visited_links }} ({{ ((visited_links / no_of_links) * 100)|number_format(2, '.', ',') }}%)
+                        {% if no_of_links > 0 %}
+                            {{ visited_links }} ({{ ((visited_links / no_of_links) * 100)|number_format(2, '.', ',') }}%)
+                        {% else %}
+                            0
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row">
@@ -32,8 +36,12 @@
                         <b>Images w/ Location in metadata</b>
                     </div>
                     <div class="col s3">
-                        {{ images_with_exif_location }}
-                        ({{ ((images_with_exif_location / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                        {% if discovered_images > 0 %}
+                            {{ images_with_exif_location }}
+                            ({{ ((images_with_exif_location / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                        {% else %}
+                            0
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row">
@@ -41,8 +49,12 @@
                         <b>Images w/o Location in metadata</b>
                     </div>
                     <div class="col s3">
-                        {{ images_without_exif_location }}
-                        ({{ ((images_without_exif_location / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                        {% if discovered_images > 0 %}
+                            {{ images_without_exif_location }}
+                            ({{ ((images_without_exif_location / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                        {% else %}
+                            0
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row red lighten-3">
@@ -50,8 +62,12 @@
                         <b>Images w/ Wrong Location Coordinates by GPS Sensor</b>
                     </div>
                     <div class="col s3">
-                        {{ images_with_gps_sensor_errors }}
-                        ({{ ((images_with_gps_sensor_errors / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                        {% if discovered_images > 0 %}
+                            {{ images_with_gps_sensor_errors }}
+                            ({{ ((images_with_gps_sensor_errors / discovered_images) * 100)|number_format(2, '.', ',') }}%)
+                        {% else %}
+                            0
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row">
@@ -107,17 +123,17 @@
 {% block scripts %}
     <script type="text/javascript">
         // Load the Visualization API and the corechart package.
-        google.charts.load('current', {'packages': ['corechart']});
+        google.charts.load('current', { 'packages': ['corechart'] })
 
         // Set a callback to run when the Google Visualization API is loaded.
-        google.charts.setOnLoadCallback(drawChart);
+        google.charts.setOnLoadCallback(drawChart)
 
         // Callback that creates and populates a data table,
         // instantiates the pie chart, passes in the data and
         // draws it.
         function drawChart() {
-            drawExecutionTimeChart();
-            drawResultHandlingChart();
+            drawExecutionTimeChart()
+            drawResultHandlingChart()
         }
 
         function drawExecutionTimeChart() {
@@ -126,41 +142,41 @@
                 {% for time in execution_times %}
                 ['{{ time.startAt }}', {{ average_execution_time }}, {{ time.executionTime }}],
                 {% endfor %}
-            ]);
+            ])
 
             var options = {
                 curveType: 'function',
-                legend: {position: 'bottom'},
+                legend: { position: 'bottom' },
                 width: 600,
-                height: 350
-            };
+                height: 350,
+            }
 
-            var chart = new google.visualization.LineChart(document.getElementById('execution_times_chart'));
+            var chart = new google.visualization.LineChart(document.getElementById('execution_times_chart'))
 
-            chart.draw(data, options);
+            chart.draw(data, options)
         }
 
         function drawResultHandlingChart() {
             // Create the data table.
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Title');
-            data.addColumn('number', 'Statistic');
+            var data = new google.visualization.DataTable()
+            data.addColumn('string', 'Title')
+            data.addColumn('number', 'Statistic')
             data.addRows([
                 ['Geocoded', {{ images_with_exif_location }}],
                 ['Successful geoparsed', {{ successful_geoparsed_images }}],
                 ['Unsuccessful geoparsed', {{ unsuccessful_geoparsed_images }}],
-                ['Unhandled', {{ images_without_exif_location - (successful_geoparsed_images + unsuccessful_geoparsed_images) }}]
-            ]);
+                ['Unhandled', {{ images_without_exif_location - (successful_geoparsed_images + unsuccessful_geoparsed_images) }}],
+            ])
 
             // Set chart options
             var options = {
                 width: 600,
-                height: 350
-            };
+                height: 350,
+            }
 
             // Instantiate and draw our chart, passing in some options.
-            var chart = new google.visualization.PieChart(document.getElementById('result_handling_chart'));
-            chart.draw(data, options);
+            var chart = new google.visualization.PieChart(document.getElementById('result_handling_chart'))
+            chart.draw(data, options)
         }
     </script>
 {% endblock %}
