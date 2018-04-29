@@ -151,7 +151,7 @@ class Image
      * @param $imageFilePath
      * @param $src
      * @param array $metadata
-     * @return \AppBundle\Entity\Image
+     * @return \AppBundle\Entity\Image|null
      * @throws OptimisticLockException
      */
     protected function saveImage(\DOMElement $element, $imageFilePath, $src, array $metadata = [])
@@ -190,6 +190,7 @@ class Image
         } else {
             // Remove physical file
             unlink($imageFilePath);
+            return null;
         }
 
         return $image;
