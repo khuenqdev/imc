@@ -258,7 +258,8 @@ class Downloader
                 if ($this->algorithm === self::ALGO_BEFS) {
                     $relevance = $this->calculateRelevance($dom->getUri(), $linkUrl, $pageText, $linkTitle);
                 } else {
-                    $relevance = 1;
+                    $linkHost = parse_url($linkUrl, PHP_URL_HOST);
+                    $relevance = (int) !$this->isHostBanned($linkHost);
                 }
 
                 // Ignore completely irrelevant links
@@ -349,11 +350,10 @@ class Downloader
     protected function calculateRelevance($pageUrl, $linkUrl, $pageText, $linkTitle)
     {
         // Get a list of banned hosts (mostly social networks)
-        $bannedHosts = $this->container->getParameter('banned_hosts');
         $linkHost = parse_url($linkUrl, PHP_URL_HOST);
 
         // If the host of the link is in the list of banned host, we automatically assume it is irrelevant
-        if (in_array($linkHost, $bannedHosts)) {
+        if ($this->isHostBanned($linkHost)) {
             return 0;
         }
 
@@ -376,6 +376,22 @@ class Downloader
         }
 
         return (float)$score / $criteria;
+    }
+
+    /**
+     * Check if a host is banned
+     *
+     * @param $host
+     * @return bool
+     */
+    protected function isHostBanned($host) {
+        $bannedHosts = $this->container->getParameter('banned_hosts');
+
+        if (in_array($host, $bannedHosts)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
