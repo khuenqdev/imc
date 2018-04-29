@@ -1,33 +1,5 @@
 (function ($) {
     $(document).ready(function () {
-        $searchInput = $('#search-input');
-
-        $searchInput.on('keyup', _.debounce(function () {
-            var search = $(this).val();
-            var params = {
-                'offset': 0,
-                'limit': 1,
-                'search': search,
-                'only_with_location': 1,
-                'only_location_from_exif': 1
-            };
-
-            var url = Routing.generate('list_images') + '?' + $.param(params);
-
-            $.getJSON(url, function (data) {
-                var image = data[0];
-
-                if (typeof image !== 'undefined') {
-                    map.setCenter({
-                        lat: image.latitude,
-                        lng: image.longitude
-                    });
-
-                    map.setZoom(4);
-                }
-            });
-        }, 300));
-
         $('.modal').modal({
             dismissible: true, // Modal can be dismissed by clicking outside of the modal
             inDuration: 300, // Transition in duration
@@ -101,14 +73,6 @@ function addMarker(position) {
     markers.push(marker);
 }
 
-function clearOldMarkers() {
-    for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(null);
-    }
-
-    markers = [];
-}
-
 function buildImageContent(data) {
     var itemHtml = "";
 
@@ -174,16 +138,6 @@ function openImageWindow(position) {
     });
 }
 
-function getImageInfoHtml(imageId) {
-    $.ajax({
-        url: Routing.generate('gallery_view', {id: imageId}, false),
-        dataType: 'html',
-        success: function (data) {
-            $('#image-info').html(data);
-        }
-    });
-}
-
 /**
  * Initialize map data (for image location/homepage)
  */
@@ -203,6 +157,34 @@ function initMap() {
     jQuery(window).resize(function(){
         jQuery('.googlemap').css({ height: mapHeight });
     });
+
+    $searchInput = $('#search-input');
+
+    $searchInput.on('keyup', _.debounce(function () {
+        var search = $(this).val();
+        var params = {
+            'offset': 0,
+            'limit': 1,
+            'search': search,
+            'only_with_location': 1,
+            'only_location_from_exif': 1
+        };
+
+        var url = Routing.generate('list_images') + '?' + $.param(params);
+
+        $.getJSON(url, function (data) {
+            var image = data[0];
+
+            if (typeof image !== 'undefined') {
+                map.setCenter({
+                    lat: image.latitude,
+                    lng: image.longitude
+                });
+
+                map.setZoom(4);
+            }
+        });
+    }, 300));
 }
 
 function createMap(lat, lon, canvasId, zoomLevel) {
