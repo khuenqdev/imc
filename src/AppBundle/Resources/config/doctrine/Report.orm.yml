@@ -20,6 +20,11 @@ AppBundle\Entity\Report:
             precision: 10
             scale: '2'
             column: execution_time
+        memoryUsage:
+            type: decimal
+            precision: 10
+            scale: '2'
+            column: memory_usage
         noOfLinks:
             type: integer
             column: no_of_links

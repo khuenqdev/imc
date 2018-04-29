@@ -106,7 +106,7 @@
     <div class="row">
         <div class="col s12 m6">
             <div class="statistics">
-                <h5>Execution times of previous crawling tasks</h5>
+                <h5>Execution times of previous crawling tasks (hours)</h5>
                 <div id="execution_times_chart"></div>
             </div>
         </div>
@@ -123,59 +123,59 @@
 {% block scripts %}
     <script type="text/javascript">
         // Load the Visualization API and the corechart package.
-        google.charts.load('current', { 'packages': ['corechart'] })
+        google.charts.load('current', { 'packages': ['corechart'] });
 
         // Set a callback to run when the Google Visualization API is loaded.
-        google.charts.setOnLoadCallback(drawChart)
+        google.charts.setOnLoadCallback(drawChart);
 
         // Callback that creates and populates a data table,
         // instantiates the pie chart, passes in the data and
         // draws it.
         function drawChart() {
-            drawExecutionTimeChart()
-            drawResultHandlingChart()
+            drawExecutionTimeChart();
+            drawResultHandlingChart();
         }
 
         function drawExecutionTimeChart() {
             var data = google.visualization.arrayToDataTable([
                 ['Date', 'Average', 'Execution Times'],
                 {% for time in execution_times %}
-                ['{{ time.startAt }}', {{ average_execution_time }}, {{ time.executionTime }}],
+                ['{{ time.startAt }}', {{ average_execution_time / 3600 }}, {{ time.executionTime / 3600 }}],
                 {% endfor %}
-            ])
+            ]);
 
             var options = {
                 curveType: 'function',
                 legend: { position: 'bottom' },
                 width: 600,
-                height: 350,
-            }
+                height: 350
+            };
 
-            var chart = new google.visualization.LineChart(document.getElementById('execution_times_chart'))
+            var chart = new google.visualization.LineChart(document.getElementById('execution_times_chart'));
 
             chart.draw(data, options)
         }
 
         function drawResultHandlingChart() {
             // Create the data table.
-            var data = new google.visualization.DataTable()
-            data.addColumn('string', 'Title')
-            data.addColumn('number', 'Statistic')
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Title');
+            data.addColumn('number', 'Statistic');
             data.addRows([
                 ['Geocoded', {{ images_with_exif_location }}],
                 ['Successful geoparsed', {{ successful_geoparsed_images }}],
                 ['Unsuccessful geoparsed', {{ unsuccessful_geoparsed_images }}],
-                ['Unhandled', {{ images_without_exif_location - (successful_geoparsed_images + unsuccessful_geoparsed_images) }}],
-            ])
+                ['Unhandled', {{ images_without_exif_location - (successful_geoparsed_images + unsuccessful_geoparsed_images) }}]
+            ]);
 
             // Set chart options
             var options = {
                 width: 600,
-                height: 350,
-            }
+                height: 350
+            };
 
             // Instantiate and draw our chart, passing in some options.
-            var chart = new google.visualization.PieChart(document.getElementById('result_handling_chart'))
+            var chart = new google.visualization.PieChart(document.getElementById('result_handling_chart'));
             chart.draw(data, options)
         }
     </script>

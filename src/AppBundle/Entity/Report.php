@@ -28,6 +28,11 @@ class Report
     public $executionTime;
 
     /**
+     * @var double
+     */
+    public $memoryUsage;
+
+    /**
      * @var int
      */
     public $noOfLinks;

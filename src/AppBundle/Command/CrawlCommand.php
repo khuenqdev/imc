@@ -189,6 +189,7 @@ class CrawlCommand extends ContainerAwareCommand
         $seconds = $executionEndTime - $executionStartTime;
         $this->downloader->getReport()->executionTime = $seconds;
         $this->downloader->getReport()->endAt = new \DateTime();
+        $this->downloader->getReport()->memoryUsage = $this->memoryUsage(true);
 
         // Print out crawling task report and save report to database
         $this->printReport($input, $output, $this->downloader->getReport());
@@ -210,6 +211,7 @@ class CrawlCommand extends ContainerAwareCommand
             ["Start At", "{$report->startAt->format('Y-m-d H:i:s')}"],
             ["End At", "{$report->endAt->format('Y-m-d H:i:s')}"],
             ["Total execution time", "{$report->executionTime} seconds"],
+            ["Memory usage", "{$report->memoryUsage} Mb"],
             ["Discovered links", "{$report->noOfLinks}"],
             ["Visited links", "{$report->noOfVisitedLinks}"],
             ["Discovered images", "{$report->noOfImages}"],
