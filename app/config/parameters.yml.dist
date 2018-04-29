@@ -53,4 +53,4 @@ parameters:
     maximum_geoparser_retry: 3
     allowed_aspect_ratios: [1, 1.25, 0.8, 1.33, 0.75, 1.5, 0.67, 1.67, 0.6, 1.78, 0.56, 3, 0.33]
     non_rep_image_keywords: ["logo", "banner", "header", "footer", "button", "free", "adserver", "advertisement", "ads", "now", "buy", "join", "click", "affiliate", "adv", "hits", "counter", "sprite"]
-    banned_hosts: ["www.facebook.com", "www.instagram.com", "www.pinterest.com", "twitter.com", "www.reddit.com", "ask.fm", "www.tumblr.com", "plus.google.com", "www.meetup.com", "qzone.qq.com", "weibo.com", "ok.ru", "vk.com"]
+    banned_hosts: ["facebook.com", "instagram.com", "pinterest.com", "twitter.com", "reddit.com", "ask.fm", "tumblr.com", "plus.google.com", "meetup.com", "qzone.qq.com", "weibo.com", "ok.ru", "vk.com"]
