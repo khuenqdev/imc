@@ -387,8 +387,10 @@ class Downloader
     protected function isHostBanned($host) {
         $bannedHosts = $this->container->getParameter('banned_hosts');
 
-        if (in_array($host, $bannedHosts)) {
-            return true;
+        foreach($bannedHosts as $banned) {
+            if (strpos($host, $banned) !== false) {
+                return true;
+            }
         }
 
         return false;
