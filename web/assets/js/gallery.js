@@ -107,7 +107,7 @@
             '<a class="btn-floating halfway-fab waves-effect waves-light light-blue btn-edit" href="' + editRoute + '">' +
             '<i class="material-icons">edit</i>' +
             '</a>' +
-            '<a class="btn-floating halfway-fab waves-effect waves-light red btn-delete" href="' + deleteRoute + '">' +
+            '<a class="btn-floating halfway-fab waves-effect waves-light red btn-delete" onclick="return confirm(\'Do you want to delete the image?\')" href="' + deleteRoute + '">' +
             '<i class="material-icons">delete</i>' +
             '</a>' +
             '</div>' +

@@ -69,6 +69,17 @@ class DefaultController extends Controller
     }
 
     /**
+     * Crawling task execution report statistics
+     */
+    public function reportStatsAction()
+    {
+        return $this->render(
+            '@Gui/gui/reports.html.twig',
+            ['reports' => $this->get('gui.statistics')->getReports()]
+        );
+    }
+
+    /**
      * For testing various UI functionality
      */
     public function testAction()

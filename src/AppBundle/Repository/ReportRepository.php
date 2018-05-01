@@ -40,13 +40,19 @@ class ReportRepository extends \Doctrine\ORM\EntityRepository
      * @param null $limit
      * @return array
      */
-    public function getExecutionTimes($limit = null)
+    public function getReport($limit = null)
     {
         $qb = $this->createQueryBuilder('r');
 
         $qb->select('r.id')
             ->addSelect('r.startAt')
-            ->addSelect('r.executionTime');
+            ->addSelect('r.endAt')
+            ->addSelect('r.executionTime')
+            ->addSelect('r.memoryUsage')
+            ->addSelect('r.noOfLinks')
+            ->addSelect('r.noOfVisitedLinks')
+            ->addSelect('r.noOfImages')
+            ->addSelect('r.noOfExifImages');
         $qb->orderBy('r.startAt', 'DESC');
 
         if (!is_null($limit)) {

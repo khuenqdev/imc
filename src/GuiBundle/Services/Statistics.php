@@ -126,7 +126,7 @@ class Statistics
         }
 
         if (isset($filters['execution_times']) && $filters['execution_times']) {
-            $statistics = array_merge($statistics, $this->getExecutionTimeReportStatistics());
+            $statistics = array_merge($statistics, $this->getExecutionTimeReportStatistics(100));
         }
 
         return $statistics;
@@ -224,15 +224,15 @@ class Statistics
     }
 
     /**
-     * Get execution time report of the last 100 (maximum) crawling tasks
+     * Get execution time report of the last 100 crawling tasks
      * plus the average execution times of all crawling task
      *
+     * @param int $limit
      * @return array
-     * @throws \Doctrine\ORM\ORMException
      */
-    public function getExecutionTimeReportStatistics()
+    public function getExecutionTimeReportStatistics($limit = 100)
     {
-        $executionTimes = $this->reportRepo->getExecutionTimes(100);
+        $executionTimes = $this->reportRepo->getReport($limit);
 
         uasort($executionTimes, function ($a, $b) {
             if ($a['id'] == $b['id']) {
@@ -259,5 +259,15 @@ class Statistics
             'average_execution_time' => $averageExecutionTime,
             'execution_times' => $executionTimes
         ];
+    }
+
+    /**
+     * Get crawling task execution full reports
+     *
+     * @return array
+     */
+    public function getReports()
+    {
+        return $this->reportRepo->getReport();
     }
 }
