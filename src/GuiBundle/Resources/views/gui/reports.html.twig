@@ -12,7 +12,7 @@
                     <th>#</th>
                     <th>Start At</th>
                     <th>End At</th>
-                    <th>Execution Time (seconds)</th>
+                    <th>Execution Time (hours)</th>
                     <th>Memory Usage (Mb)</th>
                     <th>Links</th>
                     <th>Visited</th>
@@ -26,7 +26,7 @@
                         <td>{{ loop.index }}</td>
                         <td>{{ data.startAt|date('d/m/Y H:i:s') }}</td>
                         <td>{{ data.endAt|date('d/m/Y H:i:s') }}</td>
-                        <td>{{ data.executionTime }}</td>
+                        <td>{{ data.executionTime / 3600 }}</td>
                         <td>{{ data.memoryUsage }}</td>
                         <td>{{ data.noOfLinks }}</td>
                         <td>{{ data.noOfVisitedLinks }}</td>
