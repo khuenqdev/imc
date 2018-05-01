@@ -26,8 +26,8 @@
                         <td>{{ loop.index }}</td>
                         <td>{{ data.startAt|date('d/m/Y H:i:s') }}</td>
                         <td>{{ data.endAt|date('d/m/Y H:i:s') }}</td>
-                        <td>{{ data.executionTime / 3600 }}</td>
-                        <td>{{ data.memoryUsage }}</td>
+                        <td>{{ (data.executionTime / 3600)|number_format(2, '.', ',') }}</td>
+                        <td>{{ data.memoryUsage == 0 ? 'N/A' : data.memoryUsage|number_format(2, '.', ',') }}</td>
                         <td>{{ data.noOfLinks }}</td>
                         <td>{{ data.noOfVisitedLinks }}</td>
                         <td>{{ data.noOfImages }}</td>
