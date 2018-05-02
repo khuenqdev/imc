@@ -28,7 +28,7 @@ class Report
     public $executionTime;
 
     /**
-     * @var double
+     * @var string
      */
     public $memoryUsage;
 

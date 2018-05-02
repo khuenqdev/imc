@@ -177,6 +177,8 @@ class CrawlCommand extends ContainerAwareCommand
             //$output->writeln('Number of links in queue: ' . $this->queue->getSize());
         }
 
+        $output->writeln("<fg=magenta;options=bold>[Memory Usage] " . $memoryUsage . "</>");
+
         // If there aren't any unvisited link left for the current seed, mark it as done and update to the database
         if (!$this->em->getRepository(Link::class)->getLastUnvisitedLink()) {
             $this->seed->isDone = true;
@@ -215,7 +217,7 @@ class CrawlCommand extends ContainerAwareCommand
             ["Start At", "{$report->startAt->format('Y-m-d H:i:s')}"],
             ["End At", "{$report->endAt->format('Y-m-d H:i:s')}"],
             ["Total execution time", "{$report->executionTime} seconds"],
-            ["Memory usage", "{$report->memoryUsage} Mb"],
+            ["Memory usage", "{$report->memoryUsage}"],
             ["Discovered links", "{$report->noOfLinks}"],
             ["Visited links", "{$report->noOfVisitedLinks}"],
             ["Discovered images", "{$report->noOfImages}"],
@@ -235,7 +237,7 @@ class CrawlCommand extends ContainerAwareCommand
     private function memoryUsage($realUsage = false)
     {
         $size = memory_get_usage($realUsage);
-        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        $unit = array('B', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb');
 
         return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
     }
