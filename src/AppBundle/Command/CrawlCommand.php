@@ -112,12 +112,14 @@ class CrawlCommand extends ContainerAwareCommand
 
         // Number of crawl links
         $noOfLinks = 0;
+        $memoryUsage = 0;
 
         // Main crawler loop
         while (!$this->queue->isEmpty()) {
 
             // If no terminate url is defined and the number of crawled links is larger than configured limit, terminate the crawling task
             if (!$terminateUrl && $noOfLinks >= $limit) {
+                $memoryUsage = $this->memoryUsage(true);
                 break;
             }
 
@@ -162,11 +164,13 @@ class CrawlCommand extends ContainerAwareCommand
             }
 
             if ($noOfLinks % 100 === 0) {
-                $output->writeln("<fg=magenta;options=bold>[Memory Usage] " . $this->memoryUsage(true) . "</>");
+                $memoryUsage = $this->memoryUsage(true);
+                $output->writeln("<fg=magenta;options=bold>[Memory Usage] " . $memoryUsage . "</>");
             }
 
             // If the terminate url is defined, terminate the crawling task when it reaches the link
             if ($terminateUrl && $terminateUrl === $link->url) {
+                $memoryUsage = $this->memoryUsage(true);
                 break;
             }
 
@@ -189,7 +193,7 @@ class CrawlCommand extends ContainerAwareCommand
         $seconds = $executionEndTime - $executionStartTime;
         $this->downloader->getReport()->executionTime = $seconds;
         $this->downloader->getReport()->endAt = new \DateTime();
-        $this->downloader->getReport()->memoryUsage = $this->memoryUsage(true);
+        $this->downloader->getReport()->memoryUsage = $memoryUsage;
 
         // Print out crawling task report and save report to database
         $this->printReport($input, $output, $this->downloader->getReport());
