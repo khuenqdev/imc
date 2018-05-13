@@ -271,11 +271,12 @@ class CrawlCommand extends ContainerAwareCommand
 
         // Terminate current script if there's a running script
         if ($taskRepo->findOneBy(['finished' => false])) {
-            exit('Another crawling task is running!');
+            exit("Another crawling task is running!\n");
         }
 
         // Create a new record of the crawling task
         $this->task = new Task();
+        $this->em->persist($this->task);
         $this->em->flush($this->task);
         $this->em->refresh($this->task);
     }
@@ -381,6 +382,7 @@ class CrawlCommand extends ContainerAwareCommand
         $this->task->endAt = $this->downloader->getReport()->startAt;
         $this->task->endAt = $this->downloader->getReport()->endAt;
         $this->task->finished = true;
+        $this->em->persist($this->task);
         $this->em->flush($this->task);
         $this->em->refresh($this->task);
     }
