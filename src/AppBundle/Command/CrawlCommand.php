@@ -11,6 +11,7 @@ namespace AppBundle\Command;
 use AppBundle\Entity\Link;
 use AppBundle\Entity\Report;
 use AppBundle\Entity\Seed;
+use AppBundle\Entity\Task;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Downloader;
 use QueueBundle\Queue;
@@ -42,6 +43,13 @@ class CrawlCommand extends ContainerAwareCommand
      * @var Seed
      */
     private $seed;
+
+    /**
+     * Entity that keeps record of the current crawling task
+     *
+     * @var Task
+     */
+    private $task;
 
     /**
      * Configure the command
@@ -102,11 +110,6 @@ class CrawlCommand extends ContainerAwareCommand
         }
 
         $algorithm = $input->getOption('algorithm');
-
-        if (!$algorithm) {
-            $this->getContainer()->getParameter('algorithm');
-        }
-
         $this->initializeCrawler($algorithm);
         $this->initializeQueue($input->getOption('seed'));
 
@@ -199,6 +202,9 @@ class CrawlCommand extends ContainerAwareCommand
 
         // Print out crawling task report and save report to database
         $this->printReport($input, $output, $this->downloader->getReport());
+
+        // Save record of the crawling task
+        $this->saveTaskRecord();
     }
 
     /**
@@ -254,9 +260,24 @@ class CrawlCommand extends ContainerAwareCommand
         $this->downloader = $this->getContainer()->get('downloader');
         $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-        if ($algorithm) {
-            $this->downloader->setAlgorithm($algorithm);
+        if (!$algorithm) {
+            $algorithm = $this->getContainer()->getParameter('algorithm');
         }
+
+        $this->downloader->setAlgorithm($algorithm);
+
+        // Check if there's a pending crawling task
+        $taskRepo = $this->em->getRepository(Task::class);
+
+        // Terminate current script if there's a running script
+        if ($taskRepo->findOneBy(['finished' => false])) {
+            exit('Another crawling task is running!');
+        }
+
+        // Create a new record of the crawling task
+        $this->task = new Task();
+        $this->em->flush($this->task);
+        $this->em->refresh($this->task);
     }
 
     /**
@@ -307,7 +328,6 @@ class CrawlCommand extends ContainerAwareCommand
         if ($startLink) {
             $this->queue->addLink($startLink);
         }
-
     }
 
     /**
@@ -349,5 +369,19 @@ class CrawlCommand extends ContainerAwareCommand
         $this->em->persist($report);
         $this->em->flush($report);
         $this->em->refresh($report);
+    }
+
+    /**
+     * Save task record
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function saveTaskRecord()
+    {
+        $this->task->endAt = $this->downloader->getReport()->startAt;
+        $this->task->endAt = $this->downloader->getReport()->endAt;
+        $this->task->finished = true;
+        $this->em->flush($this->task);
+        $this->em->refresh($this->task);
     }
 }

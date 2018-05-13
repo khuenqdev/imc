@@ -1,0 +1,23 @@
+AppBundle\Entity\Task:
+    type: entity
+    table: null
+    repositoryClass: AppBundle\Repository\TaskRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        startAt:
+            type: datetime
+            column: start_at
+            nullable: true
+        endAt:
+            type: datetime
+            column: end_at
+            nullable: true
+        finished:
+            type: boolean
+            nullable: true
+    lifecycleCallbacks: {  }

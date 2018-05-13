@@ -126,7 +126,7 @@ class Statistics
         }
 
         if (isset($filters['execution_times']) && $filters['execution_times']) {
-            $statistics = array_merge($statistics, $this->getExecutionTimeReportStatistics(100));
+            $statistics = array_merge($statistics, $this->getExecutionTimeReportStatistics(10));
         }
 
         return $statistics;
@@ -224,8 +224,8 @@ class Statistics
     }
 
     /**
-     * Get execution time report of the last 100 crawling tasks
-     * plus the average execution times of all crawling task
+     * Get execution time report of the last n crawling tasks
+     * plus the average execution times of those latest crawling tasks
      *
      * @param int $limit
      * @return array
