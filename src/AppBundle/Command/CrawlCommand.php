@@ -286,6 +286,7 @@ class CrawlCommand extends ContainerAwareCommand
      *
      * @param null $seedUrl
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      */
     private function initializeQueue($seedUrl = null)
     {
@@ -379,7 +380,7 @@ class CrawlCommand extends ContainerAwareCommand
      */
     private function saveTaskRecord()
     {
-        $this->task->endAt = $this->downloader->getReport()->startAt;
+        $this->task->startAt = $this->downloader->getReport()->startAt;
         $this->task->endAt = $this->downloader->getReport()->endAt;
         $this->task->finished = true;
         $this->em->persist($this->task);
