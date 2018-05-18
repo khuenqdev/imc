@@ -1,0 +1,23 @@
+gui_statistics:
+    path: /statistics
+    defaults: { _controller: GuiBundle:Statistics:stats }
+    options:
+        expose: true
+
+gui_address_statistics:
+    path: /statistics_addresses
+    defaults: { _controller: GuiBundle:Statistics:addressStats }
+    options:
+        expose: true
+
+gui_geoparsing_statistics:
+    path: /statistics_geoparsing
+    defaults: { _controller: GuiBundle:Statistics:geoparsingStats }
+    options:
+        expose: true
+
+gui_report_statistics:
+    path: /statistics_report
+    defaults: { _controller: GuiBundle:Statistics:reportStats }
+    options:
+        expose: true

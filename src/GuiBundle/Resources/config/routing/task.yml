@@ -1,0 +1,11 @@
+gui_tasks:
+    path: /
+    defaults: { _controller: GuiBundle:Task:getTasks }
+    options:
+        expose: true
+
+gui_mark_task_finished:
+    path: /{id}/mark_finished
+    defaults: { _controller: GuiBundle:Task:markTaskFinished }
+    options:
+        expose: true

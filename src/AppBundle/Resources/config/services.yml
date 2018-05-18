@@ -11,6 +11,11 @@ services:
         tags:
             - { name: monolog.logger, channel: managers }
 
+    task_manager:
+        class: AppBundle\Services\TaskManager
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
     image_serialization_subscriber:
         class: AppBundle\EventSubscribers\ImageSerializationSubscriber
         arguments: ['@request_stack']

@@ -1,0 +1,57 @@
+{% extends '@Gui/base.html.twig' %}
+
+{% set active_menu = 'stats' %}
+
+{% block title %}Crawling Tasks Management{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col s12">
+            <h5>Crawling Tasks Management</h5>
+            <table class="table responsive-table highlight striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Start At</th>
+                    <th>End At</th>
+                    <th>Status</th>
+                    <th class="center-align">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for data in tasks %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ data.startAt ? data.startAt|date('d/m/Y H:i:s') : 'N/A' }}</td>
+                        <td>{{ data.endAt ? data.endAt|date('d/m/Y H:i:s') : 'N/A' }}</td>
+                        <td>
+                            {% if data.finished %}
+                                <i class="material-icons tooltipped" data-tooltip="Finished">check</i>
+                            {% else %}
+                                <i class="material-icons tooltipped" data-tooltip="Running">query_builder</i>
+                            {% endif %}
+                        </td>
+                        <td class="center-align">
+                            {% if not data.finished %}
+                                <a href="{{ path('gui_mark_task_finished', { id: data.id }) }}">
+                                    MARK AS FINISHED
+                                </a>
+                            {% else %}
+                                <a class="black-text lighten-4">NO ACTION</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            $('.tooltipped').tooltip({ delay: 50, position: 'top' })
+        })
+    </script>
+{% endblock %}

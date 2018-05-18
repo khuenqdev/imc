@@ -275,7 +275,7 @@ class CrawlCommand extends ContainerAwareCommand
         }
 
         // Create a new record of the crawling task
-        $this->task = new Task();
+        $this->task = new Task(new \DateTime('now'));
         $this->em->persist($this->task);
         $this->em->flush($this->task);
         $this->em->refresh($this->task);

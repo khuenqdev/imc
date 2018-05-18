@@ -4,33 +4,16 @@ gui_homepage:
     options:
         expose: true
 
-gui_statistics:
-    path: /statistics
-    defaults: { _controller: GuiBundle:Default:stats }
-    options:
-        expose: true
-
-gui_address_statistics:
-    path: /statistics_addresses
-    defaults: { _controller: GuiBundle:Default:addressStats }
-    options:
-        expose: true
-
-gui_geoparsing_statistics:
-    path: /statistics_geoparsing
-    defaults: { _controller: GuiBundle:Default:geoparsingStats }
-    options:
-        expose: true
-
-gui_report_statistics:
-    path: /statistics_report
-    defaults: { _controller: GuiBundle:Default:reportStats }
-    options:
-        expose: true
+gui_task:
+    prefix: /tasks
+    resource: "@GuiBundle/Resources/config/routing/task.yml"
 
 gui_gallery:
     prefix: /gallery
     resource: "@GuiBundle/Resources/config/routing/gallery.yml"
+
+gui_statistics:
+    resource: "@GuiBundle/Resources/config/routing/statistics.yml"
 
 gui_verification:
     prefix: /verification
