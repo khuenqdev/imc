@@ -70,10 +70,11 @@ class ImageController extends Controller
      *         200="Returned when successful",
      *         404="Returned when the image is not found",
      *         500="Returned when there is a server error"
+     *     },
+     *     parameters={
+     *         {"name"="id", "dataType"="integer", "required"=true, "description"="ID of individual image"}
      *     }
      * )
-     *
-     * @Rest\QueryParam(name="id", key="id", nullable=false, description="ID of individual image")
      *
      * @Rest\View(statusCode=200)
      * @param Image $image
@@ -95,10 +96,16 @@ class ImageController extends Controller
      *         204="Returned when successful",
      *         404="Returned when the image is not found",
      *         500="Returned when there is a server error"
+     *     },
+     *     parameters={
+     *         {"name"="id", "dataType"="integer", "required"=true, "description"="ID of individual image"},
+     *         {"name"="description", "dataType"="integer", "required"=false, "description"="ID of individual image"},
+     *         {"name"="latitude", "dataType"="decimal", "required"=false, "description"="Latitude of the image's location"},
+     *         {"name"="longitude", "dataType"="decimal", "required"=false, "description"="Longitude of the image's location"},
+     *         {"name"="address", "dataType"="string", "required"=false, "description"="Address text of the image's location"}
      *     }
      * )
      *
-     * @Rest\QueryParam(name="id", key="id", nullable=false, description="ID of individual image")
      * @Rest\RequestParam(name="description", key="description", nullable=true, description="Image description")
      * @Rest\RequestParam(name="latitude", key="latitude", nullable=true, description="Latitude of the image's location")
      * @Rest\RequestParam(name="longitude", key="longitude", nullable=true, description="Longitude of the image's location")
@@ -126,6 +133,9 @@ class ImageController extends Controller
      *         204="Returned when successful",
      *         404="Returned when the image is not found",
      *         500="Returned when there is a server error"
+     *     },
+     *     parameters={
+     *         {"name"="id", "dataType"="integer", "required"=true, "description"="ID of individual image"}
      *     }
      * )
      *
