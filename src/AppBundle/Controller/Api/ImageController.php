@@ -156,6 +156,7 @@ class ImageController extends Controller
      * @Rest\QueryParam(name="regional", key="regional", nullable=true, default=0, description="Include regional statistics (number of images per world regions)")
      * @Rest\QueryParam(name="address", key="address", nullable=true, default=0, description="Include address statistics (number of images per discovered address)")
      * @Rest\QueryParam(name="domain", key="domain", nullable=true, default=0, description="Include domain statistics (number of images per URL domain)")
+     * @Rest\QueryParam(name="execution_times", key="execution_times", nullable=true, default=0, description="Include task execution time statistics")
      *
      * @ApiDoc(
      *     resource=true,

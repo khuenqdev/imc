@@ -19,8 +19,8 @@
     </php>
 
     <testsuites>
-        <testsuite name="AppBundle">
-            <directory>src/AppBundle/Tests</directory>
+        <testsuite name="Crawler">
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 

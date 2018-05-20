@@ -41,13 +41,14 @@ class DownloaderTest extends KernelTestCase
 
     /**
      * Test download a web page
+     * @throws \Exception
      */
     public function testDownload()
     {
-        $link = $this->em->getRepository(Link::class)->findOneBy([
-            'url' => 'test.com'
-        ]);
+        $this->service->download('http://info.cern.ch/');
+        $report = $this->service->getReport();
 
-        var_dump($link);
+        $this->assertEquals(4, $report->noOfLinks);
+        $this->assertEquals(0, $report->noOfImages);
     }
 }

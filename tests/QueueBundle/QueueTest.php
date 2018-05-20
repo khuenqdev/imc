@@ -25,6 +25,9 @@ class QueueTest extends KernelTestCase
         $this->service = self::$kernel->getContainer()->get('queue');
     }
 
+    /**
+     * Test add link
+     */
     public function testAddLink()
     {
         $link1 = new Link('http://example.com', '', 0.8);
@@ -41,8 +44,13 @@ class QueueTest extends KernelTestCase
         $this->service->addLink($link5);
         $this->service->addLink($link6);
         $this->service->addLink($link7);
+
+        $this->assertEquals(7, $this->service->getSize());
     }
 
+    /**
+     * Test get next link
+     */
     public function testGetNextLink()
     {
         $link1 = new Link('http://example.com', '', 0.8);
@@ -59,10 +67,8 @@ class QueueTest extends KernelTestCase
         $this->service->addLink($link5);
         $this->service->addLink($link6);
         $this->service->addLink($link7);
-    }
 
-    public function testIsEmpty()
-    {
-
+        $link = $this->service->getNextLink();
+        $this->assertEquals('http://example5.com', $link->url);
     }
 }
