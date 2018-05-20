@@ -1,0 +1,5 @@
+flickr_get_recent:
+    path: /get_recent
+    defaults: { _controller: GuiBundle:Flickr:getRecent }
+    options:
+        expose: true

@@ -21,3 +21,7 @@ services:
         arguments: ['@request_stack']
         tags:
             - { name: jms_serializer.event_subscriber }
+
+    flickr:
+        class: AppBundle\Services\Flickr
+        arguments: ['@service_container']

@@ -1,0 +1,13 @@
+{% extends '@Gui/base.html.twig' %}
+
+{% set active_menu = 'home' %}
+
+{% block content %}
+    <div class="row">
+        {% for photo in recents %}
+            <div class="col s2">
+                <img src="{{ photo }}" class="responsive-img"/>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

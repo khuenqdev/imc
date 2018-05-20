@@ -30,3 +30,7 @@ gui_clear_cache:
     defaults: { _controller: GuiBundle:Default:clearCache }
     options:
         expose: true
+
+gui_flickr:
+    prefix: /flickr
+    resource: "@GuiBundle/Resources/config/routing/flickr.yml"
