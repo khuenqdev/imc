@@ -1,8 +1,4 @@
 services:
-    gui.map:
-        class: GuiBundle\Services\Map
-        arguments: ["%google_map_api_key%"]
-
     gui.statistics:
         class: GuiBundle\Services\Statistics
         arguments: ["@doctrine.orm.entity_manager"]
