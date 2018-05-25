@@ -163,6 +163,9 @@ class CrawlCommand extends ContainerAwareCommand
 
             // If the queue is empty but we have not reach the current crawling task's limit, reinitialize it
             if ($this->queue->isEmpty() && $noOfLinks < $limit) {
+                // Mark the last link as visited
+                $link->visited = true;
+                $this->updateLink($link);
                 $this->initializeQueue();
             }
 
