@@ -13,6 +13,7 @@ use AppBundle\Entity\Report;
 use Doctrine\ORM\EntityManager;
 use DownloaderBundle\Services\Helpers;
 use GuzzleHttp\Client as HttpClient;
+use JonnyW\PhantomJs\Client as PhantomClient;
 use Monolog\Logger;
 use QueueBundle\Queue;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -120,17 +121,18 @@ class Downloader
         $this->outputMessages = "";
 
         try {
-            $client = new HttpClient([
-                'base_uri' => $url,
-                'timeout' => 60,
-                'allow_redirects' => true,
-                'verify' => false
-            ]);
+            $client = PhantomClient::getInstance();
+            $client->getEngine()->addOption('--ignore-ssl-errors=true');
+            $client->getEngine()->addOption('--load-images=true');
+            $request = $client->getMessageFactory()
+                ->createRequest($url, 'GET');
+            $request->setDelay(15);
 
-            $response = $client->get($url);
+            $response = $client->getMessageFactory()->createResponse();
+            $client->send($request, $response);
 
-            if ($response->getStatusCode() == Response::HTTP_OK) {
-                $dom = new DomCrawler($response->getBody()->getContents(), $url);
+            if ($response->getStatus() == Response::HTTP_OK) {
+                $dom = new DomCrawler($response->getContent(), $url);
                 $this->fetchContent($dom);
             }
         } catch (\Exception $e) {
@@ -250,7 +252,8 @@ class Downloader
 
         /** @var DomCrawlerLink $domLink */
         foreach ($linkElements as $domLink) {
-            $linkUrl = $this->helpers->url->parse($domLink->getUri(), $dom->getUri());
+            //$linkUrl = $this->helpers->url->parse($domLink->getUri(), $dom->getUri());
+            $linkUrl = $domLink->getUri();
 
             if (!empty($linkUrl)) {
                 $linkTitle = trim($domLink->getNode()->textContent);

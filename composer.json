@@ -35,7 +35,9 @@
         "friendsofsymfony/rest-bundle": "^2.3",
         "guzzlehttp/guzzle": "^6.3",
         "incenteev/composer-parameter-handler": "~2.0",
+        "jakoch/phantomjs-installer": "2.1.1-p09",
         "jms/serializer-bundle": "^2.3",
+        "jonnyw/php-phantomjs": "4.*",
         "knplabs/knp-paginator-bundle": "^2.7",
         "laravel/homestead": "6.6.0",
         "miljar/php-exif": "^0.6.3",
@@ -67,9 +69,11 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
         ],
         "post-install-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS",
             "@symfony-scripts"
         ],
         "post-update-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS",
             "@symfony-scripts"
         ]
     },
