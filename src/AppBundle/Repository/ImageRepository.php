@@ -32,6 +32,10 @@ class ImageRepository extends EntityRepository
             $qb->andWhere('i.isExifLocation = true');
         }
 
+        if (isset($filters['only_non_geotagged']) && $filters['only_non_geotagged']) {
+            $qb->andWhere('i.isExifLocation = false');
+        }
+
         if (isset($filters['search'])) {
             $qb->andWhere($qb->expr()->orX(
                 $qb->expr()->like('i.description', $qb->expr()->literal("%{$filters['search']}%")),
