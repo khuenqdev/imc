@@ -14,6 +14,7 @@ parameters:
     mailer_host: 127.0.0.1
     mailer_user: ~
     mailer_password: ~
+	
 
     # A secret key that's used to generate certain security-related tokens
     secret: ThisTokenIsNotSoSecretChangeIt
@@ -54,3 +55,6 @@ parameters:
     allowed_aspect_ratios: [1, 1.25, 0.8, 1.33, 0.75, 1.5, 0.67, 1.67, 0.6, 1.78, 0.56, 3, 0.33]
     non_rep_image_keywords: ["logo", "banner", "header", "footer", "button", "free", "adserver", "advertisement", "ads", "now", "buy", "join", "click", "affiliate", "adv", "hits", "counter", "sprite"]
     banned_hosts: ["facebook.com", "instagram.com", "pinterest.com", "twitter.com", "reddit.com", "ask.fm", "tumblr.com", "plus.google.com", "meetup.com", "qzone.qq.com", "weibo.com", "ok.ru", "vk.com"]
+	flickr_api_url: ~ 
+	flickr_key: ~ 
+	flickr_secret: ~ 
